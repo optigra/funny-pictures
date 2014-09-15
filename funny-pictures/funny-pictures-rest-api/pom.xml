@@ -15,16 +15,23 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<build>
-		<finalName>funny-pictures-rest-api</finalName>
-	</build>
 	
 	<dependencies>
 		<dependency>
 			<groupId>funny-pictures</groupId>
 			<artifactId>funny-pictures-facade</artifactId>
 			<version>${version}</version>
-		</dependency>	
+		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>	
 	</dependencies>
+
+	<build>
+		<finalName>funny-pictures-rest-api</finalName>
+	</build>
 
 </project>
