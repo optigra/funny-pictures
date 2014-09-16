@@ -9,9 +9,11 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-	<mvc:annotation-driven />
-	
-	<context:component-scan base-package="com.optigra.funnypictures.web"/>
-	<context:property-placeholder location="classpath:application.properties"/>
-	
+	<import resource="message-converters.xml"/>
+
+	<mvc:annotation-driven/>
+
+	<context:component-scan base-package="com.optigra.funnypictures.web" />
+	<context:property-placeholder location="classpath:application.properties" />
+
 </beans>
