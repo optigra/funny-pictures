@@ -23,11 +23,20 @@
 	<properties>
 		<java-version>1.7</java-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<version>0.0.1-SNAPSHOT</version>
 		<spring.version>4.1.0.RELEASE</spring.version>
+		<hibernate.version>4.2.0.Final</hibernate.version>
 		<slf4j.version>1.7.7</slf4j.version>
 		<log4j.version>1.2.17</log4j.version>
 		<fasterxml.version>2.4.2</fasterxml.version>
+		
+		<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
+		<jdbc.databaseurl>jdbc:postgresql://localhost:5432/optigra-ads</jdbc.databaseurl>
+		<jdbc.username>postgres</jdbc.username>
+		<jdbc.password>postgres</jdbc.password>
+		<jpa.database>POSTGRESQL</jpa.database>
+		<jpa.showSql>true</jpa.showSql>
 	</properties>
 
 	<dependencies>
@@ -67,6 +76,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 
 		<!-- LOGGING -->
 		<dependency>
@@ -85,7 +99,21 @@
 			<version>${log4j.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- jUnit + Mockito -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+		</dependency>
+
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
