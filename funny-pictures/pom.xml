@@ -17,6 +17,7 @@
 		<module>funny-pictures-persistence</module>
 		<module>funny-pictures-domain</module>
 		<module>funny-pictures-migrations</module>
+		<module>funny-pictures-generator</module>
 	</modules>
 
 	<properties>
