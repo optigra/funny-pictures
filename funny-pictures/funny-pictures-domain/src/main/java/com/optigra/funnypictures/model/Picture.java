@@ -1,4 +1,4 @@
-package org.optigra.funnypictures.dao.model;
+package com.optigra.funnypictures.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
