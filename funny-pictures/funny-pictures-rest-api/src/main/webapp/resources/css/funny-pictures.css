@@ -1,0 +1,11 @@
+#large-image {
+	width: 400px;
+	height: 400px;
+	margin: 10px;
+}
+
+#small-image {
+	width: 200px;
+	height: 200px;
+	margin: 10px;
+}
