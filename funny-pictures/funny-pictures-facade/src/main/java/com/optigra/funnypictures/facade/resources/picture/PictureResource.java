@@ -2,9 +2,9 @@ package com.optigra.funnypictures.facade.resources.picture;
 
 import java.text.MessageFormat;
 
-import com.optigra.funnypictures.facade.resources.Resource;
+import com.optigra.funnypictures.facade.resources.ApiResource;
 
-public class PictureResource extends Resource {
+public class PictureResource extends ApiResource {
 
 	private Long id;
 	private String name;

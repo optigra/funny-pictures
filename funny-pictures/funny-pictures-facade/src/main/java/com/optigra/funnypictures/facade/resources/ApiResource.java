@@ -1,6 +1,6 @@
 package com.optigra.funnypictures.facade.resources;
 
-public abstract class Resource {
+public abstract class ApiResource {
 
 	public abstract String getUri();
 	

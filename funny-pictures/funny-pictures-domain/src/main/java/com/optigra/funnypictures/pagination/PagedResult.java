@@ -1,27 +1,22 @@
-package com.optigra.funnypictures.facade.resources.search;
+package com.optigra.funnypictures.pagination;
 
 import java.util.List;
 
-import com.optigra.funnypictures.facade.resources.ApiResource;
 
-public class PagedResultResource<R> extends ApiResource {
+public class PagedResult<E> {
 
-    private Long offset;
+	private Long offset;
     private Integer limit;
     private long count;
-    private List<R> entities;
-    private String uri;
-
-    public PagedResultResource() { }
+    private List<E> entities;
     
-    public PagedResultResource(final String uri) {
-        this.uri = uri;
-    }
-    
-    @Override
-    public String getUri() {
-        return uri;
-    }
+	public PagedResult(Long offset, Integer limit, long count, List<E> entities) {
+		super();
+		this.offset = offset;
+		this.limit = limit;
+		this.count = count;
+		this.entities = entities;
+	}
 
 	public Long getOffset() {
 		return offset;
@@ -47,16 +42,12 @@ public class PagedResultResource<R> extends ApiResource {
 		this.count = count;
 	}
 
-	public List<R> getEntities() {
+	public List<E> getEntities() {
 		return entities;
 	}
 
-	public void setEntities(List<R> entities) {
+	public void setEntities(List<E> entities) {
 		this.entities = entities;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
 	}
 
 	@Override
@@ -68,7 +59,6 @@ public class PagedResultResource<R> extends ApiResource {
 				+ ((entities == null) ? 0 : entities.hashCode());
 		result = prime * result + ((limit == null) ? 0 : limit.hashCode());
 		result = prime * result + ((offset == null) ? 0 : offset.hashCode());
-		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
 		return result;
 	}
 
@@ -80,7 +70,7 @@ public class PagedResultResource<R> extends ApiResource {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PagedResultResource<?> other = (PagedResultResource<?>) obj;
+		PagedResult other = (PagedResult) obj;
 		if (count != other.count)
 			return false;
 		if (entities == null) {
@@ -98,19 +88,13 @@ public class PagedResultResource<R> extends ApiResource {
 				return false;
 		} else if (!offset.equals(other.offset))
 			return false;
-		if (uri == null) {
-			if (other.uri != null)
-				return false;
-		} else if (!uri.equals(other.uri))
-			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "PagedResultResource [offset=" + offset + ", limit=" + limit
-				+ ", count=" + count + ", entities=" + entities + ", uri="
-				+ uri + "]";
+		return "PagedResult [offset=" + offset + ", limit=" + limit
+				+ ", count=" + count + ", entities=" + entities + "]";
 	}
-
+    
 }

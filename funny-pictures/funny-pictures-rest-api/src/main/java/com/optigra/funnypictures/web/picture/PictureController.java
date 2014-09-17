@@ -1,38 +1,31 @@
 package com.optigra.funnypictures.web.picture;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.optigra.funnypictures.facade.facade.picture.PictureFacade;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
+import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.web.BaseController;
 
 @RestController("/pictures")
 public class PictureController extends BaseController {
-
+	private static final Logger logger = LoggerFactory.getLogger(PictureController.class);
+	
+	@Resource(name = "pictureFacade")
+	private PictureFacade pictureFacade;
+	
 	@RequestMapping
 	public PagedResultResource<PictureResource> getPictures(@RequestParam(value = "offset", defaultValue = "0") Long offset,
 			@RequestParam(value = "limit", defaultValue = "20") Integer limit) {
-    	PictureResource entity1 = new PictureResource();
-    	entity1.setId(1L);
-    	entity1.setName("Picture1");
-    	entity1.setUrl("url");
-
-    	long count = 100;
-    	String uri = "/pictures";
-		List<PictureResource> entities = Arrays.asList(entity1);
-    	PagedResultResource<PictureResource> expectedResource = new PagedResultResource<>();
-		expectedResource.setCount(count);
-		expectedResource.setLimit(limit);
-		expectedResource.setOffset(offset);
-		expectedResource.setUri(uri);
-		expectedResource.setEntities(entities);
-		
-		return expectedResource;
+		PagedRequest pagedRequest = new PagedRequest(offset, limit);
+		return pictureFacade.getPictures(pagedRequest);
 	}
 	
 }
