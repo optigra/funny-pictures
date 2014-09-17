@@ -9,13 +9,17 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>funny-pictures-generator</artifactId>
-	<version>0.0.1</version>
 	<name>funny-pictures-generator</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>funny-pictures</groupId>
+			<artifactId>funny-pictures-domain</artifactId>
+			<version>${version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.im4java</groupId>
 			<artifactId>im4java</artifactId>
