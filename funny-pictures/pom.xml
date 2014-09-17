@@ -32,7 +32,7 @@
 		<fasterxml.version>2.4.2</fasterxml.version>
 		
 		<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
-		<jdbc.databaseurl>jdbc:postgresql://localhost:5432/optigra-ads</jdbc.databaseurl>
+		<jdbc.databaseurl>jdbc:postgresql://localhost:5432/optigra-funnypictures</jdbc.databaseurl>
 		<jdbc.username>postgres</jdbc.username>
 		<jdbc.password>postgres</jdbc.password>
 		<jpa.database>POSTGRESQL</jpa.database>
