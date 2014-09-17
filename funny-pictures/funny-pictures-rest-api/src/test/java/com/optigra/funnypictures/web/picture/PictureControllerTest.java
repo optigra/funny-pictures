@@ -53,7 +53,7 @@ public class PictureControllerTest {
 
     	long count = 100;
     	int limit = 25;
-    	Long offset = 10L;
+    	Integer offset = 10;
     	String uri = "/pictures";
 		List<PictureResource> entities = Arrays.asList(entity1);
     	PagedResultResource<PictureResource> expectedResource = new PagedResultResource<>();

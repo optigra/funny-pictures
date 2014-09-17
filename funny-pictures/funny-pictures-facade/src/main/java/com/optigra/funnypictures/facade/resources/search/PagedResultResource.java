@@ -6,7 +6,7 @@ import com.optigra.funnypictures.facade.resources.ApiResource;
 
 public class PagedResultResource<R> extends ApiResource {
 
-    private Long offset;
+    private Integer offset;
     private Integer limit;
     private long count;
     private List<R> entities;
@@ -23,11 +23,11 @@ public class PagedResultResource<R> extends ApiResource {
         return uri;
     }
 
-	public Long getOffset() {
+	public Integer getOffset() {
 		return offset;
 	}
 
-	public void setOffset(Long offset) {
+	public void setOffset(Integer offset) {
 		this.offset = offset;
 	}
 

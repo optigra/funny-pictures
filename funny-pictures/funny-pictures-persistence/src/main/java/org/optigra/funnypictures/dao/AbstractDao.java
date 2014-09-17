@@ -1,33 +1,34 @@
 package org.optigra.funnypictures.dao;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.annotation.Resource;
+
+import org.optigra.funnypictures.dao.persistence.PersistenceManager;
 
 public abstract class AbstractDao<E, T> implements Dao<E, T> {
 
-	@PersistenceContext(unitName="persistenceUnit")
-	private EntityManager entityManager;
-
+	@Resource(name = "persistenceManager")
+	private PersistenceManager<E, T> persistenceManager;
+	
 	public abstract Class<E> getEntityClass();
 	
 	@Override
 	public E findById(T id) {
-		E entity = entityManager.find(getEntityClass(), id);
+		E entity = persistenceManager.findById(getEntityClass(), id);
 		return entity;
 	}
 
 	@Override
 	public void save(E entity) {
-		entityManager.persist(entity);
+		persistenceManager.create(entity);
 	}
 
 	@Override
 	public void update(E entity) {
-		entityManager.merge(entity);
+		persistenceManager.update(entity);
 	}
 
 	@Override
 	public void delete(E entity) {
-		entityManager.remove(entity);
+		persistenceManager.remove(entity);
 	}
 }

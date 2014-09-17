@@ -16,13 +16,12 @@ import com.optigra.funnypictures.web.BaseController;
 
 @RestController("/pictures")
 public class PictureController extends BaseController {
-	private static final Logger logger = LoggerFactory.getLogger(PictureController.class);
 	
 	@Resource(name = "pictureFacade")
 	private PictureFacade pictureFacade;
 	
 	@RequestMapping
-	public PagedResultResource<PictureResource> getPictures(@RequestParam(value = "offset", defaultValue = "0") Long offset,
+	public PagedResultResource<PictureResource> getPictures(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
 			@RequestParam(value = "limit", defaultValue = "20") Integer limit) {
 		PagedRequest pagedRequest = new PagedRequest(offset, limit);
 		return pictureFacade.getPictures(pagedRequest);

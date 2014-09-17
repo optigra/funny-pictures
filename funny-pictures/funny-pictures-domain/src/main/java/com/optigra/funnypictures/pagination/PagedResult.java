@@ -5,12 +5,12 @@ import java.util.List;
 
 public class PagedResult<E> {
 
-	private Long offset;
+	private Integer offset;
     private Integer limit;
     private long count;
     private List<E> entities;
     
-	public PagedResult(Long offset, Integer limit, long count, List<E> entities) {
+	public PagedResult(Integer offset, Integer limit, long count, List<E> entities) {
 		super();
 		this.offset = offset;
 		this.limit = limit;
@@ -18,11 +18,11 @@ public class PagedResult<E> {
 		this.entities = entities;
 	}
 
-	public Long getOffset() {
+	public Integer getOffset() {
 		return offset;
 	}
 
-	public void setOffset(Long offset) {
+	public void setOffset(Integer offset) {
 		this.offset = offset;
 	}
 
@@ -70,7 +70,7 @@ public class PagedResult<E> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PagedResult other = (PagedResult) obj;
+		PagedResult<?> other = (PagedResult<?>) obj;
 		if (count != other.count)
 			return false;
 		if (entities == null) {

@@ -47,7 +47,7 @@ public class DefaultPictureFacadeTest {
 	@Test
 	public void testGetPictures() throws Exception {
 		// Given
-		Long offset = 1L;
+		Integer offset = 1;
 		Integer limit = 20;
 		PagedRequest pagedRequest = new PagedRequest(offset, limit);
 		PagedSearch<Picture> pagedSearch = new PagedSearch<>();

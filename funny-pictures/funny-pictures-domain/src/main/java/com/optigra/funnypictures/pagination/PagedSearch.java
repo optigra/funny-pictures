@@ -13,7 +13,7 @@ import com.optigra.funnypictures.queries.Queries;
  */
 public class PagedSearch<T> {
     
-	private Long offset;
+	private Integer offset;
     private Integer limit;
     private Queries query;
     private Map<String, Object> parameters;
@@ -23,7 +23,7 @@ public class PagedSearch<T> {
 		super();
 	}
 
-	public PagedSearch(Long offset, Integer limit, Queries query,
+	public PagedSearch(Integer offset, Integer limit, Queries query,
 			Map<String, Object> parameters, Class<T> clazz) {
 		super();
 		this.offset = offset;
@@ -33,11 +33,11 @@ public class PagedSearch<T> {
 		this.clazz = clazz;
 	}
 
-	public Long getOffset() {
+	public Integer getOffset() {
 		return offset;
 	}
 
-	public void setOffset(Long offset) {
+	public void setOffset(Integer offset) {
 		this.offset = offset;
 	}
 

@@ -4,20 +4,20 @@ package com.optigra.funnypictures.facade.resources.search;
 
 public class PagedRequest {
 
-    private Long offset;
+    private Integer offset;
     private Integer limit;
 
-	public PagedRequest(Long offset, Integer limit) {
+	public PagedRequest(Integer offset, Integer limit) {
 		super();
 		this.offset = offset;
 		this.limit = limit;
 	}
 
-	public Long getOffset() {
+	public Integer getOffset() {
 		return offset;
 	}
 
-	public void setOffset(Long offset) {
+	public void setOffset(Integer offset) {
 		this.offset = offset;
 	}
 
