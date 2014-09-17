@@ -2,17 +2,19 @@ package org.funny.pictures.generator.api;
 
 import java.io.InputStream;
 
+import com.optigra.funnypictures.model.content.MimeType;
+
 public class AdviceMemeContext {
 	
 	private final InputStream templateInputStream;
 	
-	private final Object mimeType;
+	private final MimeType mimeType;
 	
 	private final String topCaption;
 	
 	private final String bottomCaption;
 
-	public AdviceMemeContext(InputStream templateInputStream, Object mimeType,
+	public AdviceMemeContext(InputStream templateInputStream, MimeType mimeType,
 			String topCaption, String bottomCaption) {
 		super();
 		this.templateInputStream = templateInputStream;
@@ -25,7 +27,7 @@ public class AdviceMemeContext {
 		return templateInputStream;
 	}
 
-	public Object getMimeType() {
+	public MimeType getMimeType() {
 		return mimeType;
 	}
 
@@ -40,7 +42,7 @@ public class AdviceMemeContext {
 	@Override
 	public String toString() {
 		return "AdviceMemeContext [templateInputStream=" + templateInputStream
-				+ ", mimeType=" + mimeType + ", topCaption=" + topCaption
+				+ ", mimeType=" + mimeType.getType() + ", topCaption=" + topCaption
 				+ ", bottomCaption=" + bottomCaption + "]";
 	}
 
