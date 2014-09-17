@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.optigra.funnypictures.content.ContentReadException;
 import com.optigra.funnypictures.content.model.Content;
-import com.optigra.funnypictures.content.model.MimeType;
+import com.optigra.funnypictures.model.content.MimeType;
 
 public class FileSystemContentService implements ContentService {
 

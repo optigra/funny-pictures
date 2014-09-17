@@ -1,4 +1,4 @@
-package com.optigra.funnypictures.content.model;
+package com.optigra.funnypictures.model.content;
 
 /**
  * MIME types

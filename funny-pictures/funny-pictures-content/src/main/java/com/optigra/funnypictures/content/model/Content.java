@@ -2,6 +2,8 @@ package com.optigra.funnypictures.content.model;
 
 import java.io.InputStream;
 
+import com.optigra.funnypictures.model.content.MimeType;
+
 public class Content {
 	
 	private String path;

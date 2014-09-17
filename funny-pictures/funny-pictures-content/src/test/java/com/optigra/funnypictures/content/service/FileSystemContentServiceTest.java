@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.optigra.funnypictures.content.model.Content;
-import com.optigra.funnypictures.content.model.MimeType;
+import com.optigra.funnypictures.model.content.MimeType;
 
 public class FileSystemContentServiceTest {
 
