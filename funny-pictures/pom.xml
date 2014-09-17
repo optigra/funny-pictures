@@ -18,6 +18,7 @@
 		<module>funny-pictures-domain</module>
 		<module>funny-pictures-migrations</module>
 		<module>funny-pictures-generator</module>
+		<module>funny-pictures-content</module>
 	</modules>
 
 	<properties>
