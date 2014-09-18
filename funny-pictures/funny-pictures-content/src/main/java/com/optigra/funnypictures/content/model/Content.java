@@ -45,4 +45,9 @@ public class Content {
 	public void setMimeType(MimeType mimeType) {
 		this.mimeType = mimeType;
 	}
+
+	@Override
+	public String toString() {
+		return "Content [path=" + path + ", size=" + size + ", mimeType=" + mimeType + "]";
+	}
 }
