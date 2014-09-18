@@ -2,7 +2,6 @@ package com.optigra.funnypictures.facade.facade.picture;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import com.optigra.funnypictures.service.picture.PictureService;
 public class DefaultPictureFacade implements PictureFacade {
 	private Logger logger = LoggerFactory.getLogger(DefaultPictureFacade.class);
 	
-	
 	@Resource(name = "pagedRequestConverter")
 	private Converter<PagedRequest, PagedSearch<Picture>> pagedRequestConverter;
 
@@ -35,11 +33,6 @@ public class DefaultPictureFacade implements PictureFacade {
 	
 	@Resource(name = "pictureService")
 	private PictureService pictureService;
-	
-	@PostConstruct
-	public void init() {
-		logger.info("INIT FACADE");
-	}
 	
 	@Override
 	public PagedResultResource<PictureResource> getPictures(PagedRequest pagedRequest) {
