@@ -1,4 +1,4 @@
-package org.optigra.funnypictures.dao.picture;
+package com.optigra.funnypictures.dao.picture;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -14,9 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.optigra.funnypictures.dao.persistence.PersistenceManager;
-import org.optigra.funnypictures.dao.picture.DefaultPictureDao;
 
+import com.optigra.funnypictures.dao.persistence.PersistenceManager;
+import com.optigra.funnypictures.dao.picture.DefaultPictureDao;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;

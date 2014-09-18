@@ -1,10 +1,10 @@
-package org.optigra.funnypictures.dao.picture;
+package com.optigra.funnypictures.dao.picture;
 
 import java.util.Collections;
 
-import org.optigra.funnypictures.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
+import com.optigra.funnypictures.dao.AbstractDao;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;

@@ -1,4 +1,4 @@
-package org.optigra.funnypictures.dao.persistence;
+package com.optigra.funnypictures.dao.persistence;
 
 import java.util.List;
 import java.util.Map;

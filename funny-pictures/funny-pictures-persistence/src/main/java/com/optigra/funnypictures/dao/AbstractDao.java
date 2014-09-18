@@ -1,9 +1,8 @@
-package org.optigra.funnypictures.dao;
+package com.optigra.funnypictures.dao;
 
 import javax.annotation.Resource;
 
-import org.optigra.funnypictures.dao.persistence.PersistenceManager;
-
+import com.optigra.funnypictures.dao.persistence.PersistenceManager;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 

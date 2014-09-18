@@ -1,4 +1,4 @@
-package org.optigra.funnypictures.dao;
+package com.optigra.funnypictures.dao;
 
 public interface Dao<E,T> {
 
