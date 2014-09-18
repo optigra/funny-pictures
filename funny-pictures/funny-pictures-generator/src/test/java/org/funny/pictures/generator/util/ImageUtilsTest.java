@@ -1,7 +1,8 @@
 package org.funny.pictures.generator.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+import java.awt.Dimension;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
@@ -19,9 +20,9 @@ public class ImageUtilsTest {
 	@Test
 	public void testGetImageDimensions() throws Exception {
 		Path dog = imagesDirectory.resolve("dog-uncropped.jpg");
-		int[] expectedDimensions = new int[]{407, 405};
-		int[] calculatedDimensions = ImageUtils.getImageDimensions(dog);
-		assertArrayEquals(expectedDimensions, calculatedDimensions);
+		Dimension expectedDimensions = new Dimension(407, 405);
+		Dimension calculatedDimensions = ImageUtils.getImageDimension(dog);
+		assertEquals(expectedDimensions, calculatedDimensions);
 	}
 	
 	@Test

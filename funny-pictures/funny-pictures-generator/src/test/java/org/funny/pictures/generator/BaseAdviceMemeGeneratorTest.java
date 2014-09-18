@@ -1,7 +1,6 @@
 package org.funny.pictures.generator;
 
-import static org.junit.Assert.*;
-import static org.funny.pictures.generator.testutil.ImageAssert.*;
+import static org.funny.pictures.generator.testutil.ImageAssert.assertImageEquals;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import org.funny.pictures.generator.api.AdviceMemeContext;
 import org.funny.pictures.generator.api.ImageHandle;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -41,11 +39,11 @@ public class BaseAdviceMemeGeneratorTest  {
 		}
 	}
 	
-	@Ignore
 	@Test
 	public void testGenerate() throws Exception {
 		//Given
-		Path templatePath = FileSystems.getDefault().getPath("src", "test", "resources", "templates", "advice-dog.jpg");
+		Path templatePath = FileSystems.getDefault().getPath
+				("src", "test", "resources", "templates", "advice-dog.jpg");
 		InputStream templateInputStream = new FileInputStream(templatePath.toString());
 		AdviceMemeContext context = new AdviceMemeContext(
 				templateInputStream, MimeType.IMAGE_JPEG_JPG, "Top caption", "Bottom caption");
@@ -55,13 +53,11 @@ public class BaseAdviceMemeGeneratorTest  {
 		Files.copy(imgHandle.getImageInputStream(), outputImagePath, StandardCopyOption.REPLACE_EXISTING);
 		
 		//Then
-		assertImageEquals(templatePath, outputImagePath);
+		Path expected = FileSystems.getDefault().getPath("src", "test", "resources", 
+				"org", "funny", "pictures", "generator", "baseAdviceMemeGeneratorTest", "testGenerate.png");
+		assertImageEquals(expected, outputImagePath);
 		
 	}
 	
-	@Test
-	public void testName() throws Exception {
-		assertTrue(true);
-	}
 
 }

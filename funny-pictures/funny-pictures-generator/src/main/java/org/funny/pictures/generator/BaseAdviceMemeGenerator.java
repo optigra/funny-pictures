@@ -1,23 +1,21 @@
 package org.funny.pictures.generator;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.funny.pictures.generator.api.AdviceMemeContext;
 import org.funny.pictures.generator.api.AdviceMemeGenerator;
+import org.funny.pictures.generator.api.GeneratorException;
 import org.funny.pictures.generator.api.ImageHandle;
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 
-import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.content.MimeType;
 
 public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
@@ -37,7 +35,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	}
 
 	@Override
-	public ImageHandle generate(AdviceMemeContext context) throws IOException, InterruptedException, IM4JavaException{
+	public ImageHandle generate(AdviceMemeContext context) throws IOException, InterruptedException, GeneratorException{
 			
 		Path templateInput = toTempFile(context.getTemplateInputStream(), 
 				context.getMimeType().getExtension());
@@ -55,6 +53,8 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 			InputStream resultStream = new FileInputStream(result.toString());
 			return new ImageHandle(resultStream, outputFormat);
 			
+		}catch(IM4JavaException e){
+			throw new GeneratorException(e.getMessage(), e);
 		}finally{
 			if(templateInput != null) Files.deleteIfExists(templateInput);
 			if(topCaption != null) Files.deleteIfExists(topCaption);
@@ -65,7 +65,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	private Path generateCaption(String text, int width, int height) throws IOException, InterruptedException, IM4JavaException{
 		Path result = Files.createTempFile("caption", internalFormat.getExtension());
 		IMOperation op = new IMOperation();
-		op.size(400, 50);
+		op.size(width, height);
 		op.background("transparent");
 		op.fill("white");
 		op.stroke("black");
