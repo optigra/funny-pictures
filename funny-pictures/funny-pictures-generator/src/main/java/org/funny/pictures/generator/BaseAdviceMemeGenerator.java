@@ -1,10 +1,8 @@
 package org.funny.pictures.generator;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -17,7 +15,6 @@ import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 
-import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.content.MimeType;
 
 public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
