@@ -4,6 +4,9 @@ import javax.annotation.Resource;
 
 import org.optigra.funnypictures.dao.persistence.PersistenceManager;
 
+import com.optigra.funnypictures.pagination.PagedResult;
+import com.optigra.funnypictures.pagination.PagedSearch;
+
 public abstract class AbstractDao<E, T> implements Dao<E, T> {
 
 	@Resource(name = "persistenceManager")
@@ -30,5 +33,9 @@ public abstract class AbstractDao<E, T> implements Dao<E, T> {
 	@Override
 	public void delete(E entity) {
 		persistenceManager.remove(entity);
+	}
+	
+	protected PagedResult<E> search(PagedSearch<E> searchRequest) {
+		return persistenceManager.search(searchRequest);
 	}
 }

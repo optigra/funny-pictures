@@ -148,7 +148,7 @@ public class DefaultPersistenceManagerTest {
 		int offset = 20;
 		Long count = 100L;
 		Map<String, Object> parameters = Collections.emptyMap();
-		Queries query = Queries.FIND_USER_BY_LOGIN;
+		Queries query = Queries.FIND_PICTURES;
 		Class<Picture> clazz = Picture.class;
 		
 		PagedSearch<Picture> searchRequest = new PagedSearch<Picture>(start, offset, query, parameters, clazz);
