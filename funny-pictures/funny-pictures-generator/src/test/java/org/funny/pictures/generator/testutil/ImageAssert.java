@@ -14,7 +14,7 @@ public class ImageAssert {
 
 	public static void assertImageEquals(Path expected, Path actual)
 			throws IOException, InterruptedException, IM4JavaException {
-		assertImageEquals(null, expected, actual);
+		assertImageEquals("", expected, actual);
 	}
 
 	public static void assertImageEquals(String message, Path expected,
@@ -26,9 +26,9 @@ public class ImageAssert {
 		assertEquals(message, expectedDimension, actualDimension);
 		
 		// TODO add more measures (e. g. PSNR)
-		double expectedRmse = calculateNormalizedRmseDifference(expected,actual);
+		double actualRmse = calculateNormalizedRmseDifference(expected,actual);
 
-		assertEquals(expectedRmse, 0, 0);
+		assertEquals(0, actualRmse, 0);
 	}
 
 
