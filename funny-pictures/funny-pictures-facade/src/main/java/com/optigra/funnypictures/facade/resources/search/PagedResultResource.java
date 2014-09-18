@@ -59,13 +59,13 @@ public class PagedResultResource<R> extends ApiResource {
 		this.uri = uri;
 	}
 
+	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (count ^ (count >>> 32));
-		result = prime * result
-				+ ((entities == null) ? 0 : entities.hashCode());
 		result = prime * result + ((limit == null) ? 0 : limit.hashCode());
 		result = prime * result + ((offset == null) ? 0 : offset.hashCode());
 		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
@@ -82,11 +82,6 @@ public class PagedResultResource<R> extends ApiResource {
 			return false;
 		PagedResultResource<?> other = (PagedResultResource<?>) obj;
 		if (count != other.count)
-			return false;
-		if (entities == null) {
-			if (other.entities != null)
-				return false;
-		} else if (!entities.equals(other.entities))
 			return false;
 		if (limit == null) {
 			if (other.limit != null)
