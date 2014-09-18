@@ -5,19 +5,27 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+import org.funny.pictures.generator.BaseAdviceMemeGenerator;
 import org.im4java.core.CompareCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.process.ArrayListErrorConsumer;
 import org.im4java.process.ArrayListOutputConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImageUtils {
 
 	public static final String NULL_OUTPUT = "null:";
 
+	private static final Logger LOG = LoggerFactory.getLogger(ImageUtils.class);
+	
 	public static Dimension getImageDimension(Path image) throws IOException,
 			InterruptedException, IM4JavaException {
+		
+		LOG.debug("Getting image dimension for image path: " + image.toAbsolutePath().toString());
+		
 		String separator = " ";
 		String resultFormat = "%w" + separator + "%h";
 
@@ -29,11 +37,17 @@ public class ImageUtils {
 		op.ping();
 		op.format(resultFormat);
 		op.addImage("info:");
+		LOG.debug("Running command: " + op.toString());
 		cmd.run(op);
 
 		ArrayList<String> output = outputConsumer.getOutput();
+		
+		logCommandOutput(output);
+		
 		String[] dimensions = output.get(0).split(separator);
-		return new Dimension(Integer.valueOf(dimensions[0]),Integer.valueOf(dimensions[1]));
+		Dimension result = new Dimension(Integer.valueOf(dimensions[0]),Integer.valueOf(dimensions[1]));
+		LOG.debug("Calculated dimension: " + result.toString());
+		return result;
 
 	}
 
@@ -51,6 +65,10 @@ public class ImageUtils {
 	public static double calculateNormalizedRmseDifference(Path imageA,
 			Path imageB) throws IOException, InterruptedException,
 			IM4JavaException {
+		
+		LOG.debug("Calculating image dimension for image paths \"%1$s\" and \"%2$s\"", 
+				imageA.toAbsolutePath(), imageB.toAbsolutePath());
+		
 		CompareCmd cmd = new CompareCmd();
 		/*
 		 * For some reason, compare -metric sends its output to stderr.
@@ -68,9 +86,11 @@ public class ImageUtils {
 		op.addImage(imageA.toString());
 		op.addImage(imageB.toString());
 		op.addImage("null:");
+		LOG.debug("Running command: " + op.toString());
 		cmd.run(op);
 
 		ArrayList<String> output = outputConsumer.getOutput();
+		logCommandOutput(output);
 
 		String metricValue = output.get(output.size() - 1);
 
@@ -78,8 +98,18 @@ public class ImageUtils {
 		int endIndex = metricValue.lastIndexOf(")");
 		String relativeMetricValue = metricValue.substring(beginIndex + 1,
 				endIndex);
-		return Double.valueOf(relativeMetricValue);
+		double result = Double.valueOf(relativeMetricValue);
+		LOG.debug("Calculated normalized RMSE differense: " + result);
+		return result;
 
+	}
+	
+	private static void logCommandOutput(ArrayList<String> output) {
+		StringBuilder logBuilder = new StringBuilder(System.lineSeparator());
+		for(String outputRow : output){
+			logBuilder.append(outputRow).append(System.lineSeparator());
+		}
+		LOG.debug("Command output: " + logBuilder.toString());
 	}
 
 }
