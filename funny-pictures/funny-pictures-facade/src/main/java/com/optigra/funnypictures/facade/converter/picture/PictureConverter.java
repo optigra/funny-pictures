@@ -1,9 +1,12 @@
-package com.optigra.funnypictures.facade.converter.search;
+package com.optigra.funnypictures.facade.converter.picture;
+
+import org.springframework.stereotype.Component;
 
 import com.optigra.funnypictures.facade.converter.AbstractConverter;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.model.Picture;
 
+@Component("pictureConverter")
 public class PictureConverter extends AbstractConverter<Picture, PictureResource> {
 
 	@Override

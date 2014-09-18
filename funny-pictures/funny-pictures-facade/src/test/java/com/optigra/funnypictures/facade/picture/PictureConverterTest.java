@@ -1,4 +1,4 @@
-package com.optigra.funnypictures.facade.converter.search;
+package com.optigra.funnypictures.facade.picture;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.optigra.funnypictures.facade.converter.picture.PictureConverter;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.model.Picture;
 
