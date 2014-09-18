@@ -12,7 +12,8 @@ import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.web.BaseController;
 
-@RestController("/pictures")
+@RestController
+@RequestMapping(value = "/pictures")
 public class PictureController extends BaseController {
 	
 	@Resource(name = "pictureFacade")
