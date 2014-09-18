@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 import org.funny.pictures.generator.api.AdviceMemeContext;
 import org.funny.pictures.generator.api.AdviceMemeGenerator;
@@ -30,13 +31,11 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	
 	private MimeType outputFormat;
 	
-	public BaseAdviceMemeGenerator() {
-		this(DEFAULT_OUTPUT_FORMAT);
-	}
+	private ConvertCmd convertCommand = new ConvertCmd();
 	
-	public BaseAdviceMemeGenerator(MimeType outputFormat) {
-		this.outputFormat = outputFormat;
-		LOG.trace("A BaseAdviceMemeGenerator was created. Output format is " + outputFormat.getType());
+	private CompositeCmd compositeCommand = new CompositeCmd();
+	
+	public BaseAdviceMemeGenerator() {
 	}
 
 	@Override
@@ -50,9 +49,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		Path bottomCaption = null;
 		Path result = null;
 		try{
+			result = prepareTemplate(templateInput);
 			topCaption = generateCaption(context.getTopCaption(), 400, 50);
 			bottomCaption = generateCaption(context.getBottomCaption(), 400, 50);
-			result = prepareTemplate(templateInput);
 			
 			addCaption(result, topCaption, 0, 0);
 			addCaption(result, bottomCaption, 0, 350);
@@ -90,11 +89,14 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		op.font("Impact-Regular");
 		op.gravity("Center");
 		op.addImage("label:"+text);
-		op.addImage(result.toString());
-		LOG.debug("Running command: " + op.toString());
+		op.addImage();
 		
-		ConvertCmd convertCommand = new ConvertCmd();
-		convertCommand.run(op);
+		Object[] args = new String[]{result.toString()};
+		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);		
+		System.out.println(op.toString());
+		System.out.println(Arrays.toString(args));
+		System.out.println();
+		convertCommand.run(op, args);
 		
 		return result;
 	}
@@ -103,28 +105,30 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		Path result = Files.createTempFile("template", internalFormat.getExtension());
 		
 		IMOperation op = new IMOperation();
-		op.addImage(templatePath.toString());
+		op.addImage();
 		op.gravity("Center");
 		op.crop(400, 400, 0, 0);
 		op.p_repage();
-		op.addImage(result.toString());		
-		LOG.debug("Running command: " + op.toString());
+		op.addImage();		
 		
-		ConvertCmd convertCommand = new ConvertCmd();
-		convertCommand.run(op);
+		Object[] args = new String[]{templatePath.toString(), result.toString()};
+		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);		
+		convertCommand.run(op, args);
 		
 		return result;
 	}
 	
 	private void addCaption(Path template, Path caption, int offsetX, int offsetY) throws IOException, InterruptedException, IM4JavaException{
+		
 		IMOperation op = new IMOperation();
 		op.geometry(400, 400, offsetX, offsetY);
-		op.addImage(caption.toString());
-		op.addImage(template.toString());
-		op.addImage(template.toString());
-		CompositeCmd compositeCommand = new CompositeCmd();
-		LOG.debug("Running command: " + op.toString());
-		compositeCommand.run(op);
+		op.addImage();
+		op.addImage();
+		op.addImage();
+		
+		Object[] args = new String[]{caption.toString(), template.toString(), template.toString()};
+		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
+		compositeCommand.run(op, args);
 	}
 	
 	private Path toTempFile(InputStream istream, String extensionSuffix) throws IOException{
