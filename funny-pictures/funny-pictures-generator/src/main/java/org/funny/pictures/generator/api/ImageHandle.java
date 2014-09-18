@@ -26,7 +26,7 @@ public class ImageHandle {
 
 	@Override
 	public String toString() {
-		return "AdviceMemePicture [imageInputStream=" + imageInputStream
+		return "ImageHandle [imageInputStream=" + imageInputStream
 				+ ", imageFormat=" + imageFormat + "]";
 	}
 	
