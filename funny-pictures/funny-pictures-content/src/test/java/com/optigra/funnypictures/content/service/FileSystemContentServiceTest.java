@@ -43,6 +43,5 @@ public class FileSystemContentServiceTest {
 		// Then
 		assertEquals(expectedContent.getPath(), actualContent.getPath());
 		assertEquals(expectedContent.getMimeType(), actualContent.getMimeType());
-		assertEquals(expectedContent.getSize(), actualContent.getSize());
 	}
 }

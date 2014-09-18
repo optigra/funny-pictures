@@ -4,8 +4,8 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.funny.pictures.generator.BaseAdviceMemeGenerator;
 import org.im4java.core.CompareCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
@@ -104,7 +104,7 @@ public class ImageUtils {
 
 	}
 	
-	private static void logCommandOutput(ArrayList<String> output) {
+	private static void logCommandOutput(List<String> output) {
 		StringBuilder logBuilder = new StringBuilder(System.lineSeparator());
 		for(String outputRow : output){
 			logBuilder.append(outputRow).append(System.lineSeparator());
