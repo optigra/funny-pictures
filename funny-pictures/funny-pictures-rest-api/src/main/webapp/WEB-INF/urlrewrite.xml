@@ -4,7 +4,7 @@
 <urlrewrite>
 
        <rule>
-           <from>/v1/content/(.*)</from>
-           <to>/v1/content?contentPath=/$1</to>
+           <from>/api/content/(.*)</from>
+           <to>/api/content?contentPath=/$1</to>
        </rule>
 </urlrewrite>
