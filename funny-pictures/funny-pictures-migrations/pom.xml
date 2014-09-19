@@ -22,7 +22,7 @@
 			<version>3.2.2</version>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -37,7 +37,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<changeLogFile>src/main/resources/migrations/db.changelog.xml</changeLogFile>
+					<changeLogFile>${migrations.location}</changeLogFile>
 					<driver>${jdbc.driverClassName}</driver>
 					<url>${jdbc.databaseurl}</url>
 					<username>${jdbc.username}</username>

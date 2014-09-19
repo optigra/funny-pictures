@@ -7,5 +7,4 @@ import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 public interface PictureFacade {
 
 	PagedResultResource<PictureResource> getPictures(PagedRequest pagedRequest);
-
 }

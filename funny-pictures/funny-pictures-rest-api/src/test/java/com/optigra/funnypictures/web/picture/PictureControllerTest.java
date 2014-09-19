@@ -78,4 +78,5 @@ public class PictureControllerTest {
     	
     	verify(pictureFacade).getPictures(pagedRequest);
 	}
+    
 }

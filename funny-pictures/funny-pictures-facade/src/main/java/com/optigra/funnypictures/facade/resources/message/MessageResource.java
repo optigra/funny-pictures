@@ -5,6 +5,16 @@ public class MessageResource {
 	private MessageType messageType;
 	private String message;
 	
+	public MessageResource() {
+		super();
+	}
+
+	public MessageResource(MessageType messageType, String message) {
+		super();
+		this.messageType = messageType;
+		this.message = message;
+	}
+	
 	public MessageType getMessageType() {
 		return messageType;
 	}

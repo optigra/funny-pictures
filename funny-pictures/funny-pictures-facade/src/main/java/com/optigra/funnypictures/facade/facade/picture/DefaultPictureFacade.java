@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.optigra.funnypictures.facade.converter.Converter;
@@ -20,7 +18,6 @@ import com.optigra.funnypictures.service.picture.PictureService;
 
 @Component("pictureFacade")
 public class DefaultPictureFacade implements PictureFacade {
-	private Logger logger = LoggerFactory.getLogger(DefaultPictureFacade.class);
 	
 	@Resource(name = "pagedRequestConverter")
 	private Converter<PagedRequest, PagedSearch<Picture>> pagedRequestConverter;
