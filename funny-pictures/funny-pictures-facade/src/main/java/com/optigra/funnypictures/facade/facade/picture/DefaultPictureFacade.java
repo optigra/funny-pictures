@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.resources.ApiResource;
@@ -17,6 +18,7 @@ import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.picture.PictureService;
 
 @Component("pictureFacade")
+@Transactional
 public class DefaultPictureFacade implements PictureFacade {
 	
 	@Resource(name = "pagedRequestConverter")
@@ -27,6 +29,9 @@ public class DefaultPictureFacade implements PictureFacade {
 
 	@Resource(name = "pictureConverter")
 	private Converter<Picture, PictureResource> pictureConverter;
+	
+	@Resource(name = "pictureResourceConverter")
+	private Converter<PictureResource, Picture> pictureResourceConverter;
 	
 	@Resource(name = "pictureService")
 	private PictureService pictureService;
@@ -50,6 +55,15 @@ public class DefaultPictureFacade implements PictureFacade {
 		pagedResultConverter.convert(pagedResult, pagedResultResource);
 		
 		return pagedResultResource;
+	}
+
+	@Override
+	public PictureResource createPicture(PictureResource pictureResource) {
+		
+		Picture pictureForService = pictureResourceConverter.convert(pictureResource);
+		pictureService.createPicture(pictureForService);
+		
+		return pictureConverter.convert(pictureForService);
 	}
 
 }

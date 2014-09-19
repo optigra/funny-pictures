@@ -40,10 +40,13 @@ public class DefaultPictureFacadeTest {
 
 	@Mock
 	private Converter<Picture, PictureResource> pictureConverter;
-	
+
+	@Mock
+	private Converter<PictureResource, Picture> pictureResourceConverter;
+
 	@Mock
 	private PictureService pictureService;
-	
+
 	@Test
 	public void testGetPictures() throws Exception {
 		// Given
@@ -58,18 +61,18 @@ public class DefaultPictureFacadeTest {
 		picture1.setName("picture1");
 		long count = 199;
 		List<Picture> entities = Arrays.asList(picture1);
-		PagedResult<Picture> pagedResult = new PagedResult<Picture>(offset, limit, count , entities);
+		PagedResult<Picture> pagedResult = new PagedResult<Picture>(offset, limit, count, entities);
 		PictureResource resource1 = new PictureResource();
 		List<PictureResource> resources = Arrays.asList(resource1);
-		
+
 		PagedResultResource<PictureResource> expected = new PagedResultResource<>("/pictures");
 		expected.setEntities(resources);
-		
+
 		// When
 		when(pagedRequestConverter.convert(any(PagedRequest.class))).thenReturn(pagedSearch);
-		when(pictureService.getPictures(Matchers.<PagedSearch<Picture>>any())).thenReturn(pagedResult);
+		when(pictureService.getPictures(Matchers.<PagedSearch<Picture>> any())).thenReturn(pagedResult);
 		when(pictureConverter.convertAll(anyListOf(Picture.class))).thenReturn(resources);
-		
+
 		PagedResultResource<PictureResource> actual = unit.getPictures(pagedRequest);
 
 		// Then
@@ -77,7 +80,38 @@ public class DefaultPictureFacadeTest {
 		verify(pictureService).getPictures(pagedSearch);
 		verify(pictureConverter).convertAll(entities);
 		verify(pagedResultConverter).convert(pagedResult, expected);
-		
+
 		assertEquals(expected, actual);
 	}
+
+	@Test
+	public void testCreatePicture() {
+
+		// Given
+		String name = "name";
+		String url = "url";
+
+		PictureResource pictureResource = new PictureResource();
+		pictureResource.setName(name);
+		pictureResource.setUrl(url);
+
+		Picture returnedPictureFromConverter = new Picture();
+		returnedPictureFromConverter.setName(name);
+		returnedPictureFromConverter.setUrl(url);
+		
+		PictureResource expected = new PictureResource();
+		expected.setName(name);
+		expected.setUrl(url);
+		
+		// When
+
+		when(pictureResourceConverter.convert(pictureResource)).thenReturn(returnedPictureFromConverter);
+		when(pictureConverter.convert(returnedPictureFromConverter)).thenReturn(expected);
+		PictureResource actual = unit.createPicture(pictureResource);
+		// Then
+
+		verify(pictureConverter).convert(returnedPictureFromConverter);
+		assertEquals(expected, actual);
+	}
+
 }

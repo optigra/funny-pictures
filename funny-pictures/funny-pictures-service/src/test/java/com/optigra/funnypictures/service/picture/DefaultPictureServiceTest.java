@@ -1,6 +1,7 @@
 package com.optigra.funnypictures.service.picture;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,10 +25,10 @@ public class DefaultPictureServiceTest {
 
 	@InjectMocks
 	private DefaultPictureService unit;
-	
+
 	@Mock
 	private PictureDao pictureDao;
-	
+
 	@Test
 	public void testGetPictures() throws Exception {
 		// Given
@@ -36,15 +37,15 @@ public class DefaultPictureServiceTest {
 		long count = 100;
 		Picture entity1 = new Picture();
 		List<Picture> entities = Arrays.asList(entity1);
-		
+
 		PagedSearch<Picture> pagedSearch = new PagedSearch<>();
 		pagedSearch.setLimit(limit);
 		pagedSearch.setOffset(offset);
 
 		PagedResult<Picture> expected = new PagedResult<Picture>(offset, limit, count, entities);
 
-		when(pictureDao.getPictures(Matchers.<PagedSearch<Picture>>any())).thenReturn(expected);
-		
+		when(pictureDao.getPictures(Matchers.<PagedSearch<Picture>> any())).thenReturn(expected);
+
 		// When
 		PagedResult<Picture> actual = unit.getPictures(pagedSearch);
 
@@ -52,4 +53,28 @@ public class DefaultPictureServiceTest {
 		verify(pictureDao).getPictures(pagedSearch);
 		assertEquals(expected, actual);
 	}
+
+	@Test
+	public void testCreatePicture() {
+		
+		// Given
+		String name = "name";
+		String url = "url";
+		
+		Picture picture = new Picture();
+		picture.setName(name);
+		picture.setUrl(url);
+		
+		Picture expectedPicture = new Picture();
+		expectedPicture.setName(name);
+		expectedPicture.setUrl(url);
+		
+		// When
+		Picture actualPicture = unit.createPicture(picture);
+		
+		// Then
+		verify(pictureDao).save(picture);
+		assertEquals(expectedPicture, actualPicture);
+	}
+
 }

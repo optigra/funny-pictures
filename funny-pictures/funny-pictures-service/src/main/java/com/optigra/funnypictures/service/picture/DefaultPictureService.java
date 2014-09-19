@@ -20,4 +20,10 @@ public class DefaultPictureService implements PictureService {
 		return pictureDao.getPictures(pagedSearch);
 	}
 
+	@Override
+	public Picture createPicture(Picture picture) {
+		pictureDao.save(picture);
+		return picture;
+	}
+
 }

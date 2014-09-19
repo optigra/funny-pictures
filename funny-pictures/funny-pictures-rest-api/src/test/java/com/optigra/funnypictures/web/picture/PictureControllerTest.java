@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -24,9 +26,10 @@ import com.optigra.funnypictures.facade.facade.picture.PictureFacade;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
+import com.optigra.funnypictures.web.AbstractControllerTest;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PictureControllerTest {
+public class PictureControllerTest extends AbstractControllerTest {
 
 	@InjectMocks
 	private PictureController unit;
@@ -78,5 +81,33 @@ public class PictureControllerTest {
     	
     	verify(pictureFacade).getPictures(pagedRequest);
 	}
+    
+    @Test
+    public void testPostPictures() throws Exception{
+    	
+    	// Given
+
+    	Long id = 2L;
+    	String name = "Name";
+    	String url = "Url";
+    	PictureResource inputEntity = new PictureResource();
+    	inputEntity.setId(id);
+    	inputEntity.setName(name);
+		inputEntity.setUrl(url);
+		
+    	// When
+    	
+		String expectedResponse = objectMapper.writeValueAsString(inputEntity);
+		when(pictureFacade.createPicture(any(PictureResource.class))).thenReturn(inputEntity);
+	
+    	// Then
+    	
+		mockMvc.perform(post("/pictures")
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.content(getJson(inputEntity, true)))
+    			.andExpect(status().isOk())
+    			.andExpect(content().string(expectedResponse));
+    	
+    }
     
 }

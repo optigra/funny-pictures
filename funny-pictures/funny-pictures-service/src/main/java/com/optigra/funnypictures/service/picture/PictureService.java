@@ -8,4 +8,7 @@ public interface PictureService {
 
 	PagedResult<Picture> getPictures(PagedSearch<Picture> pagedSearch);
 
+	Picture createPicture(Picture picture);
+	
 }
+
