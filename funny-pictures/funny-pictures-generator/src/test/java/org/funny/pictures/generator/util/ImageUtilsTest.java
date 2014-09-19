@@ -6,10 +6,12 @@ import java.awt.Dimension;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+@Ignore
 @RunWith(JUnit4.class)
 public class ImageUtilsTest {
 	
