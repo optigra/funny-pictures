@@ -1,5 +1,7 @@
 package com.optigra.funnypictures.facade.facade.content;
 
+import java.io.InputStream;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.optigra.funnypictures.content.model.Content;
 import com.optigra.funnypictures.content.service.ContentService;
 import com.optigra.funnypictures.facade.resources.content.ContentResource;
+import com.optigra.funnypictures.facade.resources.content.ContentResourceNamingStrategy;
 
 @Component("contentFacade")
 public class DefaultContentFacade implements ContentFacade {
@@ -17,6 +20,9 @@ public class DefaultContentFacade implements ContentFacade {
 
 	@Resource(name = "contentService")
 	private ContentService contentService;
+	
+	@Resource(name = "namingStrategy")
+	private ContentResourceNamingStrategy namingStrategy; 
 
 	@Override
 	public ContentResource getContent(String uri) {
@@ -31,5 +37,19 @@ public class DefaultContentFacade implements ContentFacade {
 		contentResource.setPath(uri);
 
 		return contentResource;
+	}
+
+	@Override
+	public void storeContent(ContentResource resource) {
+		
+		Object identifier = namingStrategy.createIdentifier(resource);
+		LOG.info("Store content with identifier: %s", identifier);
+		
+		InputStream contentStream = resource.getContentStream();
+		Content content = new Content();
+		content.setContentStream(contentStream);
+		content.setPath(identifier.toString());		
+		contentService.saveContent(content);
+		
 	}
 }

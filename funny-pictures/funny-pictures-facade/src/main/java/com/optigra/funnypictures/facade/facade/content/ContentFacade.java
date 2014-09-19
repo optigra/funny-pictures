@@ -5,4 +5,6 @@ import com.optigra.funnypictures.facade.resources.content.ContentResource;
 public interface ContentFacade {
 
 	ContentResource getContent(String uri);
+	
+	void storeContent(ContentResource resource);
 }
