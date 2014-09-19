@@ -1,8 +1,6 @@
 package org.funny.pictures.generator;
 
-import static org.funny.pictures.generator.testutil.ImageAssert.assertImageEquals;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
