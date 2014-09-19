@@ -42,7 +42,7 @@ public class PictureConverterTest {
 		PictureResource actualResource = unit.convert(picture1);
 
 		// Then
-		assertEquals(actualResource, expectedResource);
+		assertEquals(expectedResource, actualResource);
 
 	}
 
@@ -70,7 +70,7 @@ public class PictureConverterTest {
 		actualResource = unit.convert(picture1, actualResource);
 
 		// Then
-		assertEquals(actualResource, expectedResource);
+		assertEquals(expectedResource,actualResource);
 
 	}
 
