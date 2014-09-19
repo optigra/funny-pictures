@@ -9,6 +9,10 @@ public interface PictureService {
 	PagedResult<Picture> getPictures(PagedSearch<Picture> pagedSearch);
 
 	Picture createPicture(Picture picture);
+
+	Picture getPicture(Long id);
+
+	void updatePicture(Picture picture);
 	
 }
 

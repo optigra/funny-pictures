@@ -11,19 +11,16 @@ public class PictureResourceConverter extends AbstractConverter<PictureResource,
 
 	@Override
 	public Picture convert(PictureResource source, Picture target) {
-		target.setId(source.getId());
+		
 		target.setName(source.getName());
 		target.setUrl(source.getUrl());
+		
 		return target;
 	}
 
 	@Override
 	public Picture convert(PictureResource source) {
-		Picture result = new Picture();
-		result.setId(source.getId());
-		result.setName(source.getName());
-		result.setUrl(source.getUrl());
-		return result;
+		return convert(source, new Picture());
 	}
 
 }

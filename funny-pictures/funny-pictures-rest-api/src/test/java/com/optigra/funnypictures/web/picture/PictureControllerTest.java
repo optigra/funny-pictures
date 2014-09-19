@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.optigra.funnypictures.facade.facade.picture.PictureFacade;
+import com.optigra.funnypictures.facade.resources.message.MessageResource;
+import com.optigra.funnypictures.facade.resources.message.MessageType;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
@@ -108,6 +111,33 @@ public class PictureControllerTest extends AbstractControllerTest {
     			.andExpect(status().isOk())
     			.andExpect(content().string(expectedResponse));
     	
+    }
+
+    @Test
+    public void testUpdatePictures() throws Exception{
+    	
+    	// Given
+    	
+    	Long id = 2L;
+    	String name = "Name";
+    	String url = "Url";
+    	PictureResource inputEntity = new PictureResource();
+    	inputEntity.setId(id);
+    	inputEntity.setName(name);
+    	inputEntity.setUrl(url);
+    	
+    	// When
+    	MessageResource expectedResource = new MessageResource(MessageType.INFO, "Picture Resource updated");
+    	String expectedResponse = objectMapper.writeValueAsString(expectedResource);
+    	
+    	// Then
+    	
+    	mockMvc.perform(put("/pictures/{id}", id)
+    			.contentType(MediaType.APPLICATION_JSON)
+    			.content(getJson(inputEntity, true)))
+    			.andExpect(status().isOk())
+    			.andExpect(content().string(expectedResponse));
+    	verify(pictureFacade).updatePicture(id, inputEntity);
     }
     
 }

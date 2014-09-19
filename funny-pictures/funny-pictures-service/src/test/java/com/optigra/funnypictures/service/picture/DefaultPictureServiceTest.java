@@ -1,7 +1,7 @@
 package com.optigra.funnypictures.service.picture;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -77,4 +77,40 @@ public class DefaultPictureServiceTest {
 		assertEquals(expectedPicture, actualPicture);
 	}
 
+	@Test
+	public void testUpdatePicture() throws Exception {
+		// Given
+		String name = "name";
+		String url = "url";
+		
+		Picture picture = new Picture();
+		picture.setName(name);
+		picture.setUrl(url);
+		
+		// When
+		unit.updatePicture(picture);
+		
+		// Then
+		verify(pictureDao).update(picture);
+	}
+	
+	@Test
+	public void testGetPicture() throws Exception {
+		// Given
+		Long id = 2L;
+		String name = "name";
+		String url = "url";
+		
+		Picture expected = new Picture();
+		expected.setName(name);
+		expected.setUrl(url);
+
+		// When
+		when(pictureDao.findById(anyLong())).thenReturn(expected);
+		Picture actual = unit.getPicture(id);
+
+		// Then
+		verify(pictureDao).findById(id);
+		assertEquals(expected, actual);
+	}
 }

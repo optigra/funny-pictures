@@ -26,4 +26,14 @@ public class DefaultPictureService implements PictureService {
 		return picture;
 	}
 
+	@Override
+	public Picture getPicture(Long id) {
+		return pictureDao.findById(id);
+	}
+
+	@Override
+	public void updatePicture(Picture picture) {
+		pictureDao.update(picture);
+	}
+
 }

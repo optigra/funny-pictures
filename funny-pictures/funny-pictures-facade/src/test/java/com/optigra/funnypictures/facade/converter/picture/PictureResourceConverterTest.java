@@ -29,7 +29,6 @@ public class PictureResourceConverterTest {
 
 		Picture expectedResource = new Picture();
 
-		expectedResource.setId(id);
 		expectedResource.setName(name);
 		expectedResource.setUrl(url);
 
@@ -56,7 +55,6 @@ public class PictureResourceConverterTest {
 
 		Picture expectedResource = new Picture();
 
-		expectedResource.setId(id);
 		expectedResource.setName(name);
 		expectedResource.setUrl(url);
 
