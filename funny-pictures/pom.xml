@@ -38,6 +38,8 @@
 		<jdbc.password>postgres</jdbc.password>
 		<jpa.database>POSTGRESQL</jpa.database>
 		<jpa.showSql>true</jpa.showSql>
+		<content.repository.path>/var/funny-pictures/repository</content.repository.path>
+		<api.output.json.pretty>true</api.output.json.pretty>
 	</properties>
 
 	<dependencies>
