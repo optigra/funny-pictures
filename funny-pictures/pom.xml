@@ -41,7 +41,7 @@
 		<jdbc.password>postgres</jdbc.password>
 		<jpa.database>POSTGRESQL</jpa.database>
 		<jpa.showSql>true</jpa.showSql>
-		<content.repository.path>~/tmp/funny-pictures</content.repository.path>
+		<content.repository.path>${user.home}/tmp/funny-pictures</content.repository.path>
 		<api.output.json.pretty>true</api.output.json.pretty>
 	</properties>
 

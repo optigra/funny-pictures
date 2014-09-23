@@ -67,7 +67,7 @@ public class DefaultContentFacadeTest {
 		resource.setContentStream(contentStream);
 		
 		//When
-		Object identifier = new String("identifier");
+		String identifier = new String("identifier");
 		when(namingStrategy.createIdentifier(Mockito.any(ContentResource.class))).thenReturn(identifier);
 		unit.storeContent(resource);
 		
