@@ -4,6 +4,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         
         <class>com.optigra.funnypictures.model.Picture</class>
+        <class>com.optigra.funnypictures.model.FunnyPicture</class>
         
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
