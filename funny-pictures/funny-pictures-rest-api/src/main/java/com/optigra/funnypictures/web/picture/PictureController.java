@@ -41,6 +41,19 @@ public class PictureController extends BaseController {
 		return pictureFacade.createPicture(picture);
 	}
 	
+	@RequestMapping(value = "/{id}",method = RequestMethod.GET)
+	public PictureResource getPicture(@PathVariable("id") Long id) {
+		logger.info("Getting Picture resource with id: {}", id);
+		return pictureFacade.getPicture(id);
+	}
+	
+	@RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
+	public MessageResource deletePicture(@PathVariable("id") Long id) {
+		logger.info("Getting Picture resource with id: {}", id);
+		pictureFacade.deletePicture(id);
+		return new MessageResource(MessageType.INFO, "Picture Resource was deleted");
+	}
+	
 	@RequestMapping(value = "/{id}",method = RequestMethod.PUT)
 	public MessageResource updatePicture(@PathVariable("id") Long id, @RequestBody PictureResource pictureResource) {
 		logger.info("Updating Picture resource with id: {}, resource: {}", id, pictureResource);

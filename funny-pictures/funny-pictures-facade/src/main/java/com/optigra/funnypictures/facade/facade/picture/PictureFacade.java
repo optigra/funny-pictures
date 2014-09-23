@@ -11,5 +11,9 @@ public interface PictureFacade {
 	PictureResource createPicture(PictureResource pictureResource);
 	
 	void updatePicture(Long id, PictureResource pictureResource);
+	
+	PictureResource getPicture(Long id);
+
+	void deletePicture(Long id);
 
 }

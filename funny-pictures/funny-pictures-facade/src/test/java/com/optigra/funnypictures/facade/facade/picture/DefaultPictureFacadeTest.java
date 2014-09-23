@@ -143,5 +143,52 @@ public class DefaultPictureFacadeTest {
 		verify(pictureResourceConverter).convert(pictureResource, picture);
 		verify(pictureService).updatePicture(picture);
 	}
+	
+	@Test
+	public void testGetPicture() {
+		
+		// Given
+		Long id = 2L;
+		String name = "name";
+		String url = "url";
+		
+		Picture picture = new Picture();
+		picture.setName(name);
+		picture.setUrl(url);
+		
+		PictureResource expected = new PictureResource();
+		expected.setName(name);
+		expected.setUrl(url);
+		
+		// When
+		when(pictureService.getPicture(anyLong())).thenReturn(picture);
+		when(pictureConverter.convert(any(Picture.class))).thenReturn(expected);
+		PictureResource actual = unit.getPicture(id);
+		// Then
+		verify(pictureService).getPicture(id);
+		verify(pictureConverter).convert(picture);
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void testDeletePicture() {
+		
+		// Given
+		Long id = 2L;
+		String name = "name";
+		String url = "url";
+		
+		Picture picture = new Picture();
+		picture.setName(name);
+		picture.setUrl(url);
+		
+		
+		// When
+		when(pictureService.getPicture(anyLong())).thenReturn(picture);
+		unit.deletePicture(id);
+		// Then
+		verify(pictureService).getPicture(id);
+		verify(pictureService).deletePicture(picture);
+	}
 
 }

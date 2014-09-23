@@ -36,4 +36,9 @@ public class DefaultPictureService implements PictureService {
 		pictureDao.update(picture);
 	}
 
+	@Override
+	public void deletePicture(Picture picture) {
+		pictureDao.delete(picture);		
+	}
+
 }

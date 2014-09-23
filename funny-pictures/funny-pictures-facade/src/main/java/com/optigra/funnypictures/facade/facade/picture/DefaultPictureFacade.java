@@ -73,4 +73,16 @@ public class DefaultPictureFacade implements PictureFacade {
 		pictureService.updatePicture(picture);
 	}
 
+	@Override
+	public PictureResource getPicture(Long id) {
+		Picture picture = pictureService.getPicture(id);
+		return pictureConverter.convert(picture);
+	}
+
+	@Override
+	public void deletePicture(Long id) {
+		Picture picture = pictureService.getPicture(id);
+		pictureService.deletePicture(picture);
+	}
+
 }

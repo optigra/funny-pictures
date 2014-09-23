@@ -14,5 +14,7 @@ public interface PictureService {
 
 	void updatePicture(Picture picture);
 	
+	void deletePicture(Picture picture);
+	
 }
 

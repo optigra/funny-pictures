@@ -113,4 +113,21 @@ public class DefaultPictureServiceTest {
 		verify(pictureDao).findById(id);
 		assertEquals(expected, actual);
 	}
+	
+	@Test
+	public void testDeletePicture() throws Exception {
+		// Given
+		String name = "name";
+		String url = "url";
+		
+		Picture expected = new Picture();
+		expected.setName(name);
+		expected.setUrl(url);
+
+		// When
+		unit.deletePicture(expected);
+
+		// Then
+		verify(pictureDao).delete(expected);
+	}
 }

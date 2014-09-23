@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -140,4 +141,49 @@ public class PictureControllerTest extends AbstractControllerTest {
     	verify(pictureFacade).updatePicture(id, inputEntity);
     }
     
+    @Test
+    public void testGetPicture() throws Exception{
+    	
+    	// Given
+    	
+    	Long id = 2L;
+    	String name = "Name";
+    	String url = "Url";
+    	
+    	PictureResource expectedResource = new PictureResource();
+    	expectedResource.setId(id);
+    	expectedResource.setName(name);
+    	expectedResource.setUrl(url);
+    	
+    	// When
+    	String expectedResponse = objectMapper.writeValueAsString(expectedResource);
+    	when(pictureFacade.getPicture(any(Long.class))).thenReturn(expectedResource);
+    	// Then
+    	
+    	mockMvc.perform(get("/pictures/{id}", id)
+    			.contentType(MediaType.APPLICATION_JSON))
+    			.andExpect(status().isOk())
+    			.andExpect(content().string(expectedResponse));
+    	verify(pictureFacade).getPicture(id);
+    }
+    
+    @Test
+    public void testDeletePicture() throws Exception{
+    	
+    	// Given
+    	
+    	Long id = 2L;
+    	
+    	// When
+    	MessageResource expectedResource = new MessageResource(MessageType.INFO, "Picture Resource was deleted");
+    	String expectedResponse = objectMapper.writeValueAsString(expectedResource);
+    	
+    	// Then
+    	
+    	mockMvc.perform(delete("/pictures/{id}", id)
+    			.contentType(MediaType.APPLICATION_JSON))
+    			.andExpect(status().isOk())
+    			.andExpect(content().string(expectedResponse));
+    	verify(pictureFacade).deletePicture(id);
+    }
 }
