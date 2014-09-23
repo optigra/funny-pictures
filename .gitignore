@@ -8,5 +8,5 @@ target
 *.war
 *.ear
 .metadata
-/.idea*
+.idea
 /target
