@@ -27,7 +27,7 @@ public class FileSystemContentService implements ContentService {
 	public Content getContentByPath(String path) {
 		Content content = null;
 
-		LOG.info("Read file from {}" + path);
+		LOG.info("Read file from " + path);
 
 		try {
 			File file = new File(getFullfilePath(path));

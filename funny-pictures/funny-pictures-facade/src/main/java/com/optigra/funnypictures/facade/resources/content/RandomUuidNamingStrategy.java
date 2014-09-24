@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 public class RandomUuidNamingStrategy implements ContentResourceNamingStrategy {
 
 	@Override
-	public UUID createIdentifier(ContentResource resource) {
+	public String createIdentifier(ContentResource resource) {
 		UUID uuid = UUID.randomUUID();
-		return uuid;
+		return uuid.toString();
 	}
 
 }

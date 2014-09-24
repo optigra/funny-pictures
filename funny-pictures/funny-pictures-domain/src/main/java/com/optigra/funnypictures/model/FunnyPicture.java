@@ -7,13 +7,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="picture")
-public class Picture {
-
+@Table(name="funny_picture")
+public class FunnyPicture {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")
@@ -24,10 +25,20 @@ public class Picture {
 	
 	@Column(name="url")
 	private String url;
-
-	@OneToMany(mappedBy="picture")
-	private Set<FunnyPicture> funnyPictures;
 	
+	@Column(name="header")
+	private String header;
+	
+	@Column(name="footer")
+	private String footer;
+	
+	@ManyToOne
+	@JoinColumn(name="picture_id", nullable=false)
+	private Picture picture;
+	
+	public FunnyPicture() {
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -52,10 +63,28 @@ public class Picture {
 		this.url = url;
 	}
 
+	public String getHeader() {
+		return header;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
+
+	public String getFooter() {
+		return footer;
+	}
+
+	public void setFooter(String footer) {
+		this.footer = footer;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((footer == null) ? 0 : footer.hashCode());
+		result = prime * result + ((header == null) ? 0 : header.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
@@ -70,7 +99,17 @@ public class Picture {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Picture other = (Picture) obj;
+		FunnyPicture other = (FunnyPicture) obj;
+		if (footer == null) {
+			if (other.footer != null)
+				return false;
+		} else if (!footer.equals(other.footer))
+			return false;
+		if (header == null) {
+			if (other.header != null)
+				return false;
+		} else if (!header.equals(other.header))
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -91,7 +130,11 @@ public class Picture {
 
 	@Override
 	public String toString() {
-		return "Picture [id=" + id + ", name=" + name + ", url=" + url + "]";
+		return "FunnyPicture [id=" + id + ", name=" + name + ", url=" + url
+				+ ", header=" + header + ", footer=" + footer + "]";
 	}
+	
+	
 
+	
 }
