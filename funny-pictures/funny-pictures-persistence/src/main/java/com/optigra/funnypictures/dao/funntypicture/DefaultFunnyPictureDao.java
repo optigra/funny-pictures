@@ -2,12 +2,15 @@ package com.optigra.funnypictures.dao.funntypicture;
 
 import java.util.Collections;
 
+import org.springframework.stereotype.Repository;
+
 import com.optigra.funnypictures.dao.AbstractDao;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.queries.Queries;
 
+@Repository("funnyPictureDao")
 public class DefaultFunnyPictureDao extends AbstractDao<FunnyPicture, Long> implements FunnyPictureDao{
 
 	@Override
