@@ -49,7 +49,7 @@
 
                         <div class="col-md-6" ng-repeat="i in [$index,$index+1]"
                              ng-if="pictures[i]!=null">
-                            <a href="{{pictures[i].uri}}" class="thumbnail"> <img
+                            <a ng-click="changeMainPicture(pictures[i].id)" class="thumbnail"> <img
                                     ng-src="{{pictures[i].url}}">{{pictures[i].name}}
                             </a>
                         </div>

@@ -59,6 +59,12 @@ mainModule.controller('MainController', [ '$scope', '$http' , '$location', 'Pict
         $scope.alerts.splice(index, 1);
     };
 
+    $scope.changeMainPicture = function (url) {
+        Pictures.get({id : url} , function (picture) {
+            $scope.imagePreview = picture.url;
+        })
+    }
+
 } ]);
 
 
