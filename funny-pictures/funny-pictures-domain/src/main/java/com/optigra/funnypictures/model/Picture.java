@@ -1,5 +1,7 @@
 package com.optigra.funnypictures.model;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,7 +25,8 @@ public class Picture {
 	@Column(name="url")
 	private String url;
 
-	// TODO: OY @OneToMany
+	@OneToMany(mappedBy="picture")
+	private Set<FunnyPicture> funnyPictures;
 	
 	public Long getId() {
 		return id;

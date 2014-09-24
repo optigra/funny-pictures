@@ -1,10 +1,14 @@
 package com.optigra.funnypictures.model;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -28,7 +32,9 @@ public class FunnyPicture {
 	@Column(name="footer")
 	private String footer;
 	
-	// TODO: OY @ManyToOne
+	@ManyToOne
+	@JoinColumn(name="picture_id", nullable=false)
+	private Picture picture;
 	
 	public FunnyPicture() {
 	}

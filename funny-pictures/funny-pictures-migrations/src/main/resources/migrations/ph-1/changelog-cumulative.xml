@@ -40,4 +40,26 @@
     	</createTable>
     </changeSet>
     
+    <changeSet id="createFunnyPictureTable" author="Oleh Yatskiv">
+    	<createTable tableName="funny_picture">
+    		<column name="id" type="bigint" autoIncrement="true">
+    			<constraints primaryKey="true" nullable="false"/>
+    		</column>
+    		<column name="name" type="varchar(255)">
+    			<constraints nullable="false"/>
+    		</column>
+    		<column name="url" type="varchar(255)">
+    			<constraints nullable="false" unique="true"/>
+    		</column>
+    		<column name="header" type="varchar(255)">
+    		</column>
+    		<column name="footer" type="varchar(255)">
+    		</column>
+    		<column name="picture_id" type="bigint">
+            <constraints nullable="false" foreignKeyName="fk_funnypic_picture" references="picture(id)"/>
+        	</column>
+    		
+    	</createTable>
+    </changeSet>
+    
 </databaseChangeLog>
