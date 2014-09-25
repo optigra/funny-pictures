@@ -1,6 +1,7 @@
 package com.optigra.funnypictures.facade.converter.picture;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import com.optigra.funnypictures.facade.converter.AbstractConverter;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
@@ -20,6 +21,7 @@ public class PictureConverter extends AbstractConverter<Picture, PictureResource
 	@Override
 	public PictureResource convert(Picture source) {
 		PictureResource result = new PictureResource();
+		Assert.notNull(source, "Source is required");
 		if (source != null) {
 			result.setId(source.getId());
 			result.setName(source.getName());
