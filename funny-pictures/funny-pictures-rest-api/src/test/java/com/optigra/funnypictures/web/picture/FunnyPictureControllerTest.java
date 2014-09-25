@@ -3,7 +3,7 @@ package com.optigra.funnypictures.web.picture;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -42,7 +43,7 @@ public class FunnyPictureControllerTest extends AbstractControllerTest {
     }
     
     @Test
-	public void testGetPictures() throws Exception {
+	public void testGetFunnies() throws Exception {
 		// Given
     	FunnyPictureResource entity1 = new FunnyPictureResource();
     	entity1.setId(1L);
@@ -76,4 +77,30 @@ public class FunnyPictureControllerTest extends AbstractControllerTest {
     	
     	verify(funnyPictureFacade).getFunnies(pagedRequest);
 	}
+    
+    @Test
+   	public void testCreateFunnyPicture() throws Exception {
+   		// Given
+       	FunnyPictureResource funnyPicture = new FunnyPictureResource();
+       	funnyPicture.setName("Funny Picture1");
+       	funnyPicture.setUrl("url");
+       	funnyPicture.setHeader("Header");
+       	funnyPicture.setFooter("Footer");
+
+       	String requestBody = getJson(funnyPicture, true);
+       	String expectedResponse = getJson(funnyPicture, false);
+       	
+       	// When
+       	when(funnyPictureFacade.createFunnyPicture(any(FunnyPictureResource.class))).thenReturn(funnyPicture);
+       	
+   		// Then
+
+       	mockMvc.perform(post("/funnies")
+       			.contentType(MediaType.APPLICATION_JSON)
+       			.content(requestBody))
+       		.andExpect(status().isOk())
+       		.andExpect(content().string(expectedResponse));
+       	
+       	verify(funnyPictureFacade).createFunnyPicture(funnyPicture);
+   	}
 }

@@ -9,6 +9,7 @@
 			classpath*:persistence-context.xml
 			classpath*:service-context.xml
 			classpath*:content-context.xml
+			classpath*:generator-context.xml
 			classpath*:facade-context.xml
 		</param-value>
 	</context-param>

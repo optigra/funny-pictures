@@ -66,7 +66,6 @@ public class BaseAdviceMemeGeneratorTest {
 
 	@Test
 	public void testGenerate() throws Exception {
-		System.out.println(convertCommand);
 		// Given
 		Path templatePath = FileSystems.getDefault().getPath("src", "test", "resources", "templates", "advice-dog.jpg");
 		InputStream templateInputStream = new FileInputStream(templatePath.toString());
@@ -78,7 +77,6 @@ public class BaseAdviceMemeGeneratorTest {
 
 		// Then
 		verify(convertCommand, times(3)).run(convertOperationCaptor.capture(), anyVararg());
-		//verify(convertCommand).run(bottomCaptionOperationCaptor.capture(), anyVararg());
 		verify(compositeCommand, times(2)).run(compositeOperationCaptor.capture(), anyVararg());
 		
 		String expectedCropCommand = "?img? -gravity Center -crop 400x400+0+0 +repage ?img? ";
@@ -92,7 +90,5 @@ public class BaseAdviceMemeGeneratorTest {
 		assertEquals(expectedConvertBottomCommand, convertOperationCaptor.getAllValues().get(2).toString());
 		assertEquals(expectedCompositeTopCommand, compositeOperationCaptor.getAllValues().get(0).toString());
 		assertEquals(expectedCompositeBottomCommand, compositeOperationCaptor.getAllValues().get(1).toString());
-
 	}
-
 }

@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,5 +34,12 @@ public class FunnyPictureController extends BaseController {
 		PagedRequest pagedRequest = new PagedRequest(offset, limit);
 
 		return funnyPictureFacade.getFunnies(pagedRequest);
+	}
+	
+	@RequestMapping(method = RequestMethod.POST)
+	public FunnyPictureResource createFunny(@RequestBody FunnyPictureResource funnyPictureResource){
+		LOG.info("Create funny picture for {}", funnyPictureResource);
+		
+		return funnyPictureFacade.createFunnyPicture(funnyPictureResource);
 	}
 }
