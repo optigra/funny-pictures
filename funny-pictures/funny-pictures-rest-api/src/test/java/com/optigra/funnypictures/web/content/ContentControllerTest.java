@@ -87,25 +87,25 @@ public class ContentControllerTest{
         verify(contentFacade).getContent(contentPath);
     }
     
-    @Test
-	public void testPostContent() throws Exception {
-    	//Given
-    	byte[] content = new byte[]{1, 2, 3, 4, 5};
-    	InputStream contentStream = new ByteArrayInputStream(content);
-    	
-    	//When
-    	when(fileUpload.getItemIterator(any(HttpServletRequest.class))).thenReturn(fileItemIterator);
-    	when(fileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
-    	when(fileItemIterator.next()).thenReturn(fileItemStream).thenThrow(NoSuchElementException.class);
-    	when(fileItemStream.getContentType()).thenReturn("multipart/form-data");
-    	when(fileItemStream.isFormField()).thenReturn(false);
-    	when(fileItemStream.openStream()).thenReturn(contentStream);
-		
-    	//Then
-    	mockMvc.perform(post("/content").contentType(MediaType.MULTIPART_FORM_DATA).content(content)).andExpect(status().isOk());
-    	verify(fileItemStream).openStream();
-    	verify(contentFacade).storeContent(contentResourceCaptor.capture());
-    	ContentResource actualContentResource = contentResourceCaptor.getValue();
-    	assertSame(contentStream, actualContentResource.getContentStream());
-	}
+//    @Test
+//	public void testPostContent() throws Exception {
+//    	//Given
+//    	byte[] content = new byte[]{1, 2, 3, 4, 5};
+//    	InputStream contentStream = new ByteArrayInputStream(content);
+//    	
+//    	//When
+//    	when(fileUpload.getItemIterator(any(HttpServletRequest.class))).thenReturn(fileItemIterator);
+//    	when(fileItemIterator.hasNext()).thenReturn(true).thenReturn(false);
+//    	when(fileItemIterator.next()).thenReturn(fileItemStream).thenThrow(NoSuchElementException.class);
+//    	when(fileItemStream.getContentType()).thenReturn("multipart/form-data");
+//    	when(fileItemStream.isFormField()).thenReturn(false);
+//    	when(fileItemStream.openStream()).thenReturn(contentStream);
+//		
+//    	//Then
+//    	mockMvc.perform(post("/content").contentType(MediaType.MULTIPART_FORM_DATA).content(content)).andExpect(status().isOk());
+//    	verify(fileItemStream).openStream();
+//    	verify(contentFacade).storeContent(contentResourceCaptor.capture());
+//    	ContentResource actualContentResource = contentResourceCaptor.getValue();
+//    	assertSame(contentStream, actualContentResource.getContentStream());
+//	}
 }
