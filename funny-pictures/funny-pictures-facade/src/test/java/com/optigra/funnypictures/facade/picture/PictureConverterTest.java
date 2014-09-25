@@ -45,7 +45,17 @@ public class PictureConverterTest {
 		assertEquals(expectedResource, actualResource);
 
 	}
-
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testConvertWithNullSource() {
+		
+		// Given
+		Picture picture1 = null;
+		
+		// When
+		unit.convert(picture1);
+	}
+	
 	@Test
 	public void testConvertToResource() {
 
@@ -74,6 +84,8 @@ public class PictureConverterTest {
 
 	}
 
+	
+	
 	@Test
 	public void testConvertAll() {
 		// Given
