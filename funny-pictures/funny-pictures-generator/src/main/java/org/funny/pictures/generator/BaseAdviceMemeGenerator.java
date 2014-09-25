@@ -93,9 +93,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		
 		Object[] args = new String[]{result.toString()};
 		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);		
-		System.out.println(op.toString());
-		System.out.println(Arrays.toString(args));
-		System.out.println();
+
 		convertCommand.run(op, args);
 		
 		return result;
