@@ -26,8 +26,9 @@ public class PictureConverter extends AbstractConverter<Picture, PictureResource
 		Assert.notNull(source);
 		
 		PictureResource result = new PictureResource();
+
 		result = convert(source, result);
-		
+
 		return result;
 	}
 }
