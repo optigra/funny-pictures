@@ -108,9 +108,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 		IMOperation op = new IMOperation();
 		op.addImage();
-		op.gravity("Center");
-		op.crop(400, 400, 0, 0);
-		op.p_repage();
 		op.addImage();
 
 		Object[] args = new String[] { templatePath.toString(), result.toString() };

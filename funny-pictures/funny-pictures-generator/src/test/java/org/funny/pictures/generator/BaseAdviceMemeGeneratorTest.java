@@ -79,7 +79,7 @@ public class BaseAdviceMemeGeneratorTest {
 		verify(convertCommand, times(3)).run(convertOperationCaptor.capture(), anyVararg());
 		verify(compositeCommand, times(2)).run(compositeOperationCaptor.capture(), anyVararg());
 		
-		String expectedCropCommand = "?img? -gravity Center -crop 400x400+0+0 +repage ?img? ";
+		String expectedCropCommand = "?img? ?img? ";
 		String expectedConvertTopCommand = "-size 400x50 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Top caption ?img? ";
 		String expectedConvertBottomCommand = "-size 400x50 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Bottom caption ?img? ";
 		String expectedCompositeTopCommand = "-geometry 400x400+0+0 ?img? ?img? ?img? ";
