@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Funny pictures</title>
+<link rel="stylesheet" href="thirdparty/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="css/funny-pictures.css">
+<script src="thirdparty/js/angular.js"></script>
+<script src="thirdparty/js/angular-resource.js"></script>
+<script src="thirdparty/js/angular-route.js"></script>
+<script src="thirdparty/js/ui-bootstrap-angular-0.11.0.js"></script>
+<script src="thirdparty/js/jquery-2.1.1.js"></script>
+<script src="js/main.js"></script>
+</head>
+
+
+<body ng-app="mainModule">
+	<header></header>
+	<div class="container" role="main" ng-controller="MainController">
+		<div class="row">
+			<img class="img-thumbnail" id="large-image"
+				ng-src="{{generatedImage.url}}">
+		</div>
+	</div>
+	<footer></footer>
+</body>
+</html>

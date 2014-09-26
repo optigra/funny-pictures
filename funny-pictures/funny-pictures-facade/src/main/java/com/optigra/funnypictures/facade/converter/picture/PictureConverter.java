@@ -16,7 +16,7 @@ public class PictureConverter extends AbstractConverter<Picture, PictureResource
 		
 		target.setId(source.getId());
 		target.setName(source.getName());
-		target.setUrl(source.getUrl());
+		target.setUrl("http://localhost:8080/funny-pictures-rest-api/api/content" + source.getUrl());
 		
 		return target;
 	}

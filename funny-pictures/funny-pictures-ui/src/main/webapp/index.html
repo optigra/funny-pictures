@@ -20,21 +20,25 @@
     <div class="row">
         <div class="page-header">
             <h1>Create your picture</h1>
-            <h2>{{path}}</h2>
         </div>
 
         <div class="col-lg-7">
             <img class="img-thumbnail" id="large-image" alt="200x200"
-                 ng-src="{{imagePreview}}">
+                 ng-src="{{imagePreview.url}}">
 
-            <form class="input-form">
+            <form name="funnyText" class="input-form">
                 <div class="form-group">
-                    <input type="text" placeholder="Text above" class="form-control"/>
+                    <input type="text" placeholder="Text above" name="headerText" ng-model="headerText"
+                           class="form-control" required/>
                 </div>
                 <div class="form-group">
-                    <input type="text" placeholder="Text below" class="form-control"/>
+                    <input type="text" placeholder="Text below" name="footerText" ng-model="footerText"
+                           class="form-control" required/>
                 </div>
-                <button type="submit" class="btn btn-lg btn-success">Create
+                <div ng-show="funnyText.headerText.$dirty|| funnyText.footerText.$invalid">
+                    <span ng-show="funnyText.headerText.$error.required || funnyText.footerText.$error.required">Fill header and footer text.</span>
+                </div>
+                <button ng-click="createPicture()" class="btn btn-lg btn-success">Create
                     a picture
                 </button>
             </form>
@@ -59,8 +63,14 @@
                 </div>
             </div>
         </div>
+        
     </div>
+    <div class="row">
+        <img class="img-thumbnail" id="large-image" 
+                 ng-src="{{generatedImage.url}}">
+        </div>
 </div>
+
 <footer></footer>
 </body>
 </html>
