@@ -3,19 +3,18 @@
  */
 var funnyControllers = angular.module('funnyControllers', []);
 
-funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location', '$window', 'Pictures' , 'Funnies' , 'sharedProperties', function ($scope, $http, $location, $window, Pictures, Funnies, sharedProperties) {
+funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location', '$window', 'Pictures' , 'Funnies' , 'SharedProperties', function ($scope, $http, $location, $window, Pictures, Funnies, SharedProperties) {
     $scope.imagePreview = {};
     $scope.alerts = [];
     $scope.headerText = "";
     $scope.footerText = "";
-    $scope.currentPage = 0;
+    $scope.currentPage = 1;
     $scope.totalItems = 11;
-    $scope.itemsPerPage = 6;
-    $scope.generatedImage = sharedProperties.getGeneratedFunny();
+    $scope.itemsPerPage = 4;
 
     Pictures.query({
-        offset: 0,
-        limit: 20
+        offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+        limit: $scope.itemsPerPage
     }, function (data) {
         $scope.pictures = data.entities;
         $scope.totalItems = data.count;
@@ -26,7 +25,17 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
     });
 
     $scope.pageChanged = function () {
-        console.log('Page changed to: ' + $scope.currentPage);
+        Pictures.query({
+            offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+            limit: $scope.itemsPerPage
+        }, function (data) {
+            $scope.pictures = data.entities;
+            $scope.totalItems = data.count;
+            $scope.imagePreview = data.entities[0];
+        }, function (error) {
+            $scope.totalItems = 0;
+            $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
+        });
     };
 
     $scope.showPagination = function () {
@@ -52,7 +61,7 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
         postObject.template.id = $scope.imagePreview.id;
         Funnies.save(postObject,
             function (data) {
-                sharedProperties.setGeneratedFunny(data);
+                SharedProperties.setGeneratedFunny(data);
                 $scope.alerts.push({type: 'success', msg: "Picture created with id : " + data.id});
                 $location.path('/preview');
             },
@@ -64,3 +73,41 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
     };
 
 } ]);
+
+funnyControllers.controller('PreviewFunnyController', [ '$scope', 'SharedProperties', function ($scope, SharedProperties) {
+    $scope.generatedImage = SharedProperties.getGeneratedFunny();
+} ]);
+
+funnyControllers.controller('HeaderController', [ '$scope', '$location' , function ($scope, $location) {
+    $scope.isActive = function (viewLocation) {
+        return viewLocation === $location.path();
+    };
+} ]);
+
+funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , 'FileUpload' , 'SharedProperties', 'Pictures' , '$location', function ($scope, $http, $location, FileUpload, SharedProperties, Pictures) {
+    $scope.pictureTitle = "";
+    $scope.headerText = "";
+    $scope.uploadFile = function () {
+        var file = $scope.myFile;
+        var uploadUrl = SharedProperties.getApiUrl() + "/content";
+        FileUpload.uploadFileToUrl(file, uploadUrl)
+            .then(function (data) {
+                var pictureObject = {
+                    name: $scope.pictureTitle,
+                    url: data.path
+                };
+                Pictures.save(pictureObject,
+                    function (data) {
+                        $scope.headerText = "File " + data + " uploaded to server!";
+                        $location.path('/home');
+
+                    },
+                    function (error) {
+                        $scope.headerText = "Error" + error.message;
+                    }
+                );
+            });
+
+    };
+} ]);
+

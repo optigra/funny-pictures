@@ -30,7 +30,7 @@
                 <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}
                 </alert>
                 <div class="row" style="text-align: center; ">
-                    <div class="row" ng-repeat="picture in pictures track by $index"
+                    <div class="row" ng-repeat="picture in pictures track by $index "
                          ng-if="$index%2==0">
 
                         <div class="col-md-6" ng-repeat="i in [$index,$index+1]"
