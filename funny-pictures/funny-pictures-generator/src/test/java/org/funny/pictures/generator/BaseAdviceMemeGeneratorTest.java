@@ -1,10 +1,13 @@
 package org.funny.pictures.generator;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.awt.Dimension;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +18,11 @@ import java.nio.file.StandardCopyOption;
 
 import org.funny.pictures.generator.api.AdviceMemeContext;
 import org.funny.pictures.generator.api.ImageHandle;
+import org.funny.pictures.generator.util.ImageInformationExtractor;
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
+import org.im4java.process.OutputConsumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,8 +47,14 @@ public class BaseAdviceMemeGeneratorTest {
 	@Mock
 	private CompositeCmd compositeCommand;
 	
+	@Mock
+	private ImageInformationExtractor imageInfoExtractor;
+	
 	@Captor
 	private ArgumentCaptor<IMOperation> convertOperationCaptor;
+	
+	@Captor
+	private ArgumentCaptor<OutputConsumer> outputConsumerCaptor;
 	
 	@Captor
 	private ArgumentCaptor<IMOperation> compositeOperationCaptor;
@@ -71,21 +82,24 @@ public class BaseAdviceMemeGeneratorTest {
 		InputStream templateInputStream = new FileInputStream(templatePath.toString());
 		AdviceMemeContext context = new AdviceMemeContext(templateInputStream, MimeType.IMAGE_JPEG_JPG, "Top caption", "Bottom caption");
 
-		// When
+		//When
+		when(imageInfoExtractor.getImageDimension(any(Path.class))).thenReturn(new Dimension(400, 400));
 		ImageHandle imgHandle = unit.generate(context);
 		Files.copy(imgHandle.getImageInputStream(), outputImagePath, StandardCopyOption.REPLACE_EXISTING);
+		
 
 		// Then
 		verify(convertCommand, times(3)).run(convertOperationCaptor.capture(), anyVararg());
 		verify(compositeCommand, times(2)).run(compositeOperationCaptor.capture(), anyVararg());
 		
-		String expectedCropCommand = "?img? ?img? ";
-		String expectedConvertTopCommand = "-size 400x50 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Top caption ?img? ";
-		String expectedConvertBottomCommand = "-size 400x50 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Bottom caption ?img? ";
-		String expectedCompositeTopCommand = "-geometry 400x400+0+0 ?img? ?img? ?img? ";
-		String expectedCompositeBottomCommand = "-geometry 400x400+0+350 ?img? ?img? ?img? ";
+		String expectedConvertCommand = "?img? ?img? ";
 		
-		assertEquals(expectedCropCommand, convertOperationCaptor.getAllValues().get(0).toString());
+		String expectedConvertTopCommand = "-size 400x80 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Top caption ?img? ";
+		String expectedConvertBottomCommand = "-size 400x80 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Bottom caption ?img? ";
+		String expectedCompositeTopCommand = "-geometry 400x400+0+0 ?img? ?img? ?img? ";
+		String expectedCompositeBottomCommand = "-geometry 400x400+0+320 ?img? ?img? ?img? ";
+		
+		assertEquals(expectedConvertCommand, convertOperationCaptor.getAllValues().get(0).toString());
 		assertEquals(expectedConvertTopCommand, convertOperationCaptor.getAllValues().get(1).toString());
 		assertEquals(expectedConvertBottomCommand, convertOperationCaptor.getAllValues().get(2).toString());
 		assertEquals(expectedCompositeTopCommand, compositeOperationCaptor.getAllValues().get(0).toString());

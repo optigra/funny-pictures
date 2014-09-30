@@ -9,6 +9,9 @@
 	<alias name="simpleMemeGenerator" alias="memeGenerator"/>
 	<bean id="simpleMemeGenerator" class="org.funny.pictures.generator.BaseAdviceMemeGenerator">
 		<property name="outputFormat" value="IMAGE_BMP_BMP" />
+		<property name="imageInfoExtractor" ref="imageInformationExtractor"/>
 	</bean>
+	
+	<bean id="imageInformationExtractor" class="org.funny.pictures.generator.util.ImageInformationExtractor"/>
 
 </beans>

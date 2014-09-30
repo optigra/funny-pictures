@@ -2,7 +2,6 @@ package org.funny.pictures.generator.util;
 
 import static org.junit.Assert.assertEquals;
 
-import java.awt.Dimension;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
@@ -18,14 +17,6 @@ public class ImageUtilsTest {
 	private Path imagesDirectory = FileSystems.getDefault()
 			.getPath("src", "test", "resources", 
 					"org", "funny", "pictures", "generator", "util", "imageUtilsTest");
-	
-	@Test
-	public void testGetImageDimensions() throws Exception {
-		Path dog = imagesDirectory.resolve("dog-uncropped.jpg");
-		Dimension expectedDimensions = new Dimension(407, 405);
-		Dimension calculatedDimensions = ImageUtils.getImageDimension(dog);
-		assertEquals(expectedDimensions, calculatedDimensions);
-	}
 	
 	@Test
 	public void testGetNormalizedRmseDifferenceSameImage() throws Exception {

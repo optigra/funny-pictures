@@ -1,5 +1,6 @@
 package org.funny.pictures.generator;
 
+import java.awt.Dimension;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,10 +8,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import javax.annotation.Resource;
+
 import org.funny.pictures.generator.api.AdviceMemeContext;
 import org.funny.pictures.generator.api.AdviceMemeGenerator;
 import org.funny.pictures.generator.api.GeneratorException;
 import org.funny.pictures.generator.api.ImageHandle;
+import org.funny.pictures.generator.util.ImageInformationExtractor;
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
@@ -23,6 +27,8 @@ import com.optigra.funnypictures.model.content.MimeType;
 public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BaseAdviceMemeGenerator.class);
+	
+	private float captionHeightRatio = 0.2f;
 
 	public static final MimeType DEFAULT_OUTPUT_FORMAT = MimeType.IMAGE_PNG_PNG;
 
@@ -33,6 +39,19 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	private ConvertCmd convertCommand = new ConvertCmd();
 
 	private CompositeCmd compositeCommand = new CompositeCmd();
+	
+	//TODO inject with Spring
+	@Resource(name = "imageInformationExtractor")
+	private ImageInformationExtractor imageInfoExtractor;
+
+	public final ImageInformationExtractor getImageInfoExtractor() {
+		return imageInfoExtractor;
+	}
+
+	public final void setImageInfoExtractor(
+			ImageInformationExtractor imageInfoExtractor) {
+		this.imageInfoExtractor = imageInfoExtractor;
+	}
 
 	public BaseAdviceMemeGenerator() {
 	}
@@ -46,14 +65,19 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		Path topCaption = null;
 		Path bottomCaption = null;
 		Path result = null;
-		try {
+		try {			
+			
 			templateInput = toTempFile(context.getTemplateInputStream(), context.getMimeType().getExtension());
 			result = prepareTemplate(templateInput);
-			topCaption = generateCaption(context.getTopCaption(), 400, 50);
-			bottomCaption = generateCaption(context.getBottomCaption(), 400, 50);
+			
+			Dimension originalDimension = imageInfoExtractor.getImageDimension(result);
+			int captionHeight =  (int) (captionHeightRatio*originalDimension.height);
+			
+			topCaption = generateCaption(context.getTopCaption(), originalDimension.width, captionHeight);
+			bottomCaption = generateCaption(context.getBottomCaption(), originalDimension.width, captionHeight);
 
-			addCaption(result, topCaption, 0, 0);
-			addCaption(result, bottomCaption, 0, 350);
+			addCaption(result, topCaption, originalDimension, 0, 0);
+			addCaption(result, bottomCaption, originalDimension, 0, originalDimension.height-captionHeight);
 
 			InputStream resultStream = new FileInputStream(result.toString());
 			LOG.debug("Advice meme generated");
@@ -117,10 +141,10 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		return result;
 	}
 
-	private void addCaption(Path template, Path caption, int offsetX, int offsetY) throws IOException, InterruptedException, IM4JavaException {
+	private void addCaption(Path template, Path caption, Dimension resultDimension, int offsetX, int offsetY) throws IOException, InterruptedException, IM4JavaException {
 
 		IMOperation op = new IMOperation();
-		op.geometry(400, 400, offsetX, offsetY);
+		op.geometry(resultDimension.width, resultDimension.height, offsetX, offsetY);
 		op.addImage();
 		op.addImage();
 		op.addImage();
@@ -145,5 +169,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		this.outputFormat = outputFormat;
 		LOG.trace("Output format set to " + outputFormat.getType());
 	}
+	
 
 }

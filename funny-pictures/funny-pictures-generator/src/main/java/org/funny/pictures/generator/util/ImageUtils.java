@@ -1,17 +1,14 @@
 package org.funny.pictures.generator.util;
 
-import java.awt.Dimension;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.im4java.core.CompareCmd;
-import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.process.ArrayListErrorConsumer;
-import org.im4java.process.ArrayListOutputConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,35 +18,7 @@ public class ImageUtils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ImageUtils.class);
 	
-	public static Dimension getImageDimension(Path image) throws IOException,
-			InterruptedException, IM4JavaException {
-		
-		LOG.debug("Getting image dimension for image path: " + image.toAbsolutePath().toString());
-		
-		String separator = " ";
-		String resultFormat = "%w" + separator + "%h";
-
-		ConvertCmd cmd = new ConvertCmd();
-		ArrayListOutputConsumer outputConsumer = new ArrayListOutputConsumer();
-		cmd.setOutputConsumer(outputConsumer);
-		IMOperation op = new IMOperation();
-		op.addImage(image.toString());
-		op.ping();
-		op.format(resultFormat);
-		op.addImage("info:");
-		LOG.debug("Running command: " + op.toString());
-		cmd.run(op);
-
-		ArrayList<String> output = outputConsumer.getOutput();
-		
-		logCommandOutput(output);
-		
-		String[] dimensions = output.get(0).split(separator);
-		Dimension result = new Dimension(Integer.valueOf(dimensions[0]),Integer.valueOf(dimensions[1]));
-		LOG.debug("Calculated dimension: " + result.toString());
-		return result;
-
-	}
+	
 
 	/**
 	 * 
