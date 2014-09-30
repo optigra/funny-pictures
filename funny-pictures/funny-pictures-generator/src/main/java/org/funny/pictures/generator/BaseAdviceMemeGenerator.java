@@ -109,10 +109,10 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		Path result = Files.createTempFile("caption", internalFormat.getExtension());
 		IMOperation op = new IMOperation();
 		op.size(width, height);
-		op.background("transparent");
+		op.background("none");
 		op.fill("white");
 		op.stroke("black");
-		op.strokewidth(2);
+		op.strokewidth((int) Math.ceil(((double) height)/40));
 		op.font("Impact-Regular");
 		op.gravity("Center");
 		op.addImage("label:" + text);

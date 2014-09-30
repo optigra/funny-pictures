@@ -94,8 +94,8 @@ public class BaseAdviceMemeGeneratorTest {
 		
 		String expectedConvertCommand = "?img? ?img? ";
 		
-		String expectedConvertTopCommand = "-size 400x80 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Top caption ?img? ";
-		String expectedConvertBottomCommand = "-size 400x80 -background transparent -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Bottom caption ?img? ";
+		String expectedConvertTopCommand = "-size 400x80 -background none -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Top caption ?img? ";
+		String expectedConvertBottomCommand = "-size 400x80 -background none -fill white -stroke black -strokewidth 2 -font Impact-Regular -gravity Center label:Bottom caption ?img? ";
 		String expectedCompositeTopCommand = "-geometry 400x400+0+0 ?img? ?img? ?img? ";
 		String expectedCompositeBottomCommand = "-geometry 400x400+0+320 ?img? ?img? ?img? ";
 		
