@@ -40,7 +40,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 	private CompositeCmd compositeCommand = new CompositeCmd();
 	
-	//TODO inject with Spring
 	@Resource(name = "imageInformationExtractor")
 	private ImageInformationExtractor imageInfoExtractor;
 
