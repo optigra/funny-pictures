@@ -30,6 +30,11 @@
 			<artifactId>funny-pictures-generator</artifactId>
 			<version>${version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${fasterxml.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>

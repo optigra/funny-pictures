@@ -2,12 +2,14 @@ package com.optigra.funnypictures.facade.resources.content;
 
 import java.io.InputStream;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.optigra.funnypictures.model.content.MimeType;
 
 public class ContentResource {
 	
 	private String path;
 
+	@JsonIgnore // TODO: IP - think about better way to ignore field for serialization
 	private InputStream contentStream;
 	
 	private MimeType mimeType;

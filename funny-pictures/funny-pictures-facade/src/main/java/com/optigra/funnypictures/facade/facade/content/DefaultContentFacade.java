@@ -30,26 +30,32 @@ public class DefaultContentFacade implements ContentFacade {
 		
 		Content content = contentService.getContentByPath(uri);
 
-		// TODO: IP - Implement converter
+		return convertConverter(content);
+	}
+
+	private ContentResource convertConverter(Content content) {
 		ContentResource contentResource = new ContentResource();
 		contentResource.setContentStream(content.getContentStream());
 		contentResource.setMimeType(content.getMimeType());
-		contentResource.setPath(uri);
-
+		contentResource.setPath(content.getPath());
+		
 		return contentResource;
 	}
 
 	@Override
-	public void storeContent(ContentResource resource) {
+	public ContentResource storeContent(ContentResource resource) {
 		
-		Object identifier = namingStrategy.createIdentifier(resource);
+		String identifier = namingStrategy.createIdentifier(resource);
 		LOG.info("Store content with identifier: %s", identifier);
 		
 		InputStream contentStream = resource.getContentStream();
 		Content content = new Content();
 		content.setContentStream(contentStream);
-		content.setPath(identifier.toString());		
+		content.setPath(identifier);
+		content.setMimeType(resource.getMimeType());
+		
 		contentService.saveContent(content);
 		
+		return convertConverter(content);
 	}
 }

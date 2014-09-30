@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.optigra.funnypictures.facade.facade.content.ContentFacade;
@@ -40,7 +41,8 @@ public class ContentController extends BaseController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public void postContent(@RequestParam("content") MultipartFile file) throws Exception {
+	@ResponseBody
+	public ContentResource postContent(@RequestParam("content") MultipartFile file) throws Exception {
 
 		InputStream istream = file.getInputStream();
 
@@ -49,8 +51,7 @@ public class ContentController extends BaseController {
 		ContentResource contentResource = new ContentResource();
 		contentResource.setContentStream(istream);
 		contentResource.setMimeType(mimeType);
-		contentFacade.storeContent(contentResource);
 
+		return contentFacade.storeContent(contentResource);
 	}
-
 }

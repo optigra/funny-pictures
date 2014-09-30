@@ -1,11 +1,11 @@
 package com.optigra.funnypictures.facade.picture;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -17,7 +17,14 @@ import com.optigra.funnypictures.model.Picture;
 @RunWith(MockitoJUnitRunner.class)
 public class PictureConverterTest {
 
-	PictureConverter unit = new PictureConverter();
+	private String contentRootUrl = "";
+	
+	private PictureConverter unit = new PictureConverter();
+	
+	@Before
+	public void setUp(){
+		unit.setContentRootUrl(contentRootUrl);
+	}
 
 	@Test
 	public void testConvert() {
@@ -83,8 +90,6 @@ public class PictureConverterTest {
 		assertEquals(expectedResource,actualResource);
 
 	}
-
-	
 	
 	@Test
 	public void testConvertAll() {
@@ -103,9 +108,9 @@ public class PictureConverterTest {
 		picture1.setUrl(url1);
 
 		Picture picture2 = new Picture();
-		picture1.setId(id2);
-		picture1.setName(name2);
-		picture1.setUrl(url2);
+		picture2.setId(id2);
+		picture2.setName(name2);
+		picture2.setUrl(url2);
 
 		PictureResource expectedResource1 = new PictureResource();
 
@@ -115,9 +120,9 @@ public class PictureConverterTest {
 
 		PictureResource expectedResource2= new PictureResource();
 		
-		expectedResource1.setId(id2);
-		expectedResource1.setName(name2);
-		expectedResource1.setUrl(url2);
+		expectedResource2.setId(id2);
+		expectedResource2.setName(name2);
+		expectedResource2.setUrl(url2);
 
 		List<PictureResource> expectedResource = Arrays.asList(expectedResource1,expectedResource2);
 		
@@ -125,6 +130,6 @@ public class PictureConverterTest {
 		List<PictureResource> actualResource = unit.convertAll(Arrays.asList(picture1,picture2)); 
 
 		// Then
-		assertArrayEquals(expectedResource.toArray(), actualResource.toArray());
+		assertEquals(expectedResource, actualResource);
 	}
 }

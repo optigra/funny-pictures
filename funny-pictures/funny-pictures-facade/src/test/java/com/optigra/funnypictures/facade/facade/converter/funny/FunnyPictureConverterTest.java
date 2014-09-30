@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -16,8 +17,15 @@ import com.optigra.funnypictures.model.FunnyPicture;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FunnyPictureConverterTest {
-
+	
+	private String contentRootUrl = "";
+	
 	private FunnyPictureConverter unit = new FunnyPictureConverter();
+	
+	@Before
+	public void setUp(){
+		unit.setContentRootUrl(contentRootUrl);
+	}
 
 	@Test
 	public void testConvert() {
@@ -97,9 +105,9 @@ public class FunnyPictureConverterTest {
 		picture1.setUrl(url1);
 
 		FunnyPicture picture2 = new FunnyPicture();
-		picture1.setId(id2);
-		picture1.setName(name2);
-		picture1.setUrl(url2);
+		picture2.setId(id2);
+		picture2.setName(name2);
+		picture2.setUrl(url2);
 
 		FunnyPictureResource expectedResource1 = new FunnyPictureResource();
 
@@ -109,9 +117,9 @@ public class FunnyPictureConverterTest {
 
 		FunnyPictureResource expectedResource2 = new FunnyPictureResource();
 
-		expectedResource1.setId(id2);
-		expectedResource1.setName(name2);
-		expectedResource1.setUrl(url2);
+		expectedResource2.setId(id2);
+		expectedResource2.setName(name2);
+		expectedResource2.setUrl(url2);
 
 		List<FunnyPictureResource> expectedResource = Arrays.asList(expectedResource1, expectedResource2);
 

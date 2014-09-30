@@ -6,5 +6,5 @@ public interface ContentFacade {
 
 	ContentResource getContent(String uri);
 	
-	void storeContent(ContentResource resource);
+	ContentResource storeContent(ContentResource resource);
 }
