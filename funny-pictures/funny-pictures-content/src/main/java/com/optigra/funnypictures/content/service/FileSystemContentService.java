@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -15,6 +16,13 @@ import com.optigra.funnypictures.content.ContentSaveException;
 import com.optigra.funnypictures.content.model.Content;
 import com.optigra.funnypictures.model.content.MimeType;
 
+/**
+ * Service, that allow you to make different manipulations with content.
+ * 
+ * @author oyats
+ * 
+ */
+
 public class FileSystemContentService implements ContentService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FileSystemContentService.class);
@@ -24,7 +32,7 @@ public class FileSystemContentService implements ContentService {
 	private String contentRepositoryPath;
 
 	@Override
-	public Content getContentByPath(String path) {
+	public Content getContentByPath(final String path) {
 		Content content = null;
 
 		LOG.info("Read file from " + path);
@@ -40,8 +48,12 @@ public class FileSystemContentService implements ContentService {
 			content.setSize(Long.valueOf(file.getTotalSpace()));
 			content.setMimeType(MimeType.fromExtension(EXTENSION_SEPARATOR + fileExtention));
 
+			fileInputStream.close();
 		} catch (FileNotFoundException e) {
 			LOG.error("Can't read file from file system", e);
+			throw new ContentReadException(e);
+		} catch (IOException e) {
+			LOG.error("Can't close file input stream", e);
 			throw new ContentReadException(e);
 		}
 
@@ -49,21 +61,32 @@ public class FileSystemContentService implements ContentService {
 	}
 
 	@Override
-	public void saveContent(Content content) {
+	public void saveContent(final Content content) {
 		LOG.info("Save content: {}", content);
 
 		File file = new File(getFullfilePath(content.getPath()));
 
 		try {
-			file.createNewFile();
-			IOUtils.copy(content.getContentStream(), new FileOutputStream(file));
+
+			if (file.createNewFile()) {
+				IOUtils.copy(content.getContentStream(), new FileOutputStream(file));
+			}
+
 		} catch (Exception e) {
 			LOG.error("Can't save file", e);
 			throw new ContentSaveException("Can't save file", e);
 		}
 	}
 
-	private String getFullfilePath(String filePath) {
+	/**
+	 * Method, that allows you to get Full File Path.
+	 * 
+	 * @param filePath
+	 *            Input file path, for which you want to find full file path.
+	 * @return Returns full path of file.
+	 */
+
+	private String getFullfilePath(final String filePath) {
 		return getContentRepositoryPath() + filePath;
 	}
 
@@ -71,7 +94,7 @@ public class FileSystemContentService implements ContentService {
 		return contentRepositoryPath;
 	}
 
-	public void setContentRepositoryPath(String contentRepositoryPath) {
+	public void setContentRepositoryPath(final String contentRepositoryPath) {
 		this.contentRepositoryPath = contentRepositoryPath;
 	}
 }

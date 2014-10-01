@@ -4,21 +4,28 @@ import java.io.InputStream;
 
 import com.optigra.funnypictures.model.content.MimeType;
 
+/**
+ * Content describes entity of picture with path, size, contentStream and
+ * mimeType.
+ * 
+ * @author oyats
+ * 
+ */
 public class Content {
-	
+
 	private String path;
-	
+
 	private Long size;
-	
+
 	private InputStream contentStream;
-	
+
 	private MimeType mimeType;
 
 	public String getPath() {
 		return path;
 	}
 
-	public void setPath(String path) {
+	public void setPath(final String path) {
 		this.path = path;
 	}
 
@@ -26,7 +33,7 @@ public class Content {
 		return size;
 	}
 
-	public void setSize(Long size) {
+	public void setSize(final Long size) {
 		this.size = size;
 	}
 
@@ -34,7 +41,7 @@ public class Content {
 		return contentStream;
 	}
 
-	public void setContentStream(InputStream contentStream) {
+	public void setContentStream(final InputStream contentStream) {
 		this.contentStream = contentStream;
 	}
 
@@ -42,7 +49,7 @@ public class Content {
 		return mimeType;
 	}
 
-	public void setMimeType(MimeType mimeType) {
+	public void setMimeType(final MimeType mimeType) {
 		this.mimeType = mimeType;
 	}
 
