@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A class that contains routines for getting metainformation about images.
  * Methods of this class never modify images they work with.
  * @author odisseus
  *
@@ -34,7 +35,13 @@ public class ImageInformationExtractor {
 	
 	private CompareCmd compareCommand = new CompareCmd();
 
-	public Dimension getImageDimension(Path image) throws ImageAccessException {
+	/**
+	 * Returns the dimension (width and height) of an image
+	 * @param image target image
+	 * @return dimension of the image
+	 * @throws ImageAccessException
+	 */
+	public Dimension getImageDimension(final Path image) throws ImageAccessException {
 
 		LOG.debug("Getting image dimension for image path: "
 				+ image.toAbsolutePath().toString());
@@ -75,9 +82,12 @@ public class ImageInformationExtractor {
 	}
 	
 	/**
-	 * 
-	 * @param image
-	 * @return
+	 * Returns normalized RMSE difference between two images.
+	 * Its values are between 0 and 1. Value of 0 corresponds to identical images.
+	 * Order of images doesn't matter.
+	 * @param imageA image to compare
+	 * @param imageB another image to compare
+	 * @return normalized RMSE value (between 0 and 1)
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws IM4JavaException
@@ -85,8 +95,8 @@ public class ImageInformationExtractor {
 	 *       https://en.wikipedia.org/wiki/Root-mean-square_deviation#Normalized_root
 	 *       -mean-square_deviation
 	 */
-	public double calculateNormalizedRmseDifference(Path imageA,
-			Path imageB) throws ImageAccessException {
+	public double calculateNormalizedRmseDifference(final Path imageA,
+			final Path imageB) throws ImageAccessException {
 		
 		LOG.debug("Calculating image dimension for image paths \"%1$s\" and \"%2$s\"", 
 				imageA.toAbsolutePath(), imageB.toAbsolutePath());
@@ -133,7 +143,11 @@ public class ImageInformationExtractor {
 
 	}
 	
-	private void logCommandOutput(List<String> output) {
+	/**
+	 * Logs multiline IM command output with DEBUG level.
+	 * @param output
+	 */
+	private void logCommandOutput(final List<String> output) {
 		StringBuilder logBuilder = new StringBuilder(System.lineSeparator());
 		for(String outputRow : output){
 			logBuilder.append(outputRow).append(System.lineSeparator());

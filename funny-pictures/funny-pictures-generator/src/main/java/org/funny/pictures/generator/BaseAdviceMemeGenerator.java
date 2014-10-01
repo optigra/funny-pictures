@@ -24,6 +24,11 @@ import org.slf4j.LoggerFactory;
 
 import com.optigra.funnypictures.model.content.MimeType;
 
+/**
+ * Generator of advice comics.
+ * @author odisseus
+ *
+ */
 public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BaseAdviceMemeGenerator.class);
@@ -47,8 +52,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		return imageInfoExtractor;
 	}
 
+	//TODO check whether this setter is necessary
 	public final void setImageInfoExtractor(
-			ImageInformationExtractor imageInfoExtractor) {
+			final ImageInformationExtractor imageInfoExtractor) {
 		this.imageInfoExtractor = imageInfoExtractor;
 	}
 
@@ -56,7 +62,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	}
 
 	@Override
-	public ImageHandle generate(AdviceMemeContext context) throws GeneratorException {
+	public ImageHandle generate(final AdviceMemeContext context) throws GeneratorException {
 
 		LOG.debug("Generating an advice meme from context: " + context.toString());
 
@@ -75,8 +81,8 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 			topCaption = generateCaption(context.getTopCaption(), originalDimension.width, captionHeight);
 			bottomCaption = generateCaption(context.getBottomCaption(), originalDimension.width, captionHeight);
 
-			addCaption(result, topCaption, originalDimension, 0, 0);
-			addCaption(result, bottomCaption, originalDimension, 0, originalDimension.height-captionHeight);
+			superimpose(result, topCaption, originalDimension, 0, 0);
+			superimpose(result, bottomCaption, originalDimension, 0, originalDimension.height-captionHeight);
 
 			InputStream resultStream = new FileInputStream(result.toString());
 			LOG.debug("Advice meme generated");
@@ -105,7 +111,18 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		}
 	}
 
-	private Path generateCaption(String text, int width, int height) throws IOException, InterruptedException, IM4JavaException {
+	/**
+	 * Renders an intermediate image with caption.
+	 * Tries to use the font size that fits best into the specified dimensions.
+	 * @param text caption text
+	 * @param width width of caption area
+	 * @param height height of caption area
+	 * @return path to generated image
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
+	private Path generateCaption(final String text, final int width, final int height) throws IOException, InterruptedException, IM4JavaException {
 		Path result = Files.createTempFile("caption", internalFormat.getExtension());
 		IMOperation op = new IMOperation();
 		op.size(width, height);
@@ -126,7 +143,16 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		return result;
 	}
 
-	private Path prepareTemplate(Path templatePath) throws IOException, InterruptedException, IM4JavaException {
+	/**
+	 * Creates a copy of template image to work with,
+	 * converted to internal format.
+	 * @param templatePath path to template image
+	 * @return path to converted working copy
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
+	private Path prepareTemplate(final Path templatePath) throws IOException, InterruptedException, IM4JavaException {
 		Path result = Files.createTempFile("template", internalFormat.getExtension());
 
 		IMOperation op = new IMOperation();
@@ -140,7 +166,19 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		return result;
 	}
 
-	private void addCaption(Path template, Path caption, Dimension resultDimension, int offsetX, int offsetY) throws IOException, InterruptedException, IM4JavaException {
+	/**
+	 * Superimposes one image on top of another, with specified
+	 * size of resulting image and offset of top layer.
+	 * @param bottom bottom layer
+	 * @param top top layer
+	 * @param resultDimension dimension of the resulting image; required for IM backend
+	 * @param offsetX horizontal offset of top layer
+	 * @param offsetY vertical offset of top layer
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws IM4JavaException
+	 */
+	private void superimpose(final Path bottom, final Path top, final Dimension resultDimension, final int offsetX, final int offsetY) throws IOException, InterruptedException, IM4JavaException {
 
 		IMOperation op = new IMOperation();
 		op.geometry(resultDimension.width, resultDimension.height, offsetX, offsetY);
@@ -148,12 +186,19 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		op.addImage();
 		op.addImage();
 
-		Object[] args = new String[] { caption.toString(), template.toString(), template.toString() };
+		Object[] args = new String[] { top.toString(), bottom.toString(), bottom.toString() };
 		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
 		compositeCommand.run(op, args);
 	}
 
-	private Path toTempFile(InputStream istream, String extensionSuffix) throws IOException {
+	/**
+	 * Writes data from an input stream to temporary file.
+	 * @param istream input stream
+	 * @param extensionSuffix extension of file to generate
+	 * @return path to generated file
+	 * @throws IOException
+	 */
+	private Path toTempFile(final InputStream istream, final String extensionSuffix) throws IOException {
 		Path result = Files.createTempFile("template", extensionSuffix);
 		Files.copy(istream, result, StandardCopyOption.REPLACE_EXISTING);
 		LOG.debug("Created a temporary file: " + result.toAbsolutePath().toString());
@@ -164,7 +209,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		return outputFormat;
 	}
 
-	public void setOutputFormat(MimeType outputFormat) {
+	public void setOutputFormat(final MimeType outputFormat) {
 		this.outputFormat = outputFormat;
 		LOG.trace("Output format set to " + outputFormat.getType());
 	}

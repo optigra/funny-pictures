@@ -4,21 +4,33 @@ import java.io.InputStream;
 
 import com.optigra.funnypictures.model.content.MimeType;
 
+/**
+ * A set of input data required to generate an advice comic.
+ * @author odisseus
+ *
+ */
 public class AdviceMemeContext {
 	
 	private final InputStream templateInputStream;
 	
-	private final MimeType mimeType;
+	private final MimeType inputMimeType;
 	
 	private final String topCaption;
 	
 	private final String bottomCaption;
 
-	public AdviceMemeContext(InputStream templateInputStream, MimeType mimeType,
-			String topCaption, String bottomCaption) {
+	/**
+	 * Creates a context with supplied data fields.
+	 * @param templateInputStream input stream containing template image binary data 
+	 * @param mimeType MIME type of the template image
+	 * @param topCaption text of top caption
+	 * @param bottomCaption text of bottom caption
+	 */
+	public AdviceMemeContext(final InputStream templateInputStream, final MimeType mimeType,
+			final String topCaption, final String bottomCaption) {
 		super();
 		this.templateInputStream = templateInputStream;
-		this.mimeType = mimeType;
+		this.inputMimeType = mimeType;
 		this.topCaption = topCaption;
 		this.bottomCaption = bottomCaption;
 	}
@@ -28,7 +40,7 @@ public class AdviceMemeContext {
 	}
 
 	public MimeType getMimeType() {
-		return mimeType;
+		return inputMimeType;
 	}
 
 	public String getTopCaption() {
@@ -42,7 +54,7 @@ public class AdviceMemeContext {
 	@Override
 	public String toString() {
 		return "AdviceMemeContext [templateInputStream=" + templateInputStream
-				+ ", mimeType=" + mimeType.getType() + ", topCaption=" + topCaption
+				+ ", mimeType=" + inputMimeType.getType() + ", topCaption=" + topCaption
 				+ ", bottomCaption=" + bottomCaption + "]";
 	}
 
