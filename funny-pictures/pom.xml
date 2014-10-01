@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>funny-pictures</groupId>
@@ -20,7 +21,6 @@
 		<module>funny-pictures-migrations</module>
 		<module>funny-pictures-generator</module>
 		<module>funny-pictures-content</module>
-		<module>funny-pictures-integration</module>
 	</modules>
 
 	<properties>
@@ -33,9 +33,9 @@
 		<slf4j.version>1.7.7</slf4j.version>
 		<log4j.version>1.2.17</log4j.version>
 		<fasterxml.version>2.4.2</fasterxml.version>
-		
+
 		<migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
-		
+
 		<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
 		<jdbc.databaseurl>jdbc:postgresql://localhost:5432/optigra-funnypictures</jdbc.databaseurl>
 		<jdbc.username>postgres</jdbc.username>
@@ -45,6 +45,8 @@
 		<content.repository.path>${user.home}/tmp/funny-pictures</content.repository.path>
 		<api.output.json.pretty>true</api.output.json.pretty>
 		<api.domain.content.url>http://localhost:8080/funny-pictures-rest-api/api/content</api.domain.content.url>
+
+		<checkstyleDir>${basedir}/checks</checkstyleDir>
 	</properties>
 
 	<dependencies>
@@ -107,7 +109,7 @@
 			<version>${log4j.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-io</artifactId>
@@ -139,20 +141,117 @@
 					<target>${java-version}</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.9</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<configLocation>${checkstyleDir}/checkstyle.xml</configLocation>
+					<suppressionsLocation>${checkstyleDir}/suppressions.xml</suppressionsLocation>
+					<failsOnError>true</failsOnError>
+					<failOnViolation>true</failOnViolation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.3.3</version>
+				<configuration>
+					<trace>false</trace>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<xmlOutput>true</xmlOutput>
+					<failOnError>true</failOnError>
+					<findbugsXmlOutput>true</findbugsXmlOutput>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.2</version>
+			</plugin>
 		</plugins>
 		<resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0-beta-2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<trace>false</trace>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<xmlOutput>true</xmlOutput>
+					<failOnError>true</failOnError>
+					<findbugsXmlOutput>true</findbugsXmlOutput>
+					<formats>
+						<format>xml</format>
+						<format>html</format>
+					</formats>
+					<canGenerate>true</canGenerate>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<configLocation>${checkstyleDir}/checkstyle.xml</configLocation>
+					<suppressionsLocation>${checkstyleDir}/suppressions.xml</suppressionsLocation>
+					<failsOnError>true</failsOnError>
+					<failOnViolation>true</failOnViolation>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 	<profiles>
 		<profile>
 			<id>development</id>
 			<properties>
 				<migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
 			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 		<profile>
 			<id>dump</id>
@@ -160,5 +259,12 @@
 				<migrations.location>src/main/resources/migrations/db.changelog-initial-dataset.xml</migrations.location>
 			</properties>
 		</profile>
-	</profiles>	
+
+		<profile>
+			<id>integration</id>
+			<modules>
+				<module>funny-pictures-integration</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>

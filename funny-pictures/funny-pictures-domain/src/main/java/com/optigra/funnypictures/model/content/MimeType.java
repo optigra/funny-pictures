@@ -662,7 +662,7 @@ public enum MimeType {
 		private String type;
 		private String extension;
 		
-		MimeType(String type, String extension) {
+		MimeType(final String type, final String extension) {
 			this.type = type;
 			this.extension = extension;
 		}
@@ -670,7 +670,7 @@ public enum MimeType {
 		/**
 		 * Get a String representation of this type. e.g. "application/zip"
 		 * 
-		 * @return
+		 * @return type
 		 */
 		public String getType() {
 			return type;
@@ -679,7 +679,7 @@ public enum MimeType {
 		/**
 		 * Get the extension for this type. e.g. ".zip"
 		 * 
-		 * @return
+		 * @return extension
 		 */
 		public String getExtension() {
 			return extension;
@@ -707,8 +707,7 @@ public enum MimeType {
 		/**
 		 * Gets the first matching mime-type for the given extension
 		 * 
-		 * @param extension
-		 *            e.g. ".zip"
+		 * @param extension e.g. ".zip"
 		 * @return The MimeType that matched the given extension
 		 */
 		public static MimeType fromExtension(String extension) {

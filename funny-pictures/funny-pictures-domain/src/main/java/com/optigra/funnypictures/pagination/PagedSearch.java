@@ -7,7 +7,6 @@ import com.optigra.funnypictures.queries.Queries;
 
 /**
  * Class for paged queries.
- * @date Feb 6, 2014
  * @author ivanursul
  *
  */
@@ -23,8 +22,8 @@ public class PagedSearch<T> {
 		super();
 	}
 
-	public PagedSearch(Integer offset, Integer limit, Queries query,
-			Map<String, Object> parameters, Class<T> clazz) {
+	public PagedSearch(final Integer offset, final Integer limit, final Queries query,
+			final Map<String, Object> parameters, final Class<T> clazz) {
 		super();
 		this.offset = offset;
 		this.limit = limit;
@@ -37,7 +36,7 @@ public class PagedSearch<T> {
 		return offset;
 	}
 
-	public void setOffset(Integer offset) {
+	public void setOffset(final Integer offset) {
 		this.offset = offset;
 	}
 
@@ -45,7 +44,7 @@ public class PagedSearch<T> {
 		return limit;
 	}
 
-	public void setLimit(Integer limit) {
+	public void setLimit(final Integer limit) {
 		this.limit = limit;
 	}
 
@@ -53,7 +52,7 @@ public class PagedSearch<T> {
 		return query;
 	}
 
-	public void setQuery(Queries query) {
+	public void setQuery(final Queries query) {
 		this.query = query;
 	}
 
@@ -61,7 +60,7 @@ public class PagedSearch<T> {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, Object> parameters) {
+	public void setParameters(final Map<String, Object> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -69,7 +68,7 @@ public class PagedSearch<T> {
 		return clazz;
 	}
 
-	public void setClazz(Class<T> clazz) {
+	public void setClazz(final Class<T> clazz) {
 		this.clazz = clazz;
 	}
 
@@ -87,7 +86,7 @@ public class PagedSearch<T> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)

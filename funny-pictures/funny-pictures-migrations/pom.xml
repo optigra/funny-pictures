@@ -9,6 +9,10 @@
 	<name>funny-pictures-migrations</name>
 	<url>http://maven.apache.org</url>
 
+	<properties>
+		<checkstyleDir>${basedir}/../checks</checkstyleDir>
+	</properties>
+
 	<parent>
 		<groupId>funny-pictures</groupId>
 		<artifactId>funny-pictures</artifactId>
