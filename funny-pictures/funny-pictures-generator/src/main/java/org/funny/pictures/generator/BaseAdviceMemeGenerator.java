@@ -58,11 +58,8 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		this.imageInfoExtractor = imageInfoExtractor;
 	}
 
-	public BaseAdviceMemeGenerator() {
-	}
-
 	@Override
-	public ImageHandle generate(final AdviceMemeContext context) throws GeneratorException {
+	public ImageHandle generate(final AdviceMemeContext context) {
 
 		LOG.debug("Generating an advice meme from context: " + context.toString());
 
@@ -76,20 +73,20 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 			result = prepareTemplate(templateInput);
 			
 			Dimension originalDimension = imageInfoExtractor.getImageDimension(result);
-			int captionHeight =  (int) (captionHeightRatio*originalDimension.height);
+			int captionHeight =  (int) (captionHeightRatio * originalDimension.height);
 			
 			topCaption = generateCaption(context.getTopCaption(), originalDimension.width, captionHeight);
 			bottomCaption = generateCaption(context.getBottomCaption(), originalDimension.width, captionHeight);
 
 			superimpose(result, topCaption, originalDimension, 0, 0);
-			superimpose(result, bottomCaption, originalDimension, 0, originalDimension.height-captionHeight);
+			superimpose(result, bottomCaption, originalDimension, 0, originalDimension.height - captionHeight);
 
 			InputStream resultStream = new FileInputStream(result.toString());
 			LOG.debug("Advice meme generated");
 
 			return new ImageHandle(resultStream, outputFormat);
 
-		} catch (Exception e) {
+		} catch (IOException | IM4JavaException | InterruptedException e) {
 			LOG.error("Internal generation procedure failed", e);
 			throw new GeneratorException(e.getMessage(), e);
 		} finally {
@@ -118,9 +115,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	 * @param width width of caption area
 	 * @param height height of caption area
 	 * @return path to generated image
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws IM4JavaException
+	 * @throws IOException when an IO problem occurs
+	 * @throws InterruptedException when thread is interrupted
+	 * @throws IM4JavaException when an im4java problem occurs
 	 */
 	private Path generateCaption(final String text, final int width, final int height) throws IOException, InterruptedException, IM4JavaException {
 		Path result = Files.createTempFile("caption", internalFormat.getExtension());
@@ -129,13 +126,13 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		op.background("none");
 		op.fill("white");
 		op.stroke("black");
-		op.strokewidth((int) Math.ceil(((double) height)/40));
+		op.strokewidth((int) Math.ceil(((double) height) / 40));
 		op.font("Impact-Regular");
 		op.gravity("Center");
 		op.addImage("label:" + text);
 		op.addImage();
 
-		Object[] args = new String[] { result.toString() };
+		Object[] args = new String[] {result.toString()};
 		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
 
 		convertCommand.run(op, args);
@@ -148,9 +145,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	 * converted to internal format.
 	 * @param templatePath path to template image
 	 * @return path to converted working copy
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws IM4JavaException
+	 * @throws IOException when an IO problem occurs
+	 * @throws InterruptedException when thread is interrupted
+	 * @throws IM4JavaException when an im4java problem occurs
 	 */
 	private Path prepareTemplate(final Path templatePath) throws IOException, InterruptedException, IM4JavaException {
 		Path result = Files.createTempFile("template", internalFormat.getExtension());
@@ -159,7 +156,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		op.addImage();
 		op.addImage();
 
-		Object[] args = new String[] { templatePath.toString(), result.toString() };
+		Object[] args = new String[] {templatePath.toString(), result.toString()};
 		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
 		convertCommand.run(op, args);
 
@@ -174,11 +171,12 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	 * @param resultDimension dimension of the resulting image; required for IM backend
 	 * @param offsetX horizontal offset of top layer
 	 * @param offsetY vertical offset of top layer
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws IM4JavaException
+	 * @throws IOException when an IO problem occurs
+	 * @throws InterruptedException when thread is interrupted
+	 * @throws IM4JavaException when an im4java problem occurs
 	 */
-	private void superimpose(final Path bottom, final Path top, final Dimension resultDimension, final int offsetX, final int offsetY) throws IOException, InterruptedException, IM4JavaException {
+	private void superimpose(final Path bottom, final Path top, final Dimension resultDimension, final int offsetX, final int offsetY) 
+			throws IOException, InterruptedException, IM4JavaException {
 
 		IMOperation op = new IMOperation();
 		op.geometry(resultDimension.width, resultDimension.height, offsetX, offsetY);
@@ -186,7 +184,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		op.addImage();
 		op.addImage();
 
-		Object[] args = new String[] { top.toString(), bottom.toString(), bottom.toString() };
+		Object[] args = new String[] {top.toString(), bottom.toString(), bottom.toString()};
 		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
 		compositeCommand.run(op, args);
 	}
@@ -196,7 +194,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	 * @param istream input stream
 	 * @param extensionSuffix extension of file to generate
 	 * @return path to generated file
-	 * @throws IOException
+	 * @throws IOException when an IO problem occurs
 	 */
 	private Path toTempFile(final InputStream istream, final String extensionSuffix) throws IOException {
 		Path result = Files.createTempFile("template", extensionSuffix);
@@ -205,10 +203,18 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		return result;
 	}
 
+	/**
+	 * Returns MIME type of output images.
+	 * @return MIME type of output images
+	 */
 	public MimeType getOutputFormat() {
 		return outputFormat;
 	}
 
+	/**
+	 * Sets MIME type of output images.
+	 * @param outputFormat MIME type of output images
+	 */
 	public void setOutputFormat(final MimeType outputFormat) {
 		this.outputFormat = outputFormat;
 		LOG.trace("Output format set to " + outputFormat.getType());

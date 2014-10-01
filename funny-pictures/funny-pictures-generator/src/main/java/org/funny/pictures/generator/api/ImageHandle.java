@@ -28,7 +28,7 @@ public class ImageHandle {
 
 	/**
 	 * Returns image data as an input stream.
-	 * @return
+	 * @return image data stream
 	 */
 	public InputStream getImageInputStream() {
 		return imageInputStream;
@@ -36,7 +36,7 @@ public class ImageHandle {
 
 	/**
 	 * Returns image MIME type.
-	 * @return
+	 * @return MIME type of the image data
 	 */
 	public MimeType getImageFormat() {
 		return imageFormat;

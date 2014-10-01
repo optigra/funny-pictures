@@ -36,12 +36,11 @@ public class ImageInformationExtractor {
 	private CompareCmd compareCommand = new CompareCmd();
 
 	/**
-	 * Returns the dimension (width and height) of an image
+	 * Returns the dimension (width and height) of an image.
 	 * @param image target image
 	 * @return dimension of the image
-	 * @throws ImageAccessException
 	 */
-	public Dimension getImageDimension(final Path image) throws ImageAccessException {
+	public Dimension getImageDimension(final Path image) {
 
 		LOG.debug("Getting image dimension for image path: "
 				+ image.toAbsolutePath().toString());
@@ -88,15 +87,11 @@ public class ImageInformationExtractor {
 	 * @param imageA image to compare
 	 * @param imageB another image to compare
 	 * @return normalized RMSE value (between 0 and 1)
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws IM4JavaException
 	 * @link 
 	 *       https://en.wikipedia.org/wiki/Root-mean-square_deviation#Normalized_root
 	 *       -mean-square_deviation
 	 */
-	public double calculateNormalizedRmseDifference(final Path imageA,
-			final Path imageB) throws ImageAccessException {
+	public double calculateNormalizedRmseDifference(final Path imageA, final Path imageB) {
 		
 		LOG.debug("Calculating image dimension for image paths \"%1$s\" and \"%2$s\"", 
 				imageA.toAbsolutePath(), imageB.toAbsolutePath());
@@ -149,7 +144,7 @@ public class ImageInformationExtractor {
 	 */
 	private void logCommandOutput(final List<String> output) {
 		StringBuilder logBuilder = new StringBuilder(System.lineSeparator());
-		for(String outputRow : output){
+		for (String outputRow : output) {
 			logBuilder.append(outputRow).append(System.lineSeparator());
 		}
 		LOG.debug("Command output: " + logBuilder.toString());
