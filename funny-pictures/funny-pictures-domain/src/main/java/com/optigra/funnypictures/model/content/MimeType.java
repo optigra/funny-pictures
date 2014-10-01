@@ -1,5 +1,7 @@
 package com.optigra.funnypictures.model.content;
 
+import java.util.Locale;
+
 /**
  * MIME types.
  * @author iurii
@@ -694,7 +696,7 @@ public enum MimeType {
 		 */
 		public static MimeType fromType(final String type) {
 			if (type != null) {
-				String typeTemp = type.trim().toLowerCase();
+				String typeTemp = type.trim().toLowerCase(Locale.ENGLISH);
 				for (MimeType mt : MimeType.values()) {
 					if (mt.getType().equals(typeTemp)) {
 						return mt;
@@ -712,7 +714,7 @@ public enum MimeType {
 		 */
 		public static MimeType fromExtension(final String extension) {
 			if (extension != null) {
-				String extensionTemp = extension.trim().toLowerCase();
+				String extensionTemp = extension.trim().toLowerCase(Locale.ENGLISH);
 				for (MimeType mt : MimeType.values()) {
 					if (mt.getExtension().equals(extensionTemp)) {
 						return mt;
