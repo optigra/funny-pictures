@@ -10,29 +10,34 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+/**
+ * Entity, that describes Template for Funny Pictures.
+ * @author ivanursul
+ *
+ */
 @Entity
-@Table(name="picture")
+@Table(name = "picture")
 public class Picture {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
+	@Column(name = "id")
 	private Long id;
 	
-	@Column(name="name")
+	@Column(name = "name")
 	private String name;
 	
-	@Column(name="url")
+	@Column(name = "url")
 	private String url;
 
-	@OneToMany(mappedBy="picture")
+	@OneToMany(mappedBy = "picture")
 	private Set<FunnyPicture> funnyPictures;
 	
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -40,7 +45,7 @@ public class Picture {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -48,7 +53,7 @@ public class Picture {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.url = url;
 	}
 
@@ -56,6 +61,8 @@ public class Picture {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((funnyPictures == null) ? 0 : funnyPictures.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
@@ -63,29 +70,45 @@ public class Picture {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Picture other = (Picture) obj;
+		if (funnyPictures == null) {
+			if (other.funnyPictures != null) {
+				return false;
+			}
+		} else if (!funnyPictures.equals(other.funnyPictures)) {
+			return false;
+		}
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (url == null) {
-			if (other.url != null)
+			if (other.url != null) {
 				return false;
-		} else if (!url.equals(other.url))
+			}
+		} else if (!url.equals(other.url)) {
 			return false;
+		}
 		return true;
 	}
 

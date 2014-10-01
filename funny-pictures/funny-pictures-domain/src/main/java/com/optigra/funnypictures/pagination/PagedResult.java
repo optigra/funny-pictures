@@ -2,7 +2,13 @@ package com.optigra.funnypictures.pagination;
 
 import java.util.List;
 
-
+/**
+ * Class for getting paged result.
+ * This class is used when you need to get pagination result.
+ * @author ivanursul
+ *
+ * @param <E> E is a generic for entities.
+ */
 public class PagedResult<E> {
 
 	private Integer offset;
@@ -10,7 +16,15 @@ public class PagedResult<E> {
     private long count;
     private List<E> entities;
     
-	public PagedResult(Integer offset, Integer limit, long count, List<E> entities) {
+    /**
+     * Basic constructor for all required parameters.
+     * @author ivanursul
+     * @param offset start position.
+     * @param limit Maximum of elements to be retrieved.
+     * @param count Count of all elements.
+     * @param entities list of elements, that will be returned.
+     */
+	public PagedResult(final Integer offset, final Integer limit, final long count, final List<E> entities) {
 		super();
 		this.offset = offset;
 		this.limit = limit;
@@ -22,7 +36,7 @@ public class PagedResult<E> {
 		return offset;
 	}
 
-	public void setOffset(Integer offset) {
+	public void setOffset(final Integer offset) {
 		this.offset = offset;
 	}
 
@@ -30,7 +44,7 @@ public class PagedResult<E> {
 		return limit;
 	}
 
-	public void setLimit(Integer limit) {
+	public void setLimit(final Integer limit) {
 		this.limit = limit;
 	}
 
@@ -38,7 +52,7 @@ public class PagedResult<E> {
 		return count;
 	}
 
-	public void setCount(long count) {
+	public void setCount(final long count) {
 		this.count = count;
 	}
 
@@ -46,7 +60,7 @@ public class PagedResult<E> {
 		return entities;
 	}
 
-	public void setEntities(List<E> entities) {
+	public void setEntities(final List<E> entities) {
 		this.entities = entities;
 	}
 
@@ -63,31 +77,41 @@ public class PagedResult<E> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PagedResult<?> other = (PagedResult<?>) obj;
-		if (count != other.count)
+		if (count != other.count) {
 			return false;
+		}
 		if (entities == null) {
-			if (other.entities != null)
+			if (other.entities != null) {
 				return false;
-		} else if (!entities.equals(other.entities))
+			}
+		} else if (!entities.equals(other.entities)) {
 			return false;
+		}
 		if (limit == null) {
-			if (other.limit != null)
+			if (other.limit != null) {
 				return false;
-		} else if (!limit.equals(other.limit))
+			}
+		} else if (!limit.equals(other.limit)) {
 			return false;
+		}
 		if (offset == null) {
-			if (other.offset != null)
+			if (other.offset != null) {
 				return false;
-		} else if (!offset.equals(other.offset))
+			}
+		} else if (!offset.equals(other.offset)) {
 			return false;
+		}
 		return true;
 	}
 

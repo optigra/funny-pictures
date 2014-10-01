@@ -1,13 +1,10 @@
 package com.optigra.funnypictures.model.content;
 
 /**
- * MIME types
+ * MIME types.
  * @author iurii
- * Copied from https://github.com/wytzevanderploeg/java-mime-types/blob/master/src/main/java/org/vertedge/util/MimeType.java 
  */
-
 public enum MimeType {
-		/* Preferred Common Types */
 		APPLICATION_PDF_PDF("application/pdf", ".pdf"),
 		APPLICATION_ZIP_ZIP("application/zip", ".zip"),
 		AUDIO_MPEG3_MP3("audio/mpeg3", ".mp3"),
@@ -23,7 +20,6 @@ public enum MimeType {
 		VIDEO_QUICKTIME_MOV("video/quicktime", ".mov"),
 		VIDEO_MPEG_MP4("video/mp4", ".mp4"),
 		VIDEO_MATROSKA_MKV("video/x-matroska", ".mkv"),
-		/* Other */
 		APPLICATION_XBYTECODEPYTHON_PYC("application/x-bytecode.python", ".pyc"),
 		APPLICATION_ACAD_DWG("application/acad", ".dwg"),
 		APPLICATION_ARJ_ARJ("application/arj", ".arj"),
@@ -662,13 +658,18 @@ public enum MimeType {
 		private String type;
 		private String extension;
 		
+		/**
+		 * Constructor with two parameters.
+		 * @param type param, that describes type of Mime Type
+		 * @param extension Extension of appropriate Mime Type
+		 */
 		MimeType(final String type, final String extension) {
 			this.type = type;
 			this.extension = extension;
 		}
 
 		/**
-		 * Get a String representation of this type. e.g. "application/zip"
+		 * Get a String representation of this type. e.g. "application/zip".
 		 * 
 		 * @return type
 		 */
@@ -677,7 +678,7 @@ public enum MimeType {
 		}
 
 		/**
-		 * Get the extension for this type. e.g. ".zip"
+		 * Get the extension for this type. e.g. ".zip".
 		 * 
 		 * @return extension
 		 */
@@ -686,17 +687,16 @@ public enum MimeType {
 		}
 
 		/**
-		 * Gets the first matching mime-type for the given type
+		 * Gets the first matching mime-type for the given type.
 		 * 
-		 * @param type
-		 *            e.g. "application/zip"
+		 * @param type e.g. "application/zip"
 		 * @return The MimeType that matched the given type
 		 */
-		public static MimeType fromType(String type) {
+		public static MimeType fromType(final String type) {
 			if (type != null) {
-				type = type.trim().toLowerCase();
+				String typeTemp = type.trim().toLowerCase();
 				for (MimeType mt : MimeType.values()) {
-					if (mt.getType().equals(type)) {
+					if (mt.getType().equals(typeTemp)) {
 						return mt;
 					}
 				}
@@ -705,16 +705,16 @@ public enum MimeType {
 		}
 
 		/**
-		 * Gets the first matching mime-type for the given extension
+		 * Gets the first matching mime-type for the given extension.
 		 * 
 		 * @param extension e.g. ".zip"
 		 * @return The MimeType that matched the given extension
 		 */
-		public static MimeType fromExtension(String extension) {
+		public static MimeType fromExtension(final String extension) {
 			if (extension != null) {
-				extension = extension.trim().toLowerCase();
+				String extensionTemp = extension.trim().toLowerCase();
 				for (MimeType mt : MimeType.values()) {
-					if (mt.getExtension().equals(extension)) {
+					if (mt.getExtension().equals(extensionTemp)) {
 						return mt;
 					}
 				}

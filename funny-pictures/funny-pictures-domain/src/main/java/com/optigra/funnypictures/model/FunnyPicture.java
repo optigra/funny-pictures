@@ -9,39 +9,41 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+/**
+ * Entity, that describes generated picture with text.
+ * @author ivanursul
+ *
+ */
 @Entity
-@Table(name="funny_picture")
+@Table(name = "funny_picture")
 public class FunnyPicture {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
+	@Column(name = "id")
 	private Long id;
 	
-	@Column(name="name")
+	@Column(name = "name")
 	private String name;
 	
-	@Column(name="url")
+	@Column(name = "url")
 	private String url;
 	
-	@Column(name="header")
+	@Column(name = "header")
 	private String header;
 	
-	@Column(name="footer")
+	@Column(name = "footer")
 	private String footer;
 	
 	@ManyToOne
-	@JoinColumn(name="picture_id", nullable=false)
+	@JoinColumn(name = "picture_id", nullable = false)
 	private Picture picture;
 	
-	public FunnyPicture() {
-	}
-
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -49,7 +51,7 @@ public class FunnyPicture {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -57,7 +59,7 @@ public class FunnyPicture {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	public void setUrl(final String url) {
 		this.url = url;
 	}
 
@@ -65,7 +67,7 @@ public class FunnyPicture {
 		return header;
 	}
 
-	public void setHeader(String header) {
+	public void setHeader(final String header) {
 		this.header = header;
 	}
 
@@ -73,7 +75,7 @@ public class FunnyPicture {
 		return footer;
 	}
 
-	public void setFooter(String footer) {
+	public void setFooter(final String footer) {
 		this.footer = footer;
 	}
 
@@ -81,7 +83,7 @@ public class FunnyPicture {
 		return picture;
 	}
 
-	public void setPicture(Picture picture) {
+	public void setPicture(final Picture picture) {
 		this.picture = picture;
 	}
 
@@ -98,39 +100,52 @@ public class FunnyPicture {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		FunnyPicture other = (FunnyPicture) obj;
 		if (footer == null) {
-			if (other.footer != null)
+			if (other.footer != null) {
 				return false;
-		} else if (!footer.equals(other.footer))
+			}
+		} else if (!footer.equals(other.footer)) {
 			return false;
+		}
 		if (header == null) {
-			if (other.header != null)
+			if (other.header != null) {
 				return false;
-		} else if (!header.equals(other.header))
+			}
+		} else if (!header.equals(other.header)) {
 			return false;
+		}
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (url == null) {
-			if (other.url != null)
+			if (other.url != null) {
 				return false;
-		} else if (!url.equals(other.url))
+			}
+		} else if (!url.equals(other.url)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -139,8 +154,4 @@ public class FunnyPicture {
 		return "FunnyPicture [id=" + id + ", name=" + name + ", url=" + url
 				+ ", header=" + header + ", footer=" + footer + "]";
 	}
-	
-	
-
-	
 }

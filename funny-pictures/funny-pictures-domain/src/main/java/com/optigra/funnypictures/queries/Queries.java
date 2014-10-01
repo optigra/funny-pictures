@@ -2,7 +2,11 @@ package com.optigra.funnypictures.queries;
 
 
 
-
+/**
+ * Class, that contains all queries for databases.
+ * @author ivanursul
+ *
+ */
 public class Queries {
 	
 	private static final String FIND_PICTURES_QUERY_NAME = "Pictures.findPictures";
@@ -17,6 +21,11 @@ public class Queries {
     private final String queryName;
     private final String query;
 
+    /**
+     * Constructor, that forms Queries object by name of query and query.
+     * @param queryName
+     * @param query
+     */
     private Queries(final String queryName, final String query) {
         this.queryName = queryName;
         this.query = query;

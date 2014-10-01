@@ -6,9 +6,10 @@ import com.optigra.funnypictures.queries.Queries;
 
 
 /**
- * Class for paged queries.
+ * Class for getting paged result for pagination.
  * @author ivanursul
  *
+ * @param <T> Generic parameter for entity.
  */
 public class PagedSearch<T> {
     
@@ -18,10 +19,23 @@ public class PagedSearch<T> {
     private Map<String, Object> parameters;
     private Class<T> clazz;
 	
+    /**
+     * Base constructor.
+     * @author ivanursul
+     */
     public PagedSearch() {
 		super();
 	}
-
+    
+    /**
+     * Basic constructor for setting all required fields to PagedSearch.
+     * @author ivanursul
+     * @param offset start position.
+     * @param limit Maximum of elements to be retrieved.
+     * @param query query, that will be executed.
+     * @param parameters required parameters(can be empty)
+     * @param clazz Class instance for mapping.
+     */
 	public PagedSearch(final Integer offset, final Integer limit, final Queries query,
 			final Map<String, Object> parameters, final Class<T> clazz) {
 		super();
@@ -87,38 +101,51 @@ public class PagedSearch<T> {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PagedSearch<?> other = (PagedSearch<?>) obj;
 		if (clazz == null) {
-			if (other.clazz != null)
+			if (other.clazz != null) {
 				return false;
-		} else if (!clazz.equals(other.clazz))
+			}
+		} else if (!clazz.equals(other.clazz)) {
 			return false;
+		}
 		if (limit == null) {
-			if (other.limit != null)
+			if (other.limit != null) {
 				return false;
-		} else if (!limit.equals(other.limit))
+			}
+		} else if (!limit.equals(other.limit)) {
 			return false;
+		}
 		if (offset == null) {
-			if (other.offset != null)
+			if (other.offset != null) {
 				return false;
-		} else if (!offset.equals(other.offset))
+			}
+		} else if (!offset.equals(other.offset)) {
 			return false;
+		}
 		if (parameters == null) {
-			if (other.parameters != null)
+			if (other.parameters != null) {
 				return false;
-		} else if (!parameters.equals(other.parameters))
+			}
+		} else if (!parameters.equals(other.parameters)) {
 			return false;
+		}
 		if (query == null) {
-			if (other.query != null)
+			if (other.query != null) {
 				return false;
-		} else if (!query.equals(other.query))
+			}
+		} else if (!query.equals(other.query)) {
 			return false;
+		}
 		return true;
 	}
 
