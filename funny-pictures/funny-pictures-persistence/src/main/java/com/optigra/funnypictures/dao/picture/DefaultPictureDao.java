@@ -10,6 +10,12 @@ import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.queries.Queries;
 
+/**
+ * DAO class to access entity class and get pictures.
+ * 
+ * @author oyats
+ *
+ */
 @Repository("pictureDao")
 public class DefaultPictureDao extends AbstractDao<Picture, Long> implements PictureDao {
 
@@ -19,14 +25,14 @@ public class DefaultPictureDao extends AbstractDao<Picture, Long> implements Pic
 	}
 
 	@Override
-	public PagedResult<Picture> getPictures(PagedSearch<Picture> pagedSearch) {
-		
+	public PagedResult<Picture> getPictures(final PagedSearch<Picture> pagedSearch) {
+
 		Queries query = Queries.FIND_PICTURES;
-		
+
 		pagedSearch.setClazz(getEntityClass());
 		pagedSearch.setParameters(Collections.<String, Object>emptyMap());
 		pagedSearch.setQuery(query);
-		
+
 		return search(pagedSearch);
 	}
 

@@ -23,7 +23,7 @@ public interface ContentService {
 	 * 
 	 * @param path
 	 *            Path parameter for getting Content by it.
-	 * @return Returns Content by path.
+	 * @return Content by path.
 	 */
 	Content getContentByPath(String path);
 

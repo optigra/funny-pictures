@@ -15,88 +15,120 @@ import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.queries.Query;
 
+/**
+ * Class to handle and use EntityManager.
+ * 
+ * @author oyats
+ *
+ * @param <T>
+ *            Type parameter of returned entity.
+ * @param <I>
+ *            Type of Id of an entity.
+ */
 @Repository("persistenceManager")
 public class DefaultPersistenceManager<T, I> implements PersistenceManager<T, I> {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultPersistenceManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultPersistenceManager.class);
 
-    private static final String COUNT_QUERY = "SELECT COUNT(*) FROM %s a WHERE a IN(%s) ";
+	private static final String COUNT_QUERY = "SELECT COUNT(*) FROM %s a WHERE a IN(%s) ";
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    @Override
-    public T create(final T entity) {
-		logger.info("Saving entity for class:{}", entity.getClass());
+	@Override
+	public T create(final T entity) {
+		LOG.info("Saving entity for class:{}", entity.getClass());
 		entityManager.persist(entity);
 		return entity;
-    }
+	}
 
-    @Override
-    public T findById(final Class<T> clazz, final I id) {
-        T entity = entityManager.find(clazz, id);
-        return entity;
-    }
+	@Override
+	public T findById(final Class<T> clazz, final I id) {
+		T entity = entityManager.find(clazz, id);
+		return entity;
+	}
 
-    @Override
-    public T update(final T entity) {
-    	logger.info("Updating entity for class:{}", entity.getClass());
-        return entityManager.merge(entity);
-    }
+	@Override
+	public T update(final T entity) {
+		LOG.info("Updating entity for class:{}", entity.getClass());
+		return entityManager.merge(entity);
+	}
 
-    @Override
-    public void remove(final T entity) {
-    	logger.info("Removing entity for class:{}", entity.getClass());
-        entityManager.remove(entity);
-    }
+	@Override
+	public void remove(final T entity) {
+		LOG.info("Removing entity for class:{}", entity.getClass());
+		entityManager.remove(entity);
+	}
 
-    @Override
-    public T executeSingleResultQuery(final Query<T> query) {
-        Query<T> finalQuery = query;
-        TypedQuery<T> typedQuery = createQuery(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
+	@Override
+	public T executeSingleResultQuery(final Query<T> query) {
+		Query<T> finalQuery = query;
+		TypedQuery<T> typedQuery = createQuery(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
 
-        return typedQuery.getSingleResult();
-    }
+		return typedQuery.getSingleResult();
+	}
 
-    @Override
-    public List<T> executeMultipleResultQuery(final Query<T> query) {
-        Query<T> finalQuery = query;
-        TypedQuery<T> typedQuery = createQuery(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
+	@Override
+	public List<T> executeMultipleResultQuery(final Query<T> query) {
+		Query<T> finalQuery = query;
+		TypedQuery<T> typedQuery = createQuery(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
 
-        return typedQuery.getResultList();
-    }
+		return typedQuery.getResultList();
+	}
 
-    @Override
-    public PagedResult<T> search(final PagedSearch<T> searchRequest) {
-        Query<T> finalQuery =  new Query<T>(searchRequest.getClazz(), searchRequest.getQuery().getQuery(), searchRequest.getParameters());
-        TypedQuery<T> typedQuery = createQuery(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
-        typedQuery.setFirstResult(searchRequest.getOffset());
-        typedQuery.setMaxResults(searchRequest.getLimit());
+	@Override
+	public PagedResult<T> search(final PagedSearch<T> searchRequest) {
+		Query<T> finalQuery = new Query<T>(searchRequest.getClazz(), searchRequest.getQuery().getQuery(), searchRequest.getParameters());
+		TypedQuery<T> typedQuery = createQuery(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
+		typedQuery.setFirstResult(searchRequest.getOffset());
+		typedQuery.setMaxResults(searchRequest.getLimit());
 
-        Long count = getQueryCount(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
+		Long count = getQueryCount(finalQuery.getQuery(), finalQuery.getParameters(), finalQuery.getEntityClass());
 
-        PagedResult<T> result = new PagedResult<T>(searchRequest.getOffset(), searchRequest.getLimit(), count, typedQuery.getResultList());
+		PagedResult<T> result = new PagedResult<T>(searchRequest.getOffset(), searchRequest.getLimit(), count, typedQuery.getResultList());
 
-        return result;
-    }
+		return result;
+	}
 
-    private <M> Long getQueryCount(final String querySql, final Map<String, Object> parameters, final Class<M> clazz) {
+	/**
+	 * Method to get count of entities.
+	 * 
+	 * @param querySql
+	 *            SQL to execute.
+	 * @param parameters
+	 *            Parameters in the query.
+	 * @param clazz
+	 *            Class of returned entity.
+	 * @return Count of entities.
+	 */
+	private <M> Long getQueryCount(final String querySql, final Map<String, Object> parameters, final Class<M> clazz) {
 
-        String jpQuery = String.format(COUNT_QUERY, clazz.getSimpleName(), querySql);
+		String jpQuery = String.format(COUNT_QUERY, clazz.getSimpleName(), querySql);
 
-        TypedQuery<Long> countQuery = createQuery(jpQuery, parameters, Long.class);
+		TypedQuery<Long> countQuery = createQuery(jpQuery, parameters, Long.class);
 
-        return countQuery.getSingleResult();
-    }
+		return countQuery.getSingleResult();
+	}
 
-    private <M> TypedQuery<M> createQuery(final String querySql, final Map<String, Object> parameters, final Class<M> clazz) {
-        TypedQuery<M> typedQuery = entityManager.createQuery(querySql, clazz);
+	/**
+	 * Method to create query.
+	 * 
+	 * @param querySql
+	 *            .
+	 * @param parameters
+	 *            .
+	 * @param clazz
+	 *            Class of entity.
+	 * @return Generated query.
+	 */
+	private <M> TypedQuery<M> createQuery(final String querySql, final Map<String, Object> parameters, final Class<M> clazz) {
+		TypedQuery<M> typedQuery = entityManager.createQuery(querySql, clazz);
 
-        logger.info(String.format("Create JPQL: query=[%s]; parameters=[%s] ", querySql, parameters));
+		LOG.info(String.format("Create JPQL: query=[%s]; parameters=[%s] ", querySql, parameters));
 
-        for (String key : parameters.keySet()) {
-            typedQuery.setParameter(key, parameters.get(key));
-        }
+		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+			typedQuery.setParameter(entry.getKey(), entry.getValue());
+		}
 
-        return typedQuery;
-    }
+		return typedQuery;
+	}
 }

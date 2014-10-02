@@ -83,7 +83,7 @@ public class FileSystemContentService implements ContentService {
 	 * 
 	 * @param filePath
 	 *            Input file path, for which you want to find full file path.
-	 * @return Returns full path of file.
+	 * @return Full path of file.
 	 */
 
 	private String getFullfilePath(final String filePath) {
