@@ -10,14 +10,24 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.optigra.funnypictures.facade.resources.message.MessageResource;
 import com.optigra.funnypictures.facade.resources.message.MessageType;
 
+/**
+ * Abstract Class for all common logic.
+ * @author ivanursul
+ *
+ */
 public abstract class BaseController {
-	private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseController.class);
 	
+	/**
+	 * Method for handling base exceptions.
+	 * @param e input exception.
+	 * @return message resource.
+	 */
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = { Exception.class })
     @ResponseBody
     public MessageResource handleException(final Exception e) {
-    	logger.error("Handling general exception", e);
+    	LOG.error("Handling general exception", e);
     	
         MessageResource message = new MessageResource();
         message.setMessageType(MessageType.WARN);

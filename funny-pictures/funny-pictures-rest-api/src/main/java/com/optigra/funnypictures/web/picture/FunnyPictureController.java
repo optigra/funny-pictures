@@ -4,10 +4,12 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.optigra.funnypictures.facade.facade.funny.FunnyPictureFacade;
@@ -39,6 +41,7 @@ public class FunnyPictureController extends BaseController {
 	 *            count of entities in result.
 	 * @return PagedResultResource with limit count of entities.
 	 */
+	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(method = RequestMethod.GET)
 	public PagedResultResource<FunnyPictureResource> getFunnies(@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
 			@RequestParam(value = "limit", defaultValue = "20") final Integer limit) {
@@ -57,6 +60,7 @@ public class FunnyPictureController extends BaseController {
 	 *            Request JSON parameters with funny picture object.
 	 * @return created FunnyPicture.
 	 */
+	@ResponseStatus(HttpStatus.CREATED)
 	@RequestMapping(method = RequestMethod.POST)
 	public FunnyPictureResource createFunny(@RequestBody final FunnyPictureResource funnyPictureResource) {
 		LOG.info("Create funny picture for {}", funnyPictureResource);
