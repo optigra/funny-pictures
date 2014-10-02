@@ -17,10 +17,16 @@ import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.picture.PictureService;
 
+/**
+ * Default implementation of PictureFacade.
+ * 
+ * @author rostyslav
+ *
+ */
 @Component("pictureFacade")
 @Transactional
 public class DefaultPictureFacade implements PictureFacade {
-	
+
 	@Resource(name = "pagedRequestConverter")
 	private Converter<PagedRequest, PagedSearch<Picture>> pagedRequestConverter;
 
@@ -29,58 +35,58 @@ public class DefaultPictureFacade implements PictureFacade {
 
 	@Resource(name = "pictureConverter")
 	private Converter<Picture, PictureResource> pictureConverter;
-	
+
 	@Resource(name = "pictureResourceConverter")
 	private Converter<PictureResource, Picture> pictureResourceConverter;
-	
+
 	@Resource(name = "pictureService")
 	private PictureService pictureService;
-	
+
 	@Override
-	public PagedResultResource<PictureResource> getPictures(PagedRequest pagedRequest) {
+	public PagedResultResource<PictureResource> getPictures(final PagedRequest pagedRequest) {
 		// Convert PagedRequest to PagedSearch
 		PagedSearch<Picture> pagedSearch = pagedRequestConverter.convert(pagedRequest);
-		
+
 		// Retrieve result pictureService.getPictures(pagedSearch)
 		PagedResult<Picture> pagedResult = pictureService.getPictures(pagedSearch);
-		
+
 		// Convert List<Picture> to List<PictureResource>
 		List<PictureResource> resources = pictureConverter.convertAll(pagedResult.getEntities());
-		
+
 		// Create pagedResultResource
 		PagedResultResource<PictureResource> pagedResultResource = new PagedResultResource<>("/pictures");
 		pagedResultResource.setEntities(resources);
-		
+
 		// Convert PagedResult to PagedResultResource
 		pagedResultConverter.convert(pagedResult, pagedResultResource);
-		
+
 		return pagedResultResource;
 	}
 
 	@Override
-	public PictureResource createPicture(PictureResource pictureResource) {
-		
+	public PictureResource createPicture(final PictureResource pictureResource) {
+
 		Picture pictureForService = pictureResourceConverter.convert(pictureResource);
 		pictureService.createPicture(pictureForService);
-		
+
 		return pictureConverter.convert(pictureForService);
 	}
 
 	@Override
-	public void updatePicture(Long id, PictureResource pictureResource) {
+	public void updatePicture(final Long id, final PictureResource pictureResource) {
 		Picture picture = pictureService.getPicture(id);
 		pictureResourceConverter.convert(pictureResource, picture);
 		pictureService.updatePicture(picture);
 	}
 
 	@Override
-	public PictureResource getPicture(Long id) {
+	public PictureResource getPicture(final Long id) {
 		Picture picture = pictureService.getPicture(id);
 		return pictureConverter.convert(picture);
 	}
 
 	@Override
-	public void deletePicture(Long id) {
+	public void deletePicture(final Long id) {
 		Picture picture = pictureService.getPicture(id);
 		pictureService.deletePicture(picture);
 	}

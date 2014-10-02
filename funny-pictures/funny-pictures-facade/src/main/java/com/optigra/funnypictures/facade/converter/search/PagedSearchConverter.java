@@ -8,26 +8,26 @@ import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.pagination.PagedResult;
 
 /**
- * @date Feb 14, 2014
+ * Converter for PagedResult and PagedResultResource.
+ * 
  * @author ivanursul
  *
  */
 @Component("pagedSearchConverter")
 public class PagedSearchConverter extends AbstractConverter<PagedResult<?>, PagedResultResource<? extends ApiResource>> {
 
-    @Override
-    public PagedResultResource<? extends ApiResource> convert(final PagedResult<?> source) {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	public PagedResultResource<? extends ApiResource> convert(final PagedResult<?> source) {
+		throw new UnsupportedOperationException();
+	}
 
-    @Override
-    public PagedResultResource<? extends ApiResource> convert(final PagedResult<?> source, final PagedResultResource<? extends ApiResource> target) {
+	@Override
+	public PagedResultResource<? extends ApiResource> convert(final PagedResult<?> source, final PagedResultResource<? extends ApiResource> target) {
 
-    	target.setOffset(source.getOffset());
-    	target.setLimit(source.getLimit());
-        target.setCount(source.getCount());
+		target.setOffset(source.getOffset());
+		target.setLimit(source.getLimit());
+		target.setCount(source.getCount());
 
-        return target;
-    }
+		return target;
+	}
 }
-

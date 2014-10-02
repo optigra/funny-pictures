@@ -30,6 +30,12 @@ import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.funnypicture.FunnyPictureService;
 import com.optigra.funnypictures.service.picture.PictureService;
 
+/**
+ * Default facade for funny pictures. Uses for creating funny picture.
+ * 
+ * @author rostyslav
+ *
+ */
 @Transactional
 @Component("funnyPictureFacade")
 public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
@@ -61,7 +67,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	private ContentResourceNamingStrategy namingStrategy;
 
 	@Override
-	public PagedResultResource<FunnyPictureResource> getFunnies(PagedRequest pagedRequest) {
+	public PagedResultResource<FunnyPictureResource> getFunnies(final PagedRequest pagedRequest) {
 
 		LOG.info("Get funnies by paged request: {}", pagedRequest);
 
@@ -79,7 +85,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	}
 
 	@Override
-	public FunnyPictureResource createFunnyPicture(FunnyPictureResource funny) {
+	public FunnyPictureResource createFunnyPicture(final FunnyPictureResource funny) {
 		LOG.info("Generate funny image for : {}", funny);
 
 		PictureResource picture = funny.getTemplate();
@@ -95,12 +101,23 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 		// Save funny picture
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
-		
+
 		return funnyPictureConverter.convert(funnyPicture);
-		
+
 	}
 
-	private FunnyPicture saveFunnyPicture(FunnyPictureResource funny, Picture template, Content content) {
+	/**
+	 * Method save funny picture into database.
+	 * 
+	 * @param funny
+	 *            resource with name,header and footer text.
+	 * @param template
+	 *            base for creating funny picture
+	 * @param content
+	 *            with url to content storage
+	 * @return created funny picture
+	 */
+	private FunnyPicture saveFunnyPicture(final FunnyPictureResource funny, final Picture template, final Content content) {
 		// Save generated meme
 		FunnyPicture funnyPicture = new FunnyPicture();
 		funnyPicture.setPicture(template);
@@ -112,7 +129,16 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		return funnyPictureService.createFunnyPicture(funnyPicture);
 	}
 
-	private Content generateMeme(FunnyPictureResource funny, Content templateConntent) {
+	/**
+	 * Method generates advice.
+	 * 
+	 * @param funny
+	 *            FunnyPictureResource for generating advice.
+	 * @param templateConntent
+	 *            content with stream and mimeType.
+	 * @return Generated content.
+	 */
+	private Content generateMeme(final FunnyPictureResource funny, final Content templateConntent) {
 		AdviceMemeContext context = new AdviceMemeContext(templateConntent.getContentStream(), templateConntent.getMimeType(), funny.getHeader(),
 				funny.getFooter());
 		ImageHandle generatedMeme = memeGenerator.generate(context);

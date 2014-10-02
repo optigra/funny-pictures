@@ -1,13 +1,27 @@
 package com.optigra.funnypictures.facade.resources.search;
 
-
-
+/**
+ * Request model for paged requests. Contains offset and limit fields for
+ * pagination.
+ * 
+ * @author rostyslav
+ *
+ */
 public class PagedRequest {
 
-    private Integer offset;
-    private Integer limit;
+	private Integer offset;
+	private Integer limit;
 
-	public PagedRequest(Integer offset, Integer limit) {
+	/**
+	 * 
+	 * Constructor with params.
+	 * 
+	 * @param offset
+	 *            Number of first element in request.
+	 * @param limit
+	 *            count of objects in one request.
+	 */
+	public PagedRequest(final Integer offset, final Integer limit) {
 		super();
 		this.offset = offset;
 		this.limit = limit;
@@ -17,7 +31,7 @@ public class PagedRequest {
 		return offset;
 	}
 
-	public void setOffset(Integer offset) {
+	public void setOffset(final Integer offset) {
 		this.offset = offset;
 	}
 
@@ -25,7 +39,7 @@ public class PagedRequest {
 		return limit;
 	}
 
-	public void setLimit(Integer limit) {
+	public void setLimit(final Integer limit) {
 		this.limit = limit;
 	}
 
@@ -33,30 +47,37 @@ public class PagedRequest {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((limit == null) ? 0 : limit.hashCode());
-		result = prime * result + ((offset == null) ? 0 : offset.hashCode());
+		result = (prime * result) + ((limit == null) ? 0 : limit.hashCode());
+		result = (prime * result) + ((offset == null) ? 0 : offset.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PagedRequest other = (PagedRequest) obj;
 		if (limit == null) {
-			if (other.limit != null)
+			if (other.limit != null) {
 				return false;
-		} else if (!limit.equals(other.limit))
+			}
+		} else if (!limit.equals(other.limit)) {
 			return false;
+		}
 		if (offset == null) {
-			if (other.offset != null)
+			if (other.offset != null) {
 				return false;
-		} else if (!offset.equals(other.offset))
+			}
+		} else if (!offset.equals(other.offset)) {
 			return false;
+		}
 		return true;
 	}
 

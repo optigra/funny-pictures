@@ -4,13 +4,11 @@
 var funnyPicturesApp = angular.module('mainModule', ['ngResource', 'ui.bootstrap', 'ngRoute', 'funnyControllers']);
 
 funnyPicturesApp.factory('Pictures', function ($resource, SharedProperties) {
-        return $resource(SharedProperties.getApiUrl() +'/pictures/:id',{},{'query': {method: 'GET', isArray: false}});
-    }
-)
-;
+    return $resource(SharedProperties.getApiUrl() + '/pictures/:id', {}, {'query': {method: 'GET', isArray: false}});
+});
 
 funnyPicturesApp.factory('Funnies', function ($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() +'/funnies/:id', {}, {'query': {method: 'GET', isArray: false}});
+    return $resource(SharedProperties.getApiUrl() + '/funnies/:id', {}, {'query': {method: 'GET', isArray: false}});
 });
 
 funnyPicturesApp.service('SharedProperties', function () {
@@ -37,14 +35,14 @@ funnyPicturesApp.service('FileUpload', ['$http', function ($http) {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         });
-        return ( request.then( handleSuccess, handleError ) )
+        return ( request.then(handleSuccess, handleError) )
     };
 
-    function handleError( response ) {
+    function handleError(response) {
         return(  response.data.message );
     }
 
-    function handleSuccess( response ) {
+    function handleSuccess(response) {
         return( response.data );
     }
 
@@ -63,6 +61,10 @@ funnyPicturesApp.config(["$routeProvider" , function ($routeProvider) {
         .when("/preview", {
             templateUrl: "html/funnyPicturePreview.html",
             controller: 'PreviewFunnyController'
+        })
+        .when("/funnies", {
+            templateUrl: "html/funnies.html",
+            controller: 'FunniesController'
         })
         .otherwise({redirectTo: '/home'});
 }]);

@@ -82,7 +82,7 @@ funnyControllers.controller('HeaderController', [ '$scope', '$location' , functi
     $scope.isActive = function (viewLocation) {
         return viewLocation === $location.path();
     };
-} ]);
+}]);
 
 funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , 'FileUpload' , 'SharedProperties', 'Pictures' , '$location', function ($scope, $http, $location, FileUpload, SharedProperties, Pictures) {
     $scope.pictureTitle = "";
@@ -110,4 +110,17 @@ funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , 'Fi
 
     };
 } ]);
+
+funnyControllers.controller('FunniesController', [ '$scope', 'Funnies' , function ($scope, Funnies) {
+    $scope.funnies = {};
+    $scope.carouselInterval = 2000;
+    Funnies.query({
+        offset: 0,
+        limit: 100
+    }, function (data) {
+        $scope.funnies = data.entities;
+    }, function (error) {
+        $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
+    });
+}]);
 

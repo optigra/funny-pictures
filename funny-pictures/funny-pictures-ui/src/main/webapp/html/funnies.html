@@ -1,0 +1,10 @@
+<div class="container" id="mainContainer">
+	<carousel interval="carouselInterval"> <slide
+		ng-repeat="funny in funnies" active="funny.active"> <img
+		ng-src="{{funny.url}}" style="margin: auto;">
+	<div class="carousel-caption">
+		<h4>Slide {{$index}}</h4>
+		<p>{{funny.name}}</p>
+	</div>
+	</slide> </carousel>
+</div>

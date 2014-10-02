@@ -4,12 +4,17 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Class for randomly resource naming.
+ * 
+ * @author rostyslav
+ *
+ */
 @Component("namingStrategy")
 public class RandomUuidNamingStrategy implements ContentResourceNamingStrategy {
 
 	@Override
-	public String createIdentifier(ContentResource resource) {
+	public String createIdentifier(final ContentResource resource) {
 		UUID uuid = UUID.randomUUID();
 		return "/" + uuid.toString() + resource.getMimeType().getExtension();
 	}
