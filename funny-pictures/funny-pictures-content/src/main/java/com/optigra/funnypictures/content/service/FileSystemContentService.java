@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -48,15 +47,11 @@ public class FileSystemContentService implements ContentService {
 			content.setSize(Long.valueOf(file.getTotalSpace()));
 			content.setMimeType(MimeType.fromExtension(EXTENSION_SEPARATOR + fileExtention));
 
-			fileInputStream.close();
 		} catch (FileNotFoundException e) {
 			LOG.error("Can't read file from file system", e);
 			throw new ContentReadException(e);
-		} catch (IOException e) {
-			LOG.error("Can't close file input stream", e);
-			throw new ContentReadException(e);
 		}
-
+		
 		return content;
 	}
 
