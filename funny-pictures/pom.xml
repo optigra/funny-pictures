@@ -47,6 +47,7 @@
 		<api.domain.content.url>http://localhost:8080/funny-pictures-rest-api/api/content</api.domain.content.url>
 
 		<checkstyleDir>${basedir}/checks</checkstyleDir>
+		<findBugsDir>${basedir}/findbugs</findBugsDir>
 	</properties>
 
 	<dependencies>
@@ -164,9 +165,7 @@
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>2.3.3</version>
 				<configuration>
-					<trace>false</trace>
-					<effort>Max</effort>
-					<threshold>Low</threshold>
+					<includeFilterFile>${findBugsDir}/findbugs-include.xml</includeFilterFile>
 					<xmlOutput>true</xmlOutput>
 					<failOnError>true</failOnError>
 					<findbugsXmlOutput>true</findbugsXmlOutput>
@@ -217,9 +216,7 @@
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<trace>false</trace>
-					<effort>Max</effort>
-					<threshold>Low</threshold>
+					<includeFilterFile>${findBugsDir}/findbugs-include.xml</includeFilterFile>
 					<xmlOutput>true</xmlOutput>
 					<failOnError>true</failOnError>
 					<findbugsXmlOutput>true</findbugsXmlOutput>
