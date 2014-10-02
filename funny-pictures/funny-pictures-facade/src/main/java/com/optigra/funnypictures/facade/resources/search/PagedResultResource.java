@@ -100,7 +100,7 @@ public class PagedResultResource<R> extends ApiResource {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		PagedResultResource other = (PagedResultResource) obj;
+		PagedResultResource<?> other = (PagedResultResource<?>) obj;
 		if (count != other.count) {
 			return false;
 		}
