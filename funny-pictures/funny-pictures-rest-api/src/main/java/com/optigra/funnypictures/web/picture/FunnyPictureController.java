@@ -16,18 +16,32 @@ import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.web.BaseController;
 
+/**
+ * REST Controller with CRUD for funny pictures.
+ * 
+ * @author rostyslav
+ *
+ */
 @RestController
 @RequestMapping("/funnies")
 public class FunnyPictureController extends BaseController {
-
 	private static final Logger LOG = LoggerFactory.getLogger(FunnyPictureController.class);
-
 	@Resource(name = "funnyPictureFacade")
 	private FunnyPictureFacade funnyPictureFacade;
 
+	/**
+	 * Controller method for getting paged result of funny pictures. Requested
+	 * method GET.
+	 * 
+	 * @param offset
+	 *            starting position of paged result
+	 * @param limit
+	 *            count of entities in result.
+	 * @return PagedResultResource with limit count of entities.
+	 */
 	@RequestMapping(method = RequestMethod.GET)
-	public PagedResultResource<FunnyPictureResource> getFunnies(@RequestParam(value = "offset", defaultValue = "0") Integer offset,
-			@RequestParam(value = "limit", defaultValue = "20") Integer limit) {
+	public PagedResultResource<FunnyPictureResource> getFunnies(@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
+			@RequestParam(value = "limit", defaultValue = "20") final Integer limit) {
 
 		LOG.info("Get funnies: offset [{}] limit [{}] ", offset, limit);
 
@@ -35,11 +49,18 @@ public class FunnyPictureController extends BaseController {
 
 		return funnyPictureFacade.getFunnies(pagedRequest);
 	}
-	
+
+	/**
+	 * Method for creating funny picture. Requested method POST.
+	 * 
+	 * @param funnyPictureResource
+	 *            Request JSON parameters with funny picture object.
+	 * @return created FunnyPicture.
+	 */
 	@RequestMapping(method = RequestMethod.POST)
-	public FunnyPictureResource createFunny(@RequestBody FunnyPictureResource funnyPictureResource){
+	public FunnyPictureResource createFunny(@RequestBody final FunnyPictureResource funnyPictureResource) {
 		LOG.info("Create funny picture for {}", funnyPictureResource);
-		
+
 		return funnyPictureFacade.createFunnyPicture(funnyPictureResource);
 	}
 }
