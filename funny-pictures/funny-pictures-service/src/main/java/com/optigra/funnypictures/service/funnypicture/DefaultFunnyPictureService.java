@@ -9,6 +9,13 @@ import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 
+/**
+ * Implementation of @see com.optigra.funnypictures.service.FunnyPicture,
+ * that works with @see com.optigra.funnypictures.dao.funnypicture.FunnyPictureDao.
+ * 
+ * @author ivanursul
+ *
+ */
 @Service("funnyPictureService")
 public class DefaultFunnyPictureService implements FunnyPictureService {
 
@@ -16,18 +23,18 @@ public class DefaultFunnyPictureService implements FunnyPictureService {
 	private FunnyPictureDao funnyPictureDao;
 
 	@Override
-	public PagedResult<FunnyPicture> getFunnyPictures(PagedSearch<FunnyPicture> pagedSearch) {
+	public PagedResult<FunnyPicture> getFunnyPictures(final PagedSearch<FunnyPicture> pagedSearch) {
 		return funnyPictureDao.getFunnyPictures(pagedSearch);
 	}
 
 	@Override
-	public FunnyPicture createFunnyPicture(FunnyPicture funnyPicture) {
+	public FunnyPicture createFunnyPicture(final FunnyPicture funnyPicture) {
 		funnyPictureDao.save(funnyPicture);
 		return funnyPicture;
 	}
 
 	@Override
-	public FunnyPicture getFunnyPicture(Long id) {
+	public FunnyPicture getFunnyPicture(final Long id) {
 		return funnyPictureDao.findById(id);
 	}
 
