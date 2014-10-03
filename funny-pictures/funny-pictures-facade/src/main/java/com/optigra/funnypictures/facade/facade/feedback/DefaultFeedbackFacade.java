@@ -22,11 +22,9 @@ import com.optigra.funnypictures.service.feedback.FeedbackService;
 public class DefaultFeedbackFacade implements FeedbackFacade {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultFeedbackFacade.class);
 	
-	// TODO: IU - Implement
 	@Resource(name = "feedbackResourceConverter")
 	private Converter<FeedbackResource, Feedback> feedbackResourceConverter;
 
-	// TODO: IU - Implement
 	@Resource(name = "feedbackConverter")
 	private Converter<Feedback, FeedbackResource> feedbackConverter;
 	
