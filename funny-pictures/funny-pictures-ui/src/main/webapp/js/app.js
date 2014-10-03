@@ -11,19 +11,24 @@ funnyPicturesApp.factory('Funnies', function ($resource, SharedProperties) {
     return $resource(SharedProperties.getApiUrl() + '/funnies/:id', {}, {'query': {method: 'GET', isArray: false}});
 });
 
+funnyPicturesApp.factory('Feedback', function ($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/feedbacks/:id', {}, {'query': {method: 'GET', isArray: false}});
+});
+
 funnyPicturesApp.service('SharedProperties', function () {
     var generatedFunny = { };
     var apiUrl = "http://localhost:8080/funny-pictures-rest-api/api";
     return {
+        getApiUrl: function () {
+            return apiUrl;
+        },
         getGeneratedFunny: function () {
             return generatedFunny;
         },
         setGeneratedFunny: function (value) {
             generatedFunny = value;
-        },
-        getApiUrl: function () {
-            return apiUrl;
         }
+
     };
 });
 
@@ -35,7 +40,7 @@ funnyPicturesApp.service('FileUpload', ['$http', function ($http) {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
         });
-        return ( request.then(handleSuccess, handleError) )
+        return ( request.then(handleSuccess, handleError) );
     };
 
     function handleError(response) {
@@ -66,6 +71,10 @@ funnyPicturesApp.config(["$routeProvider" , function ($routeProvider) {
             templateUrl: "html/funnies.html",
             controller: 'FunniesController'
         })
+        .when("/contact", {
+            templateUrl: "html/contact.html",
+            controller: 'ContactController'
+        })
         .otherwise({redirectTo: '/home'});
 }]);
 
@@ -77,6 +86,13 @@ funnyPicturesApp.directive('fileModel', ['$parse', function ($parse) {
             var modelSetter = model.assign;
 
             element.bind('change', function () {
+            	 var reader = new FileReader();
+
+                 reader.onload = function (e) {
+                     $('#imagePreview').attr('src', e.target.result);
+                 };
+                 reader.readAsDataURL(element[0].files[0]);
+
                 scope.$apply(function () {
                     modelSetter(scope, element[0].files[0]);
                 });

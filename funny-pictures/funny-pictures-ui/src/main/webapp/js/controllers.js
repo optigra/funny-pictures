@@ -9,7 +9,7 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
     $scope.headerText = "";
     $scope.footerText = "";
     $scope.currentPage = 1;
-    $scope.totalItems = 11;
+    $scope.totalItems = 0;
     $scope.itemsPerPage = 4;
 
     Pictures.query({
@@ -39,7 +39,7 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
     };
 
     $scope.showPagination = function () {
-        return $scope.totalItems != 0;
+        return $scope.totalItems > $scope.itemsPerPage;
     };
 
     $scope.closeAlert = function (index) {
@@ -68,8 +68,6 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
             function (error) {
                 $scope.alerts.push({type: 'danger', msg: "Can't create picture" + error.statusText + " " + error.status });
             });
-
-
     };
 
 } ]);
@@ -84,7 +82,7 @@ funnyControllers.controller('HeaderController', [ '$scope', '$location' , functi
     };
 }]);
 
-funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , 'FileUpload' , 'SharedProperties', 'Pictures' , '$location', function ($scope, $http, $location, FileUpload, SharedProperties, Pictures) {
+funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , '$location', 'FileUpload' , 'SharedProperties', 'Pictures' , function ($scope, $http, $location, FileUpload, SharedProperties, Pictures) {
     $scope.pictureTitle = "";
     $scope.headerText = "";
     $scope.uploadFile = function () {
@@ -107,20 +105,57 @@ funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , 'Fi
                     }
                 );
             });
-
     };
+
+    $scope.imagePreview = function () {
+        console.log("image preview");
+    };
+
 } ]);
 
 funnyControllers.controller('FunniesController', [ '$scope', 'Funnies' , function ($scope, Funnies) {
     $scope.funnies = {};
-    $scope.carouselInterval = 2000;
+    $scope.currentPage = 1;
+    $scope.totalItems = 0;
+    $scope.itemsPerPage = 8;
     Funnies.query({
-        offset: 0,
-        limit: 100
+        offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+        limit: $scope.itemsPerPage
     }, function (data) {
         $scope.funnies = data.entities;
+        $scope.totalItems = data.count;
     }, function (error) {
+        console.log(error.statusText + " " + error.status );
         $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
     });
+
+    $scope.pageChanged = function () {
+        Funnies.query({
+            offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+            limit: $scope.itemsPerPage
+        }, function (data) {
+            $scope.funnies = data.entities;
+            $scope.totalItems = data.count;
+        }, function (error) {
+            $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
+        });
+    };
+    $scope.showPagination = function () {
+        return $scope.totalItems > $scope.itemsPerPage;
+    };
 }]);
+
+funnyControllers.controller('ContactController', [ '$scope', 'Feedback', function ($scope, Feedback) {
+    $scope.feedback = {};
+    $scope.sendFeedback = function () {
+        Feedback.save($scope.feedback,
+            function (data, status) {
+                console.log(data + " " + status );
+            }, function (error) {
+                console.log(error.statusText + " " + error.status );
+            }
+        );
+    };
+}]);
+
 
