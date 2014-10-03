@@ -24,6 +24,7 @@ public class FeedbackResourceConverter extends AbstractConverter<FeedbackResourc
 	public Feedback convert(final FeedbackResource source, final Feedback target) {
 		
 		target.setEmail(source.getEmail());
+		target.setSubject(source.getSubject());
 		target.setName(source.getName());
 		target.setText(source.getText());
 		

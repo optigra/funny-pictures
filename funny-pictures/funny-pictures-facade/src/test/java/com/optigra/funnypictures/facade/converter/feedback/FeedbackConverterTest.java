@@ -19,18 +19,21 @@ public class FeedbackConverterTest {
 		String name = "Name";
 		String email = "email";
 		String text = "text";
+		String subject = "subject";
 		
 		Feedback source = new Feedback();
 		source.setEmail(email);
 		source.setId(id);
 		source.setName(name);
 		source.setText(text);
+		source.setSubject(subject);
 
 		FeedbackResource expected = new FeedbackResource();
 		expected.setEmail(email);
 		expected.setId(id);
 		expected.setName(name);
 		expected.setText(text);
+		expected.setSubject(subject);
 		
 		// When
 		FeedbackResource actual = unit.convert(source);
