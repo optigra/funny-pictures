@@ -5,6 +5,7 @@
         
         <class>com.optigra.funnypictures.model.Picture</class>
         <class>com.optigra.funnypictures.model.FunnyPicture</class>
+        <class>com.optigra.funnypictures.model.feedback.Feedback</class>
         
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
