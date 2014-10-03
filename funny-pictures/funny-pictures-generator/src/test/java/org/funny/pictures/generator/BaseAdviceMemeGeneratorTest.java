@@ -12,12 +12,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import org.funny.pictures.generator.api.AdviceMemeContext;
-import org.funny.pictures.generator.api.ImageHandle;
 import org.funny.pictures.generator.util.ImageInformationExtractor;
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
@@ -59,20 +56,16 @@ public class BaseAdviceMemeGeneratorTest {
 	@Captor
 	private ArgumentCaptor<IMOperation> compositeOperationCaptor;
 	
-	Path outputImagePath = null;
 
 	@Before
 	public void setUp() throws IOException {
 		//Mockito doesn't set outputFormat, so we need to set it manually
 		unit.setOutputFormat(BaseAdviceMemeGenerator.DEFAULT_OUTPUT_FORMAT);
-		outputImagePath = Files.createTempFile("expectedOutput", unit.getOutputFormat().getExtension());
 	}
 
 	@After
 	public void tearDown() throws IOException {
-		if (outputImagePath != null) {
-			Files.deleteIfExists(outputImagePath);
-		}
+
 	}
 
 	@Test
@@ -84,9 +77,7 @@ public class BaseAdviceMemeGeneratorTest {
 
 		//When
 		when(imageInfoExtractor.getImageDimension(any(Path.class))).thenReturn(new Dimension(400, 400));
-		ImageHandle imgHandle = unit.generate(context);
-		Files.copy(imgHandle.getImageInputStream(), outputImagePath, StandardCopyOption.REPLACE_EXISTING);
-		
+		unit.generate(context);		
 
 		// Then
 		verify(convertCommand, times(3)).run(convertOperationCaptor.capture(), anyVararg());
