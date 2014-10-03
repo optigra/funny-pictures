@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.resources.feedback.FeedbackResource;
@@ -17,6 +18,7 @@ import com.optigra.funnypictures.service.feedback.FeedbackService;
  *
  */
 @Component("feedbackFacade")
+@Transactional
 public class DefaultFeedbackFacade implements FeedbackFacade {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultFeedbackFacade.class);
 	
