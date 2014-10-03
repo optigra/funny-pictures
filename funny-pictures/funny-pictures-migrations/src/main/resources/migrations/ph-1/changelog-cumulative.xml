@@ -75,4 +75,9 @@
     		<column name="text" type="text"/>
     	</createTable>    
     </changeSet>
+    <changeSet id="addSubjectFieldContactTable" author="Ivan Ursul">
+    	<addColumn tableName="feedback">
+    		<column name="subject" type="varchar(255)"/>
+    	</addColumn>
+    </changeSet>    
 </databaseChangeLog>
