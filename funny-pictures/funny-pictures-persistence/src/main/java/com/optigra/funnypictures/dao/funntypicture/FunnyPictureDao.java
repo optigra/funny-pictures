@@ -21,5 +21,13 @@ public interface FunnyPictureDao extends Dao<FunnyPicture, Long> {
 	 * @return PagedResult.
 	 */
 	PagedResult<FunnyPicture> getFunnyPictures(PagedSearch<FunnyPicture> pagedSearch);
+	
+	/**
+	 * Method to get Paged Result of funny pictures by Picture.
+	 * 
+	 * @param pagedSearch Parameter by which we will find funnies.
+	 * @return Paged result of funny pictures.
+	 */
+	PagedResult<FunnyPicture> getFunnyPicturesByPicture(PagedSearch<FunnyPicture> pagedSearch);
 
 }

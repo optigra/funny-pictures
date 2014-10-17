@@ -153,4 +153,20 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 		return content;
 	}
+
+	@Override
+	public PagedResultResource<FunnyPictureResource> getFunniesForPicture(final Long id, final PagedRequest pagedRequest) {
+		
+		PagedSearch<FunnyPicture> pagedSearch = pagedRequestConverter.convert(pagedRequest);
+		
+		PagedResult<FunnyPicture> pagedResult = funnyPictureService.getFunnyPicturesByPicture(pagedSearch, id);
+		
+		List<FunnyPictureResource> resources = funnyPictureConverter.convertAll(pagedResult.getEntities());
+		
+		PagedResultResource<FunnyPictureResource> pagedResultResource = new PagedResultResource<>("/funnies");
+		pagedResultResource.setEntities(resources);
+		pagedResultConverter.convert(pagedResult, pagedResultResource);
+		
+		return pagedResultResource;
+	}
 }

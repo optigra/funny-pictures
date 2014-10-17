@@ -28,4 +28,13 @@ public interface FunnyPictureFacade {
 	 * @return created funny picture.
 	 */
 	FunnyPictureResource createFunnyPicture(FunnyPictureResource funny);
+	
+	/**
+	 * Get funnies for picture.
+	 * 
+	 * @param id Picture identifier.
+	 * @param pagedRequest Paged request.
+	 * @return Paged result of funnies.
+	 */
+	PagedResultResource<FunnyPictureResource> getFunniesForPicture(Long id, PagedRequest pagedRequest);
 }

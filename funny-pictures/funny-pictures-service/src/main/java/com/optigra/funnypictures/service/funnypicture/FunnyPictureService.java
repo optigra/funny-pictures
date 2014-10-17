@@ -35,4 +35,12 @@ public interface FunnyPictureService {
 	 */
 	FunnyPicture getFunnyPicture(Long id);
 	
+	/**
+	 * Get's funny picture by Picture id.
+	 * @param id
+	 * @return Funny Pictures entity.
+	 */
+	PagedResult<FunnyPicture> getFunnyPicturesByPicture(PagedSearch<FunnyPicture> pagedSearch, Long id);
+	
+	
 }
