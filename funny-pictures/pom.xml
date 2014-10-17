@@ -268,9 +268,9 @@
 			<id>production</id>
 			<properties>
 				<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
-				<jdbc.databaseurl>jdbc:postgresql://localhost:5432/optigra-funnypictures</jdbc.databaseurl>
+				<jdbc.databaseurl>jdbc:postgresql://10.129.151.88:5432/optigra-funnypictures</jdbc.databaseurl>
 				<jdbc.username>postgres</jdbc.username>
-				<jdbc.password>hksda78&amp;5!</jdbc.password>
+				<jdbc.password>hksda78_5!</jdbc.password>
 				<jpa.database>POSTGRESQL</jpa.database>
 				<jpa.showSql>true</jpa.showSql>
 				<content.repository.path>/home/duke/repository/funny-pictures</content.repository.path>
