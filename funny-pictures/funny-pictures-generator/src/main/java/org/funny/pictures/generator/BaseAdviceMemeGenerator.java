@@ -37,7 +37,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 	public static final MimeType DEFAULT_OUTPUT_FORMAT = MimeType.IMAGE_PNG_PNG;
 
-	private final MimeType internalFormat = MimeType.IMAGE_BMP_BMP;
+	private final MimeType internalFormat = MimeType.IMAGE_XIMAGEMAGICK_MIFF;
+	
+	private static final String TMP_FILE_NAME_BASE = "tmp_advice";
 
 	private MimeType outputFormat;
 
@@ -66,20 +68,23 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		Path templateInput = null;
 		Path topCaption = null;
 		Path bottomCaption = null;
+		Path workingCopy = null;
 		Path result = null;
 		try {			
 			
 			templateInput = toTempFile(context.getTemplateInputStream(), context.getMimeType().getExtension());
-			result = prepareTemplate(templateInput);
+			workingCopy = convert(templateInput, internalFormat);
 			
-			Dimension originalDimension = imageInfoExtractor.getImageDimension(result);
+			Dimension originalDimension = imageInfoExtractor.getImageDimension(workingCopy);
 			int captionHeight =  (int) (captionHeightRatio * originalDimension.height);
 			
 			topCaption = generateCaption(context.getTopCaption(), originalDimension.width, captionHeight);
 			bottomCaption = generateCaption(context.getBottomCaption(), originalDimension.width, captionHeight);
 
-			superimpose(result, topCaption, originalDimension, 0, 0);
-			superimpose(result, bottomCaption, originalDimension, 0, originalDimension.height - captionHeight);
+			superimpose(workingCopy, topCaption, originalDimension, 0, 0);
+			superimpose(workingCopy, bottomCaption, originalDimension, 0, originalDimension.height - captionHeight);
+			
+			result = convert(workingCopy, outputFormat);
 
 			InputStream resultStream = new FileInputStream(result.toString());
 			LOG.debug("Advice meme generated");
@@ -100,6 +105,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 				}
 				if (bottomCaption != null) {
 					Files.deleteIfExists(bottomCaption);
+				}
+				if (workingCopy != null) {
+					Files.deleteIfExists(workingCopy);
 				}
 				LOG.debug("Temporary files deleted");
 			} catch (Exception e) {
@@ -141,22 +149,22 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	}
 
 	/**
-	 * Creates a copy of template image to work with,
-	 * converted to internal format.
-	 * @param templatePath path to template image
-	 * @return path to converted working copy
+	 * Converts a given image to an identical image of given format.
+	 * @param sourcePath path to the source image
+	 * @param targetFormat target image format
+	 * @return path to the target image
 	 * @throws IOException when an IO problem occurs
 	 * @throws InterruptedException when thread is interrupted
 	 * @throws IM4JavaException when an im4java problem occurs
 	 */
-	private Path prepareTemplate(final Path templatePath) throws IOException, InterruptedException, IM4JavaException {
-		Path result = Files.createTempFile("template", internalFormat.getExtension());
+	private Path convert(final Path sourcePath, final MimeType targetFormat) throws IOException, InterruptedException, IM4JavaException {
+		Path result = Files.createTempFile(TMP_FILE_NAME_BASE, targetFormat.getExtension());
 
 		IMOperation op = new IMOperation();
 		op.addImage();
 		op.addImage();
 
-		Object[] args = new String[] {templatePath.toString(), result.toString()};
+		Object[] args = new String[] {sourcePath.toString(), result.toString()};
 		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
 		convertCommand.run(op, args);
 
@@ -197,7 +205,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	 * @throws IOException when an IO problem occurs
 	 */
 	private Path toTempFile(final InputStream istream, final String extensionSuffix) throws IOException {
-		Path result = Files.createTempFile("template", extensionSuffix);
+		Path result = Files.createTempFile(TMP_FILE_NAME_BASE, extensionSuffix);
 		Files.copy(istream, result, StandardCopyOption.REPLACE_EXISTING);
 		LOG.debug("Created a temporary file: " + result.toAbsolutePath().toString());
 		return result;

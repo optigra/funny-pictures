@@ -80,7 +80,7 @@ public class BaseAdviceMemeGeneratorTest {
 		unit.generate(context);		
 
 		// Then
-		verify(convertCommand, times(3)).run(convertOperationCaptor.capture(), anyVararg());
+		verify(convertCommand, times(4)).run(convertOperationCaptor.capture(), anyVararg());
 		verify(compositeCommand, times(2)).run(compositeOperationCaptor.capture(), anyVararg());
 		
 		String expectedConvertCommand = "?img? ?img? ";
@@ -93,6 +93,7 @@ public class BaseAdviceMemeGeneratorTest {
 		assertEquals(expectedConvertCommand, convertOperationCaptor.getAllValues().get(0).toString());
 		assertEquals(expectedConvertTopCommand, convertOperationCaptor.getAllValues().get(1).toString());
 		assertEquals(expectedConvertBottomCommand, convertOperationCaptor.getAllValues().get(2).toString());
+		assertEquals(expectedConvertCommand, convertOperationCaptor.getAllValues().get(3).toString());
 		assertEquals(expectedCompositeTopCommand, compositeOperationCaptor.getAllValues().get(0).toString());
 		assertEquals(expectedCompositeBottomCommand, compositeOperationCaptor.getAllValues().get(1).toString());
 	}

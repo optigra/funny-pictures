@@ -8,7 +8,7 @@
 
 	<alias name="simpleMemeGenerator" alias="memeGenerator"/>
 	<bean id="simpleMemeGenerator" class="org.funny.pictures.generator.BaseAdviceMemeGenerator">
-		<property name="outputFormat" value="IMAGE_BMP_BMP" />
+		<property name="outputFormat" value="IMAGE_PNG_PNG" />
 		<property name="imageInfoExtractor" ref="imageInformationExtractor"/>
 	</bean>
 	
