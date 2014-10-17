@@ -43,6 +43,7 @@
 		<jpa.database>POSTGRESQL</jpa.database>
 		<jpa.showSql>true</jpa.showSql>
 		<content.repository.path>${user.home}/tmp/funny-pictures</content.repository.path>
+		<content.upload.maxSize>100000</content.upload.maxSize>
 		<api.output.json.pretty>true</api.output.json.pretty>
 		<api.domain.content.url>http://localhost:8080/funny-pictures-rest-api/api/content</api.domain.content.url>
 
@@ -262,6 +263,21 @@
 			<modules>
 				<module>funny-pictures-integration</module>
 			</modules>
+		</profile>
+		<profile>
+			<id>production</id>
+			<properties>
+				<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
+				<jdbc.databaseurl>jdbc:postgresql://localhost:5432/optigra-funnypictures</jdbc.databaseurl>
+				<jdbc.username>postgres</jdbc.username>
+				<jdbc.password>hksda78&amp;5!</jdbc.password>
+				<jpa.database>POSTGRESQL</jpa.database>
+				<jpa.showSql>true</jpa.showSql>
+				<content.repository.path>/home/duke/repository/funny-pictures</content.repository.path>
+				<api.output.json.pretty>true</api.output.json.pretty>
+				<api.domain.content.url>http://drawmeme.com/api/content</api.domain.content.url>
+				<migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
+			</properties>
 		</profile>
 	</profiles>
 </project>
