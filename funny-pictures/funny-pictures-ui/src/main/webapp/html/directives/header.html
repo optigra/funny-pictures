@@ -1,15 +1,15 @@
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">Funny pictures</a>
+            <a class="navbar-brand" href="#home">Funny pictures</a>
         </div>
         <div class="navbar-collapse collapse" ng-controller="HeaderController">
             <ul class="nav navbar-nav">
                 <li ng-class="{ active: isActive('/home')}">
-                    <a href="#">Home</a>
+                    <a href="#home">Home</a>
                 </li>
-                <li ng-class="{ active: isActive('/create')}">
-                    <a href="#create">Create picture</a>
+                <li ng-class="{ active: isActive('/createTemplate')}">
+                    <a href="#createTemplate">Create template</a>
                 </li>
                 <li ng-class="{ active: isActive('/funnies')}">
                     <a href="#funnies">Funny pictures</a>
@@ -18,7 +18,7 @@
                     <a href="#contact">Contact us</a>
                 </li>
             </ul>
-            <form class="navbar-form navbar-right">
+            <!--<form class="navbar-form navbar-right">
                 <div class="form-group">
                     <input type="text" placeholder="Email/Login" class="form-control"/>
                 </div>
@@ -26,7 +26,7 @@
                     <input type="text" placeholder="Password" class="form-control"/>
                 </div>
                 <button type="submit" class="btn btn-primary">Log in</button>
-            </form>
+            </form>-->
         </div>
     </div>
 </div>

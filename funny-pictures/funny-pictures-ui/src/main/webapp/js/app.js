@@ -18,6 +18,7 @@ funnyPicturesApp.factory('Feedback', function ($resource, SharedProperties) {
 funnyPicturesApp.service('SharedProperties', function () {
     var generatedFunny = { };
     var apiUrl = "http://localhost:8080/funny-pictures-rest-api/api";
+    var templateId = 0;
     return {
         getApiUrl: function () {
             return apiUrl;
@@ -27,6 +28,12 @@ funnyPicturesApp.service('SharedProperties', function () {
         },
         setGeneratedFunny: function (value) {
             generatedFunny = value;
+        },
+        setTemplateId: function (id) {
+            templateId = id;
+        },
+        getTemplateId: function () {
+            return templateId;
         }
 
     };
@@ -59,9 +66,13 @@ funnyPicturesApp.config(["$routeProvider" , function ($routeProvider) {
             templateUrl: "html/home.html",
             controller: 'HomeController'
         })
-        .when("/create", {
+        .when("/createTemplate", {
             templateUrl: "html/createPicture.html",
             controller: 'CreatePictureController'
+        })
+        .when("/createFunnyPicture", {
+            templateUrl: "html/createFunnyPicture.html",
+            controller: 'CreateFunnyPictureController'
         })
         .when("/preview", {
             templateUrl: "html/funnyPicturePreview.html",
@@ -86,12 +97,12 @@ funnyPicturesApp.directive('fileModel', ['$parse', function ($parse) {
             var modelSetter = model.assign;
 
             element.bind('change', function () {
-            	 var reader = new FileReader();
+                var reader = new FileReader();
 
-                 reader.onload = function (e) {
-                     $('#imagePreview').attr('src', e.target.result);
-                 };
-                 reader.readAsDataURL(element[0].files[0]);
+                reader.onload = function (e) {
+                    $('#imagePreview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(element[0].files[0]);
 
                 scope.$apply(function () {
                     modelSetter(scope, element[0].files[0]);

@@ -1,0 +1,63 @@
+<div class="jumbotron jumbotron-sm" xmlns="http://www.w3.org/1999/html">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-lg-12">
+                <span>
+                    <h1 class="h1">
+                        Generate your funny picture!
+                    </h1>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container" id="mainContainer">
+    <div class="row">
+        <div class="col-lg-6 col-sm-6">
+            <img class="img-thumbnail" id="large-image"
+                 ng-src="{{template.url}}" ng-show="template.url">
+
+            <form name="funnyText" class="input-form">
+                <div class="form-group">
+                    <label for="headerText"> Header text</label>
+                    <input type="text" placeholder="Enter text" id="headerText" name="headerText"
+                           ng-model="headerText" class="form-control" required/>
+                </div>
+                <div class="form-group">
+                    <label for="footerText"> Footer text</label>
+                    <input type="text" placeholder="Enter text" id="footerText" name="footerText"
+                           ng-model="footerText" class="form-control" required/>
+                </div>
+                <button ng-click="createFunnyPicture()" class="btn btn-lg btn-success">Create
+                    a picture
+                </button>
+            </form>
+        </div>
+        <div class="col-sm-1 col-lg-1">
+            <button type="button" class="btn-default btn-lg" ng-show="template.header && template.footer"
+                    ng-click="fullSize()">
+                <span class="glyphicon glyphicon-th-large"></span> Full size
+            </button>
+        </div>
+        <div class="col-lg-5">
+            <div class="col-lg-12">
+                <div class="row" style="text-align: center;">
+                    <div class="row" ng-repeat="picture in funniesByTemplate track by $index "
+                         ng-if="$index%2==0">
+
+                        <div class="col-md-6" ng-repeat="i in [$index,$index+1]"
+                             ng-if="funniesByTemplate[i]!=null">
+                            <a ng-click="modalOpen(funniesByTemplate[i])" class="thumbnail">
+                                <img ng-src="{{funniesByTemplate[i].url}}">{{funniesByTemplate[i].name}}
+                            </a>
+                        </div>
+                    </div>
+
+                    <pagination total-items="totalItems" ng-model="currentPage"
+                                items-per-page="itemsPerPage" ng-change="pageChanged()"
+                                ng-show="showPagination()"></pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
