@@ -16,7 +16,7 @@ funnyControllers.controller('HomeController', ['$scope', '$modal', '$location', 
     }, function (data) {
         $scope.pictures = data.entities;
         $scope.totalItems = data.count;
-    }, function (error) {
+    }, function () {
         $scope.totalItems = 0;
     });
 
@@ -27,7 +27,7 @@ funnyControllers.controller('HomeController', ['$scope', '$modal', '$location', 
         }, function (data) {
             $scope.pictures = data.entities;
             $scope.totalItems = data.count;
-        }, function (error) {
+        }, function () {
             $scope.totalItems = 0;
         });
     };
@@ -218,13 +218,19 @@ funnyControllers.controller('FunnyPreviewModalController', function ($scope, $wi
 });
 
 funnyControllers.controller('ContactController', ['$scope', 'Feedback', function ($scope, Feedback) {
+    $scope.alerts = [];
     $scope.feedback = {
         subject: "Select subject..."
     };
     $scope.sendFeedback = function () {
         Feedback.save($scope.feedback,
             function (data, status) {
+                $scope.alerts.push({
+                    type: 'success',
+                    msg: 'Thank you ' + $scope.feedback.name + ', your feedback was sent.'
+                });
                 console.log(data + " " + status);
+
             }, function (error) {
                 console.log("Feedback can't sent " + error.statusText + " " + error.status);
             }
@@ -237,4 +243,5 @@ funnyControllers.controller('ContactController', ['$scope', 'Feedback', function
             return true;
         }
     }
-}]);
+}])
+;

@@ -13,6 +13,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8">
+            <alert ng-repeat="alert in alerts" type="{{alert.type}}">{{alert.msg}}</alert>
             <div class="well well-sm">
                 <form name="contactForm">
 
@@ -40,7 +41,8 @@
                             <div class="form-group">
 
                                 <label class="control-label">Subject</label>
-                                <select name="subject" ng-model="feedback.subject" class="form-control selectpicker" required>
+                                <select name="subject" ng-model="feedback.subject" class="form-control selectpicker"
+                                        required>
                                     <option data-hidden="true">Select subject...</option>
                                     <option value="Improvements">Improvements</option>
                                     <option value="suggestions">Suggestions</option>
@@ -51,12 +53,13 @@
                         <div class="col-md-6">
                             <div class="form-group" ng-class="{ 'has-error': contactForm.message.$invalid }">
                                 <label class="control-label">Message</label>
-                                <textarea name="message"  ng-model="feedback.text" class="form-control"
+                                <textarea name="message" ng-model="feedback.text" class="form-control"
                                           rows="9" cols="25" required placeholder="Message"></textarea>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <button ng-click="sendFeedback()" ng-disabled="isButtonEnabled()" class="btn btn-primary pull-right" >
+                            <button ng-click="sendFeedback()" ng-disabled="isButtonEnabled()"
+                                    class="btn btn-primary pull-right">
                                 Send Message
                             </button>
                         </div>
