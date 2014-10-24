@@ -3,7 +3,7 @@
  */
 var funnyControllers = angular.module('funnyControllers', []);
 
-funnyControllers.controller('HomeController', [ '$scope', '$modal', '$location', 'Pictures' , 'Funnies' , 'SharedProperties', function ($scope, $modal, $location, Pictures, Funnies, SharedProperties) {
+funnyControllers.controller('HomeController', ['$scope', '$modal', '$location', 'Pictures', 'Funnies', 'SharedProperties', function ($scope, $modal, $location, Pictures, Funnies, SharedProperties) {
     $scope.headerText = "";
     $scope.footerText = "";
     $scope.currentPage = 1;
@@ -41,19 +41,19 @@ funnyControllers.controller('HomeController', [ '$scope', '$modal', '$location',
         $location.path('/createFunnyPicture');
     };
 
-} ]);
+}]);
 
-funnyControllers.controller('PreviewFunnyController', [ '$scope', 'SharedProperties', function ($scope, SharedProperties) {
+funnyControllers.controller('PreviewFunnyController', ['$scope', 'SharedProperties', function ($scope, SharedProperties) {
     $scope.generatedImage = SharedProperties.getGeneratedFunny();
-} ]);
+}]);
 
-funnyControllers.controller('HeaderController', [ '$scope', '$location' , function ($scope, $location) {
+funnyControllers.controller('HeaderController', ['$scope', '$location', function ($scope, $location) {
     $scope.isActive = function (viewLocation) {
         return viewLocation === $location.path();
     };
 }]);
 
-funnyControllers.controller('CreatePictureController', [ '$scope', '$location', 'FileUpload' , 'SharedProperties', 'Pictures' , function ($scope, $location, FileUpload, SharedProperties, Pictures) {
+funnyControllers.controller('CreatePictureController', ['$scope', '$location', 'FileUpload', 'SharedProperties', 'Pictures', function ($scope, $location, FileUpload, SharedProperties, Pictures) {
     $scope.pictureTitle = "";
     $scope.headerText = "";
     $scope.uploadFile = function () {
@@ -77,9 +77,9 @@ funnyControllers.controller('CreatePictureController', [ '$scope', '$location', 
                 );
             });
     };
-} ]);
+}]);
 
-funnyControllers.controller('FunniesController', [ '$scope', '$modal', 'Funnies' , function ($scope, $modal, Funnies) {
+funnyControllers.controller('FunniesController', ['$scope', '$modal', 'Funnies', function ($scope, $modal, Funnies) {
     $scope.funnies = {};
     $scope.currentPage = 1;
     $scope.totalItems = 0;
@@ -105,7 +105,7 @@ funnyControllers.controller('FunniesController', [ '$scope', '$modal', 'Funnies'
         $scope.totalItems = data.count;
     }, function (error) {
         console.log(error.statusText + " " + error.status);
-        $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
+        $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status});
     });
 
     $scope.pageChanged = function () {
@@ -125,7 +125,7 @@ funnyControllers.controller('FunniesController', [ '$scope', '$modal', 'Funnies'
 }]);
 
 
-funnyControllers.controller('CreateFunnyPictureController', [ '$scope', '$window', '$modal', '$http', 'SharedProperties', 'Pictures', 'Funnies', function ($scope, $window, $modal, $http, SharedProperties, Pictures, Funnies) {
+funnyControllers.controller('CreateFunnyPictureController', ['$scope', '$window', '$modal', '$http', 'SharedProperties', 'Pictures', 'Funnies', function ($scope, $window, $modal, $http, SharedProperties, Pictures, Funnies) {
     $scope.template = {};
     $scope.funniesByTemplate = {};
     $scope.currentPage = 1;
@@ -217,8 +217,10 @@ funnyControllers.controller('FunnyPreviewModalController', function ($scope, $wi
     }
 });
 
-funnyControllers.controller('ContactController', [ '$scope', 'Feedback', function ($scope, Feedback) {
-    $scope.feedback = {};
+funnyControllers.controller('ContactController', ['$scope', 'Feedback', function ($scope, Feedback) {
+    $scope.feedback = {
+        subject: "Select subject..."
+    };
     $scope.sendFeedback = function () {
         Feedback.save($scope.feedback,
             function (data, status) {
@@ -228,4 +230,11 @@ funnyControllers.controller('ContactController', [ '$scope', 'Feedback', functio
             }
         );
     };
+    $scope.isButtonEnabled = function () {
+        if ($scope.contactForm.$valid) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }]);
