@@ -12,24 +12,27 @@
 <div class="container" id="mainContainer">
     <div class="row">
         <div class="col-lg-6">
-            <form name="funnyText" class="input-form">
-                <div class="form-group">
-                    <input type="text" placeholder="Picture title" name="headerText" ng-model="pictureTitle"
+            <form name="templateInputForm" class="input-form">
+                <div class="form-group" ng-class="{ 'has-error': templateInputForm.pictureTitle.$invalid}">
+                    <label class="control-label"> Template title </label>
+                    <input type="text" placeholder="Picture title" name="pictureTitle" ng-model="pictureTitle"
                            class="form-control" required/>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-class="{ 'has-error': templateInputForm.fileName.$invalid}">
+                    <label class="control-label">Browse path to file...</label>
                     <div class="input-group">
-				<span class="input-group-btn">
-                    <span class="btn btn-primary btn-file"> Browse&hellip;
-                        <input type="file" file-model="myFile">
-				</span>
-				</span><input type="text" class="form-control" ng-model="myFile.name" readonly>
+                        <span class="input-group-btn">
+                            <span class="btn btn-primary btn-file"> Browse&hellip;
+                                <input type="file" file-model="myFile" accept="image/*" >
+                            </span>
+                        </span>
+                        <input type="text" name="fileName" class="form-control" ng-model="myFile.name" readonly>
                     </div>
                 </div>
 
                 <div>
-                    <button class="btn btn-primary" ng-click="uploadFile()">Upload
-                        File
+                    <button class="btn btn-primary" ng-click="uploadFile()" ng-disabled="isButtonDisabled()">
+                        Upload File
                     </button>
                 </div>
             </form>

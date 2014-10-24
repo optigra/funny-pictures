@@ -53,32 +53,6 @@ funnyControllers.controller('HeaderController', ['$scope', '$location', function
     };
 }]);
 
-funnyControllers.controller('CreatePictureController', ['$scope', '$location', 'FileUpload', 'SharedProperties', 'Pictures', function ($scope, $location, FileUpload, SharedProperties, Pictures) {
-    $scope.pictureTitle = "";
-    $scope.headerText = "";
-    $scope.uploadFile = function () {
-        var file = $scope.myFile;
-        var uploadUrl = SharedProperties.getApiUrl() + "/content";
-        FileUpload.uploadFileToUrl(file, uploadUrl)
-            .then(function (data) {
-                var pictureObject = {
-                    name: $scope.pictureTitle,
-                    url: data.path
-                };
-                Pictures.save(pictureObject,
-                    function (data) {
-                        $scope.headerText = "File " + data + " uploaded to server!";
-                        $location.path('/home');
-
-                    },
-                    function (error) {
-                        $scope.headerText = "Error" + error.message;
-                    }
-                );
-            });
-    };
-}]);
-
 funnyControllers.controller('FunniesController', ['$scope', '$modal', 'Funnies', function ($scope, $modal, Funnies) {
     $scope.funnies = {};
     $scope.currentPage = 1;
@@ -123,6 +97,38 @@ funnyControllers.controller('FunniesController', ['$scope', '$modal', 'Funnies',
         return $scope.totalItems > $scope.itemsPerPage;
     };
 }]);
+
+funnyControllers.controller('CreatePictureController', ['$scope', '$location', '$window', 'FileUpload', 'SharedProperties', 'Pictures', function ($scope, $location, $window, FileUpload, SharedProperties, Pictures) {
+    $scope.pictureTitle = "";
+    $scope.headerText = "";
+    $scope.uploadFile = function () {
+        var uploadUrl = SharedProperties.getApiUrl() + "/content";
+        var file = $scope.myFile;
+        if (file) {
+            FileUpload.uploadFileToUrl(file, uploadUrl)
+                .then(function (data) {
+                    var pictureObject = {
+                        name: $scope.pictureTitle,
+                        url: data.path
+                    };
+                    Pictures.save(pictureObject,
+                        function (data) {
+                            $scope.headerText = "File " + data + " uploaded to server!";
+                            $location.path('/home');
+
+                        },
+                        function (error) {
+                            $scope.headerText = "Error" + error.message;
+                        }
+                    );
+                });
+        } else {
+            $window.alert("Please select the file!")
+        }
+    };
+}
+])
+;
 
 
 funnyControllers.controller('CreateFunnyPictureController', ['$scope', '$window', '$modal', '$http', 'SharedProperties', 'Pictures', 'Funnies', function ($scope, $window, $modal, $http, SharedProperties, Pictures, Funnies) {
@@ -185,7 +191,7 @@ funnyControllers.controller('CreateFunnyPictureController', ['$scope', '$window'
     };
 
     $scope.modalOpen = function (funnyPicture) {
-        var modalInstance = $modal.open({
+        $modal.open({
             templateUrl: 'html/modal/funnyPreviewModal.html',
             controller: 'FunnyPreviewModalController',
             resolve: {
@@ -195,6 +201,14 @@ funnyControllers.controller('CreateFunnyPictureController', ['$scope', '$window'
             }
         });
     };
+
+    $scope.isButtonDisabled = function () {
+        if ($scope.funnyPictureText.$valid) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     $scope.fullSize = function () {
         $window.open($scope.template.url);
@@ -207,16 +221,6 @@ funnyControllers.controller('CreateFunnyPictureController', ['$scope', '$window'
 
 }
 ]);
-funnyControllers.controller('FunnyPreviewModalController', function ($scope, $window, $modalInstance, funnyPicture) {
-    $scope.funnyPicture = funnyPicture;
-    $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
-    };
-    $scope.fullSize = function () {
-        $window.open($scope.funnyPicture.url);
-    }
-});
-
 funnyControllers.controller('ContactController', ['$scope', 'Feedback', function ($scope, Feedback) {
     $scope.alerts = [];
     $scope.feedback = {
@@ -236,7 +240,7 @@ funnyControllers.controller('ContactController', ['$scope', 'Feedback', function
             }
         );
     };
-    $scope.isButtonEnabled = function () {
+    $scope.isButtonDisabled = function () {
         if ($scope.contactForm.$valid) {
             return false;
         } else {
@@ -245,3 +249,13 @@ funnyControllers.controller('ContactController', ['$scope', 'Feedback', function
     }
 }])
 ;
+
+funnyControllers.controller('FunnyPreviewModalController', function ($scope, $window, $modalInstance, funnyPicture) {
+    $scope.funnyPicture = funnyPicture;
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+    $scope.fullSize = function () {
+        $window.open($scope.funnyPicture.url);
+    }
+});
