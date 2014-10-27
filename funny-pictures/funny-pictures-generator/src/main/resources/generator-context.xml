@@ -14,4 +14,8 @@
 	
 	<bean id="imageInformationExtractor" class="org.funny.pictures.generator.util.ImageInformationExtractor"/>
 
+	<bean id="thumbnailGenerator" class="org.funny.pictures.generator.BaseThumbnailGenerator">
+		<property name="outputFormat" value="${generator.output.format}" />
+	</bean>
+
 </beans>

@@ -64,7 +64,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	@Resource(name = "memeGenerator")
 	private AdviceMemeGenerator memeGenerator;
 	
-	//@Resource(name = "thumbnailGenerator")
+	@Resource(name = "thumbnailGenerator")
 	private ThumbnailGenerator thumbnailGenerator;
 
 	@Resource(name = "thumbnailService")
@@ -121,8 +121,8 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		// Save funny picture
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
 
-		//List<FunnyPictureThumbnail> thumbnails = generateThumbnails(funnyPicture, content);
-		//funnyPicture.setThumbnails(thumbnails);
+		List<FunnyPictureThumbnail> thumbnails = generateThumbnails(funnyPicture, content);
+		funnyPicture.setThumbnails(thumbnails);
 		
 		return funnyPictureConverter.convert(funnyPicture);
 	}
