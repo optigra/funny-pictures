@@ -14,9 +14,14 @@ public class Queries {
 	
 	private static final String FIND_FUNNY_PICTURES_QUERY_NAME = "FunnyPictures.findPictures";
 	private static final String FIND_FUNNY_PICTURES_QUERY = "SELECT p FROM FunnyPicture p";
+	
+	private static final String FIND_FUNNY_PICTURES_BY_PIC_QUERY_NAME = "FunnyPictures.findFunniesByPicture";
+	private static final String FIND_FUNNY_PICTURES_BY_PIC_QUERY = "SELECT p FROM FunnyPicture p WHERE p.picture = :picture";
+	
 
 	public static final Queries FIND_PICTURES = new Queries(FIND_PICTURES_QUERY_NAME, FIND_PICTURES_QUERY);
 	public static final Queries FIND_FUNNY_PICTURES = new Queries(FIND_FUNNY_PICTURES_QUERY_NAME, FIND_FUNNY_PICTURES_QUERY);
+	public static final Queries FIND_FUNNY_PICTURES_BY_PICTURE = new Queries(FIND_FUNNY_PICTURES_BY_PIC_QUERY_NAME, FIND_FUNNY_PICTURES_BY_PIC_QUERY);
 
     private final String queryName;
     private final String query;

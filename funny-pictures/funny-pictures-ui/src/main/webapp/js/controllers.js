@@ -3,14 +3,12 @@
  */
 var funnyControllers = angular.module('funnyControllers', []);
 
-funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location', '$window', 'Pictures' , 'Funnies' , 'SharedProperties', function ($scope, $http, $location, $window, Pictures, Funnies, SharedProperties) {
-    $scope.imagePreview = {};
-    $scope.alerts = [];
+funnyControllers.controller('HomeController', [ '$scope', '$modal', '$location', 'Pictures' , 'Funnies' , 'SharedProperties', function ($scope, $modal, $location, Pictures, Funnies, SharedProperties) {
     $scope.headerText = "";
     $scope.footerText = "";
     $scope.currentPage = 1;
-    $scope.totalItems = 11;
-    $scope.itemsPerPage = 4;
+    $scope.totalItems = 0;
+    $scope.itemsPerPage = 8;
 
     Pictures.query({
         offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
@@ -18,10 +16,8 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
     }, function (data) {
         $scope.pictures = data.entities;
         $scope.totalItems = data.count;
-        $scope.imagePreview = data.entities[0];
     }, function (error) {
         $scope.totalItems = 0;
-        $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
     });
 
     $scope.pageChanged = function () {
@@ -31,45 +27,18 @@ funnyControllers.controller('HomeController', [ '$scope', '$http' , '$location',
         }, function (data) {
             $scope.pictures = data.entities;
             $scope.totalItems = data.count;
-            $scope.imagePreview = data.entities[0];
         }, function (error) {
             $scope.totalItems = 0;
-            $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
         });
     };
 
     $scope.showPagination = function () {
-        return $scope.totalItems != 0;
+        return $scope.totalItems > $scope.itemsPerPage;
     };
 
-    $scope.closeAlert = function (index) {
-        $scope.alerts.splice(index, 1);
-    };
-
-    $scope.changeMainPicture = function (pictureId) {
-        Pictures.get({id: pictureId}, function (picture) {
-            $scope.imagePreview = picture;
-        });
-    };
-
-    $scope.createPicture = function () {
-        var postObject = new Object();
-        postObject.name = $scope.imagePreview.name;
-        postObject.header = $scope.headerText;
-        postObject.footer = $scope.footerText;
-        postObject.template = {};
-        postObject.template.id = $scope.imagePreview.id;
-        Funnies.save(postObject,
-            function (data) {
-                SharedProperties.setGeneratedFunny(data);
-                $scope.alerts.push({type: 'success', msg: "Picture created with id : " + data.id});
-                $location.path('/preview');
-            },
-            function (error) {
-                $scope.alerts.push({type: 'danger', msg: "Can't create picture" + error.statusText + " " + error.status });
-            });
-
-
+    $scope.createFunnyPicture = function (templateId) {
+        SharedProperties.setTemplateId(templateId);
+        $location.path('/createFunnyPicture');
     };
 
 } ]);
@@ -84,7 +53,7 @@ funnyControllers.controller('HeaderController', [ '$scope', '$location' , functi
     };
 }]);
 
-funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , 'FileUpload' , 'SharedProperties', 'Pictures' , '$location', function ($scope, $http, $location, FileUpload, SharedProperties, Pictures) {
+funnyControllers.controller('CreatePictureController', [ '$scope', '$location', 'FileUpload' , 'SharedProperties', 'Pictures' , function ($scope, $location, FileUpload, SharedProperties, Pictures) {
     $scope.pictureTitle = "";
     $scope.headerText = "";
     $scope.uploadFile = function () {
@@ -107,20 +76,156 @@ funnyControllers.controller('CreatePictureController', [ '$scope', '$http' , 'Fi
                     }
                 );
             });
-
     };
 } ]);
 
-funnyControllers.controller('FunniesController', [ '$scope', 'Funnies' , function ($scope, Funnies) {
+funnyControllers.controller('FunniesController', [ '$scope', '$modal', 'Funnies' , function ($scope, $modal, Funnies) {
     $scope.funnies = {};
-    $scope.carouselInterval = 2000;
+    $scope.currentPage = 1;
+    $scope.totalItems = 0;
+    $scope.itemsPerPage = 8;
+
+    $scope.modalOpen = function (funnyPicture) {
+        var modalInstance = $modal.open({
+            templateUrl: 'html/modal/funnyPreviewModal.html',
+            controller: 'FunnyPreviewModalController',
+            resolve: {
+                funnyPicture: function () {
+                    return funnyPicture;
+                }
+            }
+        });
+    };
+
     Funnies.query({
-        offset: 0,
-        limit: 100
+        offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+        limit: $scope.itemsPerPage
     }, function (data) {
         $scope.funnies = data.entities;
+        $scope.totalItems = data.count;
     }, function (error) {
+        console.log(error.statusText + " " + error.status);
         $scope.alerts.push({type: 'danger', msg: error.statusText + " " + error.status });
     });
+
+    $scope.pageChanged = function () {
+        Funnies.query({
+            offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+            limit: $scope.itemsPerPage
+        }, function (data) {
+            $scope.funnies = data.entities;
+            $scope.totalItems = data.count;
+        }, function (error) {
+            console.log(error.statusText + " " + error.status);
+        });
+    };
+    $scope.showPagination = function () {
+        return $scope.totalItems > $scope.itemsPerPage;
+    };
 }]);
 
+
+funnyControllers.controller('CreateFunnyPictureController', [ '$scope', '$window', '$modal', '$http', 'SharedProperties', 'Pictures', 'Funnies', function ($scope, $window, $modal, $http, SharedProperties, Pictures, Funnies) {
+    $scope.template = {};
+    $scope.funniesByTemplate = {};
+    $scope.currentPage = 1;
+    $scope.totalItems = 0;
+    $scope.itemsPerPage = 6;
+
+    Pictures.get({id: SharedProperties.getTemplateId()}, function (picture) {
+        $scope.template = picture;
+        $http({
+            url: SharedProperties.getApiUrl() + "/pictures/" + $scope.template.id + "/funnies",
+            method: "GET",
+            params: {
+                offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+                limit: $scope.itemsPerPage
+            }
+        }).success(function (data, status) {
+            $scope.funniesByTemplate = data.entities;
+            $scope.totalItems = data.count;
+        }).error(function (error) {
+            console.log(error.statusText + " " + error.status);
+        });
+    });
+
+
+    $scope.createFunnyPicture = function () {
+        var postObject = new Object();
+        postObject.name = $scope.template.name;
+        postObject.header = $scope.headerText;
+        postObject.footer = $scope.footerText;
+        postObject.template = {};
+        postObject.template.id = $scope.template.id;
+        Funnies.save(postObject,
+            function (data) {
+                $scope.template = data;
+            },
+            function (error) {
+                console.log("Can't create picture" + error.statusText + " " + error.status);
+            });
+    };
+
+    $scope.pageChanged = function () {
+        $http({
+            url: SharedProperties.getApiUrl() + "/pictures/" + $scope.template.id + "/funnies",
+            method: "GET",
+            params: {
+                offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+                limit: $scope.itemsPerPage
+            }
+        }).success(function (data, status) {
+            $scope.funniesByTemplate = data.entities;
+            $scope.totalItems = data.count;
+        }).error(function (error) {
+            console.log(error.statusText + " " + error.status);
+        });
+
+
+    };
+
+    $scope.modalOpen = function (funnyPicture) {
+        var modalInstance = $modal.open({
+            templateUrl: 'html/modal/funnyPreviewModal.html',
+            controller: 'FunnyPreviewModalController',
+            resolve: {
+                funnyPicture: function () {
+                    return funnyPicture;
+                }
+            }
+        });
+    };
+
+    $scope.fullSize = function () {
+        $window.open($scope.template.url);
+    };
+
+    $scope.showPagination = function () {
+        return $scope.totalItems > $scope.itemsPerPage;
+    };
+
+
+}
+]);
+funnyControllers.controller('FunnyPreviewModalController', function ($scope, $window, $modalInstance, funnyPicture) {
+    $scope.funnyPicture = funnyPicture;
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+    $scope.fullSize = function () {
+        $window.open($scope.funnyPicture.url);
+    }
+});
+
+funnyControllers.controller('ContactController', [ '$scope', 'Feedback', function ($scope, Feedback) {
+    $scope.feedback = {};
+    $scope.sendFeedback = function () {
+        Feedback.save($scope.feedback,
+            function (data, status) {
+                console.log(data + " " + status);
+            }, function (error) {
+                console.log("Feedback can't sent " + error.statusText + " " + error.status);
+            }
+        );
+    };
+}]);

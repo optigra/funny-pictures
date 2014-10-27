@@ -7,19 +7,52 @@ import scala.concurrent.duration._
 class PictureScenario extends Simulation {
 
   val httpConf = http
-    .baseURL("http://localhost:8080/funny-pictures-rest-api/api") // Here is the root for all relative URLs
-    .acceptHeader("text/html,application/xhtml+xml,application/xml,application/json;q=0.9,*/*;q=0.8") // Here are the common headers
-    .doNotTrackHeader("1")
-    .acceptLanguageHeader("en-US,en;q=0.5")
-    .acceptEncodingHeader("gzip, deflate")
-    .userAgentHeader("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:16.0) Gecko/20100101 Firefox/16.0")
+    .baseURL("http://localhost:8080/funny-pictures-rest-api/api")
+    .acceptHeader("application/json")
 
-  val headers_10 = Map("Content-Type" -> """application/x-www-form-urlencoded""") // Note the headers specific to a given request
-
-  val scn = scenario("Test Pictures") // A scenario is a chain of requests and pauses
-    .exec(http("Request Pictures")
-      .get("/pictures"))
+  val pictureDetails = Array(Map("name" -> "name1", "url" -> "url1"),
+                   		     Map("name" -> "name2", "url" -> "url2"),
+                             Map("name" -> "name3", "url" -> "url3"))
+                       .queue
     
+  val scn = scenario("Manage Pictures")
+	.feed(pictureDetails)
+	
+	    .exec(http("Post Picture")
+	    		.post("/pictures")
+	    		.header("Content-Type", "application/json")
+	    		.body(StringBody("""{ "name": "${name}" , "url": "${url}" }"""))
+	    		.asJSON
+	    		.check(status.is(201))
+	    		.check(jsonPath("$.id").find.saveAs("savedId"))
+	    )
+	    		
+	 .pause(500 milliseconds, 2 seconds)
+	 	.exec(
+      		http("Get picture")
+        	.get("/pictures/${savedId}")
+        	.check(status.is(200)))
+			
+    	.exec(
+      		http("Update picture")
+        	.put("/pictures/${savedId}")
+			.header("Content-Type", "application/json")
+	    	.body(StringBody("""{ "name": "updatedName" , "url": "${url}" }"""))
+			.asJSON
+        	.check(status.is(200)))
+	 
+        .exec(
+      		http("Get picture")
+        	.get("/pictures/${savedId}")
+        	.check(status.is(200))
+        	.check(jsonPath("$.name").find.is("updatedName")))
+        	
+        	
+	 	.exec(http("Delete picture")
+        	.delete("/pictures/${savedId}")
+        	.check(status.is(204)))
 
-  setUp(scn.inject(atOnceUsers(1)).protocols(httpConf))
+  setUp(
+      scn.inject(atOnceUsers(1)).protocols(httpConf)
+  )
 }

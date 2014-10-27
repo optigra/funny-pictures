@@ -655,7 +655,10 @@ public enum MimeType {
 		XWORLD_XVRML_VRML("x-world/x-vrml", ".vrml"),
 		XWORLD_XVRML_WRL("x-world/x-vrml", ".wrl"),
 		XWORLD_XVRML_WRZ("x-world/x-vrml", ".wrz"),
-		XWORLD_XVRT_VRT("x-world/x-vrt", ".vrt");
+		XWORLD_XVRT_VRT("x-world/x-vrt", ".vrt"),
+		
+		//XXX Non-standard MIME type. Consider making it an application rather than image
+		IMAGE_XIMAGEMAGICK_MIFF("image/x-miff", ".miff");
 		
 		private String type;
 		private String extension;

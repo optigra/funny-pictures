@@ -32,8 +32,21 @@ public class DefaultFunnyPictureDao extends AbstractDao<FunnyPicture, Long> impl
 	}
 
 	@Override
+	public PagedResult<FunnyPicture> getFunnyPicturesByPicture(final PagedSearch<FunnyPicture> pagedSearch) {
+		
+		Queries query = Queries.FIND_FUNNY_PICTURES_BY_PICTURE;
+
+		pagedSearch.setClazz(getEntityClass());
+		pagedSearch.setParameters(pagedSearch.getParameters());
+		pagedSearch.setQuery(query);
+
+		return search(pagedSearch);
+	}
+
+	@Override
 	public Class<FunnyPicture> getEntityClass() {
 		return FunnyPicture.class;
 	}
+
 
 }
