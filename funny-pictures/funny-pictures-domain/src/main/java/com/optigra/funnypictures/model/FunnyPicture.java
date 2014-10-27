@@ -1,5 +1,8 @@
 package com.optigra.funnypictures.model;
 
+import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,7 +10,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
 
 /**
  * Entity, that describes generated picture with text.
@@ -16,8 +22,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "funny_picture")
-public class FunnyPicture {
-	
+public class FunnyPicture implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -38,6 +45,9 @@ public class FunnyPicture {
 	@ManyToOne
 	@JoinColumn(name = "picture_id", nullable = false)
 	private Picture picture;
+	
+	@OneToMany(mappedBy = "funnyPicture")
+	private List<FunnyPictureThumbnail> thumbnails;
 	
 	public Long getId() {
 		return id;
@@ -85,6 +95,14 @@ public class FunnyPicture {
 
 	public void setPicture(final Picture picture) {
 		this.picture = picture;
+	}
+
+	public List<FunnyPictureThumbnail> getThumbnails() {
+		return thumbnails;
+	}
+
+	public void setThumbnails(final List<FunnyPictureThumbnail> thumbnails) {
+		this.thumbnails = thumbnails;
 	}
 
 	@Override
@@ -154,4 +172,5 @@ public class FunnyPicture {
 		return "FunnyPicture [id=" + id + ", name=" + name + ", url=" + url
 				+ ", header=" + header + ", footer=" + footer + "]";
 	}
+
 }

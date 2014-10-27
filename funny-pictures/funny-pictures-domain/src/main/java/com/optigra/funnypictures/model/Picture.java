@@ -1,5 +1,6 @@
 package com.optigra.funnypictures.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -17,7 +18,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "picture")
-public class Picture {
+public class Picture implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

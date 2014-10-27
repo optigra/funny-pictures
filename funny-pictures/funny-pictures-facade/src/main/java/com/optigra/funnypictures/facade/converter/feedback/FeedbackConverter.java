@@ -19,6 +19,7 @@ public class FeedbackConverter extends AbstractConverter<Feedback, FeedbackResou
 		
 		target.setEmail(source.getEmail());
 		target.setId(source.getId());
+		target.setSubject(source.getSubject());
 		target.setName(source.getName());
 		target.setText(source.getText());
 		

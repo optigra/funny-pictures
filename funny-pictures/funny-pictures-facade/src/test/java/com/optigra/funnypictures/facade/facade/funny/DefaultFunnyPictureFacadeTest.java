@@ -1,6 +1,6 @@
 package com.optigra.funnypictures.facade.facade.funny;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.verify;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Ignore;
+import org.funny.pictures.generator.api.ThumbnailGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,6 +28,8 @@ import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.queries.Queries;
 import com.optigra.funnypictures.service.funnypicture.FunnyPictureService;
+import com.optigra.funnypictures.service.thumbnail.ThumbnailService;
+import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultFunnyPictureFacadeTest {
@@ -43,6 +45,15 @@ public class DefaultFunnyPictureFacadeTest {
 
 	@Mock
 	private Converter<FunnyPicture, FunnyPictureResource> funnyPictureConverter;
+
+	@Mock
+	private ThumbnailGenerator thumbnailGenerator;
+
+	@Mock
+	private ThumbnailService thumbnailService;
+
+	@Mock
+	private FunnyPictureThumbnailService funnyPictureThumbnailService;
 
 	@InjectMocks
 	private DefaultFunnyPictureFacade unit = new DefaultFunnyPictureFacade();
@@ -74,19 +85,6 @@ public class DefaultFunnyPictureFacadeTest {
 		verify(pagedResultConverter).convert(pagedResult, expectedFunnies);
 
 		assertEquals(expectedFunnies, actualFunnies);
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	@Ignore
-	public void testCreateFunny() throws Exception {
-		// Given
-		FunnyPictureResource funny = new FunnyPictureResource();
-
-		// When
-		unit.createFunnyPicture(funny);
-
-		// Then
-		// Expected exception
 	}
 
 }
