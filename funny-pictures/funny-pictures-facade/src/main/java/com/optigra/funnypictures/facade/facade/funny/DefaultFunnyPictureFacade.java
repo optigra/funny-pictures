@@ -1,5 +1,8 @@
 package com.optigra.funnypictures.facade.facade.funny;
 
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -7,6 +10,8 @@ import javax.annotation.Resource;
 import org.funny.pictures.generator.api.AdviceMemeContext;
 import org.funny.pictures.generator.api.AdviceMemeGenerator;
 import org.funny.pictures.generator.api.ImageHandle;
+import org.funny.pictures.generator.api.ThumbnailContext;
+import org.funny.pictures.generator.api.ThumbnailGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,10 +30,15 @@ import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
+import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import com.optigra.funnypictures.model.thumbnail.Thumbnail;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.funnypicture.FunnyPictureService;
 import com.optigra.funnypictures.service.picture.PictureService;
+import com.optigra.funnypictures.service.thumbnail.ThumbnailService;
+import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
 
 /**
  * Default facade for funny pictures. Uses for creating funny picture.
@@ -53,7 +63,16 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	@Resource(name = "memeGenerator")
 	private AdviceMemeGenerator memeGenerator;
+	
+	//@Resource(name = "thumbnailGenerator")
+	private ThumbnailGenerator thumbnailGenerator;
 
+	@Resource(name = "thumbnailService")
+	private ThumbnailService thumbnailService;
+	
+	@Resource(name = "funnyPictureThumbnailService")
+	private FunnyPictureThumbnailService funnyPictureThumbnailService;
+	
 	@Resource(name = "pagedRequestConverter")
 	private Converter<PagedRequest, PagedSearch<FunnyPicture>> pagedRequestConverter;
 
@@ -102,9 +121,85 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		// Save funny picture
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
 
+		//List<FunnyPictureThumbnail> thumbnails = generateThumbnails(funnyPicture, content);
+		//funnyPicture.setThumbnails(thumbnails);
+		
 		return funnyPictureConverter.convert(funnyPicture);
-
 	}
+
+	/**
+	 * Method for generating thumbnails for each funny picture.
+	 * @param funnyPicture funny picture.
+	 * @param content  content.
+	 * @return list of thumbnails.
+	 */
+	private List<FunnyPictureThumbnail> generateThumbnails(final FunnyPicture funnyPicture, final Content content) {
+		List<FunnyPictureThumbnail> thumbnails = new ArrayList<FunnyPictureThumbnail>();
+		
+		FunnyPictureThumbnail smallFunnyPictureThumbnail = createFunnyPictureThumbnail(funnyPicture, content, ThumbnailType.SMALL);
+		FunnyPictureThumbnail mediumFunnyPictureThumbnail = createFunnyPictureThumbnail(funnyPicture, content, ThumbnailType.MEDIUM);
+		FunnyPictureThumbnail bigFunnyPictureThumbnail = createFunnyPictureThumbnail(funnyPicture, content, ThumbnailType.BIG);
+		
+		thumbnails.add(smallFunnyPictureThumbnail);
+		thumbnails.add(mediumFunnyPictureThumbnail);
+		thumbnails.add(bigFunnyPictureThumbnail);
+		
+		return thumbnails;
+	}
+	
+	/**
+	 * Method for creating funny picture.
+	 * @param funnyPicture funny picture.
+	 * @param content content.
+	 * @param thumbnailType
+	 * @return Funny Picture Thumbnail entity.
+	 */
+	private FunnyPictureThumbnail createFunnyPictureThumbnail(final FunnyPicture funnyPicture, final Content content, final ThumbnailType thumbnailType) {
+		
+		Thumbnail thumbnail = createThumbnail(funnyPicture, content, ThumbnailType.SMALL);
+		
+		FunnyPictureThumbnail funnyPictureThumbnail = new FunnyPictureThumbnail();
+		funnyPictureThumbnail.setCreateDate(new Date());
+		funnyPictureThumbnail.setUpdateDate(new Date());
+		funnyPictureThumbnail.setFunnyPicture(funnyPicture);
+		funnyPictureThumbnail.setThumbnail(thumbnail);
+
+		funnyPictureThumbnailService.createFunnyPictureThumbnail(funnyPictureThumbnail);
+		
+		return funnyPictureThumbnail;
+	}
+
+	/**
+	 * Method for creating dimensions.
+	 * @param funnyPicture
+	 * @param content
+	 * @param thumbnailType
+	 * @return Thumbnail entity.
+	 */
+	private Thumbnail createThumbnail(final FunnyPicture funnyPicture, final Content content, final ThumbnailType thumbnailType) {
+		Dimension thumbnailDimension = new Dimension(thumbnailType.getWidth(), thumbnailType.getHeight());
+		ThumbnailContext thumbnailcontext = new ThumbnailContext(content.getContentStream(), content.getMimeType(), thumbnailDimension);
+		ImageHandle imageHandle = thumbnailGenerator.generate(thumbnailcontext);
+		
+		ContentResource memeResource = new ContentResource();
+		memeResource.setMimeType(imageHandle.getImageFormat());
+		String memePath = namingStrategy.createIdentifier(memeResource);
+
+		Content thumbnailContent = new Content();
+		thumbnailContent.setPath(memePath);
+		thumbnailContent.setContentStream(imageHandle.getImageInputStream());
+		
+		Thumbnail thumbnail = new Thumbnail();
+		thumbnail.setCreateDate(new Date());
+		thumbnail.setThumbnailType(thumbnailType);
+		thumbnail.setUpdateDate(new Date());
+		thumbnail.setUrl(memePath);
+		
+		thumbnailService.createThumbnail(thumbnail);
+		
+		return thumbnail;
+	}
+	
 
 	/**
 	 * Method save funny picture into database.
@@ -152,5 +247,21 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		content.setContentStream(generatedMeme.getImageInputStream());
 
 		return content;
+	}
+
+	@Override
+	public PagedResultResource<FunnyPictureResource> getFunniesForPicture(final Long id, final PagedRequest pagedRequest) {
+		
+		PagedSearch<FunnyPicture> pagedSearch = pagedRequestConverter.convert(pagedRequest);
+		
+		PagedResult<FunnyPicture> pagedResult = funnyPictureService.getFunnyPicturesByPicture(pagedSearch, id);
+		
+		List<FunnyPictureResource> resources = funnyPictureConverter.convertAll(pagedResult.getEntities());
+		
+		PagedResultResource<FunnyPictureResource> pagedResultResource = new PagedResultResource<>("/funnies");
+		pagedResultResource.setEntities(resources);
+		pagedResultConverter.convert(pagedResult, pagedResultResource);
+		
+		return pagedResultResource;
 	}
 }

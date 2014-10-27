@@ -79,5 +79,44 @@
     	<addColumn tableName="feedback">
     		<column name="subject" type="varchar(255)"/>
     	</addColumn>
-    </changeSet>    
+    </changeSet>
+	<changeSet id="createThumbnailTable" author="Ivan Ursul">
+		<createTable tableName="thumbnail">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="url" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="type" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+	<changeSet id="createFunnyPictureThumbnailTable" author="Ivan Ursul">
+		<createTable tableName="funny_picture_thumbnail">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="thumbnail_id" type="bigint">
+				<constraints nullable="false" foreignKeyName="fk_funny_picture_thumbnail_thumbnail" references="thumbnail(id)" />
+			</column>
+			<column name="funny_picture_id" type="bigint">
+				<constraints nullable="false" foreignKeyName="fk_funny_picture_thumbnail" references="funny_picture(id)" />
+			</column>
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addUniqueConstraint columnNames="thumbnail_id, funny_picture_id" tableName="funny_picture_thumbnail" />
+	</changeSet>
 </databaseChangeLog>
