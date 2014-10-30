@@ -1,8 +1,10 @@
 package com.optigra.funnypictures.facade.resources.picture;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 import com.optigra.funnypictures.facade.resources.ApiResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
 
 /**
  * Model for funny picture with PictureResource, header and footer texts.
@@ -24,6 +26,8 @@ public class FunnyPictureResource extends ApiResource {
 
 	private PictureResource template;
 
+	private List<FunnyPictureThumbnailResource> thumbnails;	
+	
 	@Override
 	public String getUri() {
 		return MessageFormat.format("/funnies/{0}", id);
@@ -77,17 +81,27 @@ public class FunnyPictureResource extends ApiResource {
 		this.template = template;
 	}
 
+	public List<FunnyPictureThumbnailResource> getThumbnails() {
+		return thumbnails;
+	}
+
+	public void setThumbnails(final List<FunnyPictureThumbnailResource> thumbnails) {
+		this.thumbnails = thumbnails;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((footer == null) ? 0 : footer.hashCode());
-		result = (prime * result) + ((header == null) ? 0 : header.hashCode());
-		result = (prime * result) + ((id == null) ? 0 : id.hashCode());
-		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
-		result = (prime * result)
+		result = prime * result + ((footer == null) ? 0 : footer.hashCode());
+		result = prime * result + ((header == null) ? 0 : header.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
 				+ ((template == null) ? 0 : template.hashCode());
-		result = (prime * result) + ((url == null) ? 0 : url.hashCode());
+		result = prime * result
+				+ ((thumbnails == null) ? 0 : thumbnails.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
 	}
 
@@ -138,6 +152,13 @@ public class FunnyPictureResource extends ApiResource {
 		} else if (!template.equals(other.template)) {
 			return false;
 		}
+		if (thumbnails == null) {
+			if (other.thumbnails != null) {
+				return false;
+			}
+		} else if (!thumbnails.equals(other.thumbnails)) {
+			return false;
+		}
 		if (url == null) {
 			if (other.url != null) {
 				return false;
@@ -152,6 +173,7 @@ public class FunnyPictureResource extends ApiResource {
 	public String toString() {
 		return "FunnyPictureResource [id=" + id + ", url=" + url + ", name="
 				+ name + ", header=" + header + ", footer=" + footer
-				+ ", template=" + template + "]";
+				+ ", template=" + template + ", thumbnails=" + thumbnails + "]";
 	}
+
 }

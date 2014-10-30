@@ -31,13 +31,11 @@ import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
-import com.optigra.funnypictures.model.thumbnail.Thumbnail;
 import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.funnypicture.FunnyPictureService;
 import com.optigra.funnypictures.service.picture.PictureService;
-import com.optigra.funnypictures.service.thumbnail.ThumbnailService;
 import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
 
 /**
@@ -67,9 +65,6 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	@Resource(name = "thumbnailGenerator")
 	private ThumbnailGenerator thumbnailGenerator;
 
-	@Resource(name = "thumbnailService")
-	private ThumbnailService thumbnailService;
-	
 	@Resource(name = "funnyPictureThumbnailService")
 	private FunnyPictureThumbnailService funnyPictureThumbnailService;
 	
@@ -156,14 +151,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	 */
 	private FunnyPictureThumbnail createFunnyPictureThumbnail(final FunnyPicture funnyPicture, final Content content, final ThumbnailType thumbnailType) {
 		
-		Thumbnail thumbnail = createThumbnail(funnyPicture, content, ThumbnailType.SMALL);
-		
-		FunnyPictureThumbnail funnyPictureThumbnail = new FunnyPictureThumbnail();
-		funnyPictureThumbnail.setCreateDate(new Date());
-		funnyPictureThumbnail.setUpdateDate(new Date());
-		funnyPictureThumbnail.setFunnyPicture(funnyPicture);
-		funnyPictureThumbnail.setThumbnail(thumbnail);
-
+		FunnyPictureThumbnail funnyPictureThumbnail = createThumbnail(funnyPicture, content, thumbnailType);
 		funnyPictureThumbnailService.createFunnyPictureThumbnail(funnyPictureThumbnail);
 		
 		return funnyPictureThumbnail;
@@ -176,7 +164,8 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	 * @param thumbnailType
 	 * @return Thumbnail entity.
 	 */
-	private Thumbnail createThumbnail(final FunnyPicture funnyPicture, final Content content, final ThumbnailType thumbnailType) {
+	private FunnyPictureThumbnail createThumbnail(final FunnyPicture funnyPicture, final Content inputContent, final ThumbnailType thumbnailType) {
+		Content content = contentService.getContentByPath(inputContent.getPath());
 		Dimension thumbnailDimension = new Dimension(thumbnailType.getWidth(), thumbnailType.getHeight());
 		ThumbnailContext thumbnailcontext = new ThumbnailContext(content.getContentStream(), content.getMimeType(), thumbnailDimension);
 		ImageHandle imageHandle = thumbnailGenerator.generate(thumbnailcontext);
@@ -189,15 +178,16 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		thumbnailContent.setPath(memePath);
 		thumbnailContent.setContentStream(imageHandle.getImageInputStream());
 		
-		Thumbnail thumbnail = new Thumbnail();
-		thumbnail.setCreateDate(new Date());
-		thumbnail.setThumbnailType(thumbnailType);
-		thumbnail.setUpdateDate(new Date());
-		thumbnail.setUrl(memePath);
+		contentService.saveContent(thumbnailContent);
 		
-		thumbnailService.createThumbnail(thumbnail);
+		FunnyPictureThumbnail funnyPictureThumbnail = new FunnyPictureThumbnail();
+		funnyPictureThumbnail.setUrl(memePath);
+		funnyPictureThumbnail.setThumbnailType(thumbnailType);
+		funnyPictureThumbnail.setCreateDate(new Date());
+		funnyPictureThumbnail.setUpdateDate(new Date());
+		funnyPictureThumbnail.setFunnyPicture(funnyPicture);
 		
-		return thumbnail;
+		return funnyPictureThumbnail;
 	}
 	
 
@@ -244,6 +234,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 		Content content = new Content();
 		content.setPath(memePath);
+		content.setMimeType(generatedMeme.getImageFormat());
 		content.setContentStream(generatedMeme.getImageInputStream());
 
 		return content;

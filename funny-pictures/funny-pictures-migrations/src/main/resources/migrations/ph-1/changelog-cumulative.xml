@@ -119,4 +119,18 @@
 		</createTable>
 		<addUniqueConstraint columnNames="thumbnail_id, funny_picture_id" tableName="funny_picture_thumbnail" />
 	</changeSet>
+	<changeSet id="dropThumbnailTable" author="ivanursul">
+		<dropColumn tableName="funny_picture_thumbnail" columnName="thumbnail_id"/>
+		<dropTable tableName="thumbnail"/>
+		
+		<addColumn tableName="funny_picture_thumbnail" >
+			<column name="url" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="type" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+		
+	</changeSet>
 </databaseChangeLog>

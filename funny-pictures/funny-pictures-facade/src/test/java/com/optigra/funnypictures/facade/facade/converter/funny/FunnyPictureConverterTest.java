@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -18,8 +19,10 @@ import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.converter.funny.FunnyPictureConverter;
 import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
+import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FunnyPictureConverterTest {
@@ -31,6 +34,9 @@ public class FunnyPictureConverterTest {
 	
 	@Mock
 	private Converter<Picture, PictureResource> pictureConverter;
+	
+	@Mock
+	private Converter<FunnyPictureThumbnail, FunnyPictureThumbnailResource> funnyPictureThumbnailConverter;
 	
 	@Before
 	public void setUp(){
@@ -55,6 +61,7 @@ public class FunnyPictureConverterTest {
 		picture1.setFooter(footer);
 		picture1.setHeader(header);
 		picture1.setPicture(picture);
+		picture1.setThumbnails(Collections.<FunnyPictureThumbnail>emptyList());
 
 		FunnyPictureResource expectedResource = new FunnyPictureResource();
 
@@ -66,6 +73,7 @@ public class FunnyPictureConverterTest {
 		expectedResource.setHeader(header);
 		expectedResource.setFooter(footer);
 		expectedResource.setTemplate(pictureResource);
+		expectedResource.setThumbnails(Collections.<FunnyPictureThumbnailResource>emptyList());
 
 		// When
 		when(pictureConverter.convert(picture)).thenReturn(pictureResource);
@@ -89,12 +97,14 @@ public class FunnyPictureConverterTest {
 		picture1.setId(id);
 		picture1.setName(name);
 		picture1.setUrl(url);
+		picture1.setThumbnails(Collections.<FunnyPictureThumbnail>emptyList());
 
 		FunnyPictureResource expectedResource = new FunnyPictureResource();
 
 		expectedResource.setId(id);
 		expectedResource.setName(name);
 		expectedResource.setUrl(url);
+		expectedResource.setThumbnails(Collections.<FunnyPictureThumbnailResource>emptyList());
 
 		// When
 		FunnyPictureResource actualResource = new FunnyPictureResource();
@@ -120,6 +130,7 @@ public class FunnyPictureConverterTest {
 		picture1.setId(id1);
 		picture1.setName(name1);
 		picture1.setUrl(url1);
+		picture1.setThumbnails(Collections.<FunnyPictureThumbnail>emptyList());
 
 		FunnyPicture picture2 = new FunnyPicture();
 		picture2.setId(id2);
@@ -131,12 +142,14 @@ public class FunnyPictureConverterTest {
 		expectedResource1.setId(id1);
 		expectedResource1.setName(name1);
 		expectedResource1.setUrl(url1);
+		expectedResource1.setThumbnails(Collections.<FunnyPictureThumbnailResource>emptyList());
 
 		FunnyPictureResource expectedResource2 = new FunnyPictureResource();
 
 		expectedResource2.setId(id2);
 		expectedResource2.setName(name2);
 		expectedResource2.setUrl(url2);
+		expectedResource2.setThumbnails(Collections.<FunnyPictureThumbnailResource>emptyList());
 
 		List<FunnyPictureResource> expectedResource = Arrays.asList(expectedResource1, expectedResource2);
 

@@ -28,7 +28,6 @@ import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.queries.Queries;
 import com.optigra.funnypictures.service.funnypicture.FunnyPictureService;
-import com.optigra.funnypictures.service.thumbnail.ThumbnailService;
 import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -48,9 +47,6 @@ public class DefaultFunnyPictureFacadeTest {
 
 	@Mock
 	private ThumbnailGenerator thumbnailGenerator;
-
-	@Mock
-	private ThumbnailService thumbnailService;
 
 	@Mock
 	private FunnyPictureThumbnailService funnyPictureThumbnailService;

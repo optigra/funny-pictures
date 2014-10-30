@@ -9,8 +9,10 @@ import com.optigra.funnypictures.facade.converter.AbstractConverter;
 import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
+import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
 
 /**
  * Converter from FunnyPicture to FunnyPictureResource.
@@ -26,6 +28,9 @@ public class FunnyPictureConverter extends AbstractConverter<FunnyPicture, Funny
 
 	@Resource(name = "pictureConverter")
 	private Converter<Picture, PictureResource> pictureConverter;
+	
+	@Resource(name = "funnyPictureThumbnailConverter")
+	private Converter<FunnyPictureThumbnail, FunnyPictureThumbnailResource> funnyPictureThumbnailConverter;
 
 	@Override
 	public FunnyPictureResource convert(final FunnyPicture source) {
@@ -41,6 +46,7 @@ public class FunnyPictureConverter extends AbstractConverter<FunnyPicture, Funny
 		target.setHeader(source.getHeader());
 		target.setFooter(source.getFooter());
 		target.setTemplate(pictureConverter.convert(source.getPicture()));
+		target.setThumbnails(funnyPictureThumbnailConverter.convertAll(source.getThumbnails()));
 
 		return target;
 	}

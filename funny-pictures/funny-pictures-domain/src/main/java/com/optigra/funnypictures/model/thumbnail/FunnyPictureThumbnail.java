@@ -1,6 +1,9 @@
 package com.optigra.funnypictures.model.thumbnail;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -20,20 +23,15 @@ public class FunnyPictureThumbnail extends Model {
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne
-	@JoinColumn(name = "thumbnail_id")
-	private Thumbnail thumbnail;
-	
-	@ManyToOne
 	@JoinColumn(name = "funny_picture_id")
 	private FunnyPicture funnyPicture;
 	
-	public Thumbnail getThumbnail() {
-		return thumbnail;
-	}
-
-	public void setThumbnail(final Thumbnail thumbnail) {
-		this.thumbnail = thumbnail;
-	}
+	@Column(name = "url")
+	private String url;
+	
+	@Column(name = "type")
+	@Enumerated(EnumType.STRING)
+	private ThumbnailType thumbnailType;
 
 	public FunnyPicture getFunnyPicture() {
 		return funnyPicture;
@@ -43,14 +41,29 @@ public class FunnyPictureThumbnail extends Model {
 		this.funnyPicture = funnyPicture;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(final String url) {
+		this.url = url;
+	}
+
+	public ThumbnailType getThumbnailType() {
+		return thumbnailType;
+	}
+
+	public void setThumbnailType(final ThumbnailType thumbnailType) {
+		this.thumbnailType = thumbnailType;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
-				+ ((funnyPicture == null) ? 0 : funnyPicture.hashCode());
-		result = prime * result
-				+ ((thumbnail == null) ? 0 : thumbnail.hashCode());
+				+ ((thumbnailType == null) ? 0 : thumbnailType.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
 	}
 
@@ -66,18 +79,14 @@ public class FunnyPictureThumbnail extends Model {
 			return false;
 		}
 		FunnyPictureThumbnail other = (FunnyPictureThumbnail) obj;
-		if (funnyPicture == null) {
-			if (other.funnyPicture != null) {
-				return false;
-			}
-		} else if (!funnyPicture.equals(other.funnyPicture)) {
+		if (thumbnailType != other.thumbnailType) {
 			return false;
 		}
-		if (thumbnail == null) {
-			if (other.thumbnail != null) {
+		if (url == null) {
+			if (other.url != null) {
 				return false;
 			}
-		} else if (!thumbnail.equals(other.thumbnail)) {
+		} else if (!url.equals(other.url)) {
 			return false;
 		}
 		return true;
@@ -85,8 +94,8 @@ public class FunnyPictureThumbnail extends Model {
 
 	@Override
 	public String toString() {
-		return "FunnyPictureThumbnail [thumbnail=" + thumbnail
-				+ ", funnyPicture=" + funnyPicture + "]";
+		return "FunnyPictureThumbnail [funnyPicture=" + funnyPicture + ", url="
+				+ url + ", thumbnailType=" + thumbnailType + "]";
 	}
-
+	
 }

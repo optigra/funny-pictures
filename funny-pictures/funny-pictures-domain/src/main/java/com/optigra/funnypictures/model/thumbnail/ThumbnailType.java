@@ -7,9 +7,9 @@ package com.optigra.funnypictures.model.thumbnail;
  *
  */
 public enum ThumbnailType {
-	SMALL(20, 20),
-	MEDIUM(50, 50),
-	BIG(70, 70);
+	SMALL(128, 128),
+	MEDIUM(256, 256),
+	BIG(512, 512);
 	
 	private int width;
 	private int height;
