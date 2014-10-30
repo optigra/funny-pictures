@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -59,17 +60,30 @@ public class FileSystemContentService implements ContentService {
 	public void saveContent(final Content content) {
 		LOG.info("Save content: {}", content);
 
-		File file = new File(getFullfilePath(content.getPath()));
-
 		try {
-
+			File file = new File(getFullfilePath(content.getPath()));
 			if (file.createNewFile()) {
 				IOUtils.copy(content.getContentStream(), new FileOutputStream(file));
 			}
 
 		} catch (Exception e) {
 			LOG.error("Can't save file", e);
-			throw new ContentSaveException("Can't save file", e);
+			throw new ContentSaveException("Could not save content to file", e);
+		} finally {
+			try {
+				if (content.getContentStream() != null) {
+					content.getContentStream().close();
+				}
+				/*
+				 * TODO
+				 * The content input stream has been closed,
+				 * but the file it was read from (if any) still exists.
+				 * Find a way to automatically remove that file.
+				 */
+			} catch (IOException e) {
+				throw new ContentSaveException("Could not close the content input stream", e);
+			}
+			
 		}
 	}
 

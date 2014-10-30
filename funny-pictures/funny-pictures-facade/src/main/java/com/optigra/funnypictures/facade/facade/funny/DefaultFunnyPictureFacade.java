@@ -131,9 +131,12 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	private List<FunnyPictureThumbnail> generateThumbnails(final FunnyPicture funnyPicture, final Content content) {
 		List<FunnyPictureThumbnail> thumbnails = new ArrayList<FunnyPictureThumbnail>();
 		
-		FunnyPictureThumbnail smallFunnyPictureThumbnail = createFunnyPictureThumbnail(funnyPicture, content, ThumbnailType.SMALL);
-		FunnyPictureThumbnail mediumFunnyPictureThumbnail = createFunnyPictureThumbnail(funnyPicture, content, ThumbnailType.MEDIUM);
-		FunnyPictureThumbnail bigFunnyPictureThumbnail = createFunnyPictureThumbnail(funnyPicture, content, ThumbnailType.BIG);
+		FunnyPictureThumbnail smallFunnyPictureThumbnail = 
+				createFunnyPictureThumbnail(funnyPicture, contentService.getContentByPath(content.getPath()), ThumbnailType.SMALL);
+		FunnyPictureThumbnail mediumFunnyPictureThumbnail = 
+				createFunnyPictureThumbnail(funnyPicture, contentService.getContentByPath(content.getPath()), ThumbnailType.MEDIUM);
+		FunnyPictureThumbnail bigFunnyPictureThumbnail = 
+				createFunnyPictureThumbnail(funnyPicture, contentService.getContentByPath(content.getPath()), ThumbnailType.BIG);
 		
 		thumbnails.add(smallFunnyPictureThumbnail);
 		thumbnails.add(mediumFunnyPictureThumbnail);
