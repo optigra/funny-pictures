@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.funny.pictures.generator.api.GeneratorException;
 import org.funny.pictures.generator.api.ImageHandle;
 import org.funny.pictures.generator.api.ThumbnailContext;
@@ -30,6 +31,8 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseThumbnailGenerator.class);
 
 	private MimeType outputFormat;
+	
+	private static final String TMP_FILE_NAME_BASE = "tmp_thumbnail";
 
 	private ConvertCmd convertCommand = new ConvertCmd();
 
@@ -37,11 +40,13 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 	public ImageHandle generate(final ThumbnailContext context) {
 		LOG.debug("Generating a thumbnail from context: " + context.toString());
 
+		InputStream originalInputStream = null;
 		Path templateInput = null;
 		Path result = null;
 		try {			
 			
-			templateInput = toTempFile(context.getTemplateInputStream(), context.getInputMimeType().getExtension());			
+			originalInputStream = context.getTemplateInputStream();
+			templateInput = toTempFile(originalInputStream, context.getInputMimeType().getExtension());			
 			result = Files.createTempFile("caption", outputFormat.getExtension());
 			
 			Dimension targetDimension = context.getThumbnailDimension();
@@ -58,7 +63,7 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 
 			convertCommand.run(op, args);
 			
-			InputStream resultStream = new FileInputStream(result.toString());
+			InputStream resultStream = new AutoCloseInputStream(new FileInputStream(result.toString()));
 			LOG.debug("Thumbnail generated");
 
 			return new ImageHandle(resultStream, outputFormat);
@@ -68,6 +73,9 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 			throw new GeneratorException(e.getMessage(), e);
 		} finally {
 			try {
+				if (originalInputStream != null) {
+					originalInputStream.close();
+				}
 				LOG.debug("Deleting temporary files");
 				if (templateInput != null) {
 					Files.deleteIfExists(templateInput);
@@ -87,9 +95,14 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 	 * @throws IOException when an IO problem occurs
 	 */
 	private Path toTempFile(final InputStream istream, final String extensionSuffix) throws IOException {
-		Path result = Files.createTempFile("template", extensionSuffix);
-		Files.copy(istream, result, StandardCopyOption.REPLACE_EXISTING);
-		LOG.debug("Created a temporary file: " + result.toAbsolutePath().toString());
+		Path result = Files.createTempFile(TMP_FILE_NAME_BASE, extensionSuffix);
+		long bytesCopied = Files.copy(istream, result, StandardCopyOption.REPLACE_EXISTING);
+		
+		if (bytesCopied == 0) {
+			LOG.warn("The input stream was empty");
+		}
+		LOG.debug("Created a temporary file: %1$s Size: %2$d bytes ", result.toAbsolutePath().toString(), bytesCopied);
+		
 		return result;
 	}
 	

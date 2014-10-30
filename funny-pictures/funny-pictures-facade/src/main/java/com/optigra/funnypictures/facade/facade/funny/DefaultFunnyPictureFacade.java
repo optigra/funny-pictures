@@ -117,7 +117,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		Content content = generateMeme(funny, templateConntent);
 		// Save generated meme's content
 		contentService.saveContent(content);
-
+		
 		// Save funny picture
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
 

@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.funny.pictures.generator.api.AdviceMemeContext;
 import org.funny.pictures.generator.api.AdviceMemeGenerator;
 import org.funny.pictures.generator.api.GeneratorException;
@@ -65,6 +66,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 		LOG.debug("Generating an advice meme from context: " + context.toString());
 
+		InputStream templateInputStream = null;
 		Path templateInput = null;
 		Path topCaption = null;
 		Path bottomCaption = null;
@@ -72,7 +74,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		Path result = null;
 		try {			
 			
-			templateInput = toTempFile(context.getTemplateInputStream(), context.getMimeType().getExtension());
+			templateInputStream = context.getTemplateInputStream();
+			templateInput = toTempFile(templateInputStream, context.getMimeType().getExtension());
+			
 			workingCopy = convert(templateInput, internalFormat);
 			
 			Dimension originalDimension = imageInfoExtractor.getImageDimension(workingCopy);
@@ -85,8 +89,8 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 			superimpose(workingCopy, bottomCaption, originalDimension, 0, originalDimension.height - captionHeight);
 			
 			result = convert(workingCopy, outputFormat);
-
-			InputStream resultStream = new FileInputStream(result.toString());
+			
+			InputStream resultStream = new AutoCloseInputStream(new FileInputStream(result.toString()));
 			LOG.debug("Advice meme generated");
 
 			return new ImageHandle(resultStream, outputFormat);
@@ -96,6 +100,9 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 			throw new GeneratorException(e.getMessage(), e);
 		} finally {
 			try {
+				if (templateInputStream != null) {
+					templateInputStream.close();
+				}
 				LOG.debug("Deleting temporary files");
 				if (templateInput != null) {
 					Files.deleteIfExists(templateInput);
@@ -206,8 +213,13 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	 */
 	private Path toTempFile(final InputStream istream, final String extensionSuffix) throws IOException {
 		Path result = Files.createTempFile(TMP_FILE_NAME_BASE, extensionSuffix);
-		Files.copy(istream, result, StandardCopyOption.REPLACE_EXISTING);
-		LOG.debug("Created a temporary file: " + result.toAbsolutePath().toString());
+		long bytesCopied = Files.copy(istream, result, StandardCopyOption.REPLACE_EXISTING);
+		
+		if (bytesCopied == 0) {
+			LOG.warn("The input stream was empty");
+		}
+		LOG.debug("Created a temporary file: %1$s Size: %2$d bytes ", result.toAbsolutePath().toString(), bytesCopied);
+		
 		return result;
 	}
 
