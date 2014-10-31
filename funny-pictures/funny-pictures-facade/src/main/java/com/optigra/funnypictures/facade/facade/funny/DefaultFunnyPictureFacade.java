@@ -120,6 +120,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		List<FunnyPictureThumbnail> funnyPictureThumbnails = createFunnyPictureThumbnail(thumbnails, funnyPicture);
 		funnyPicture.setThumbnails(funnyPictureThumbnails);
 		
+		
 		return funnyPictureConverter.convert(funnyPicture);
 	}
 	
