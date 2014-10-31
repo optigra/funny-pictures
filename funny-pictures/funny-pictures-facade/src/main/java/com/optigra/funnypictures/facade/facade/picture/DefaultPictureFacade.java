@@ -68,7 +68,7 @@ public class DefaultPictureFacade implements PictureFacade {
 
 		Picture pictureForService = pictureResourceConverter.convert(pictureResource);
 		pictureService.createPicture(pictureForService);
-
+		
 		return pictureConverter.convert(pictureForService);
 	}
 
