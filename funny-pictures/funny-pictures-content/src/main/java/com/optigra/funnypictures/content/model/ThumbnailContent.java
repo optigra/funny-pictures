@@ -3,7 +3,7 @@ package com.optigra.funnypictures.content.model;
 import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 
 /**
- * Extended content with mimeType.
+ * Extended content that allows to specify thumbnail type.
  * @author ivanursul
  *
  */

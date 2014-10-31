@@ -30,6 +30,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.optigra.funnypictures.generator.BaseAdviceMemeGenerator;
 import com.optigra.funnypictures.model.content.MimeType;
 
 @RunWith(MockitoJUnitRunner.class)

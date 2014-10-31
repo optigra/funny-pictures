@@ -1,4 +1,4 @@
-package com.optigra.funnypictures.facade.facade.funny;
+package com.optigra.funnypictures.service.thumbnail;
 
 import java.util.List;
 

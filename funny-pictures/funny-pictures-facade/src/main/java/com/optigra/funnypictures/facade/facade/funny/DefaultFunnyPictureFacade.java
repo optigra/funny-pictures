@@ -34,6 +34,7 @@ import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.funnypicture.FunnyPictureService;
 import com.optigra.funnypictures.service.picture.PictureService;
+import com.optigra.funnypictures.service.thumbnail.ThumbnailGeneratorService;
 import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
 
 /**

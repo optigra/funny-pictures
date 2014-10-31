@@ -30,5 +30,10 @@
 			<artifactId>funny-pictures-content</artifactId>
 			<version>${version}</version>
 		</dependency>
+		<dependency>
+			<groupId>funny-pictures</groupId>
+			<artifactId>funny-pictures-generator</artifactId>
+			<version>${version}</version>
+		</dependency>
 	</dependencies>
 </project>
