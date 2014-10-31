@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,14 +40,14 @@ public class FileSystemContentService implements ContentService {
 
 		try {
 			File file = new File(getFullfilePath(path));
-			FileInputStream fileInputStream = new FileInputStream(file);
-			String fileExtention = FilenameUtils.getExtension(file.getName());
+			AutoCloseInputStream  fileInputStream = new AutoCloseInputStream(new FileInputStream(file));
+			String fileExtension = FilenameUtils.getExtension(file.getName());
 
 			content = new Content();
 			content.setContentStream(fileInputStream);
 			content.setPath(path);
 			content.setSize(Long.valueOf(file.getTotalSpace()));
-			content.setMimeType(MimeType.fromExtension(EXTENSION_SEPARATOR + fileExtention));
+			content.setMimeType(MimeType.fromExtension(EXTENSION_SEPARATOR + fileExtension));
 
 		} catch (FileNotFoundException e) {
 			LOG.error("Can't read file from file system", e);
