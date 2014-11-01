@@ -119,7 +119,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
 
 		List<ThumbnailContent> thumbnails = thumbnailGeneratorService.generateThumbnails(content);
-		for(ThumbnailContent thumbnailContent : thumbnails){
+		for (ThumbnailContent thumbnailContent : thumbnails) {
 			ContentResource thumbnailResource = new ContentResource();
 			thumbnailResource.setMimeType(thumbnailContent.getMimeType());
 			String thumbnailUrl = namingStrategy.createIdentifier(thumbnailResource);
