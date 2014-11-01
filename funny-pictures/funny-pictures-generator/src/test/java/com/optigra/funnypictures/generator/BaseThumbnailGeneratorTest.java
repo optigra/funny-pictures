@@ -1,4 +1,4 @@
-package org.funny.pictures.generator;
+package com.optigra.funnypictures.generator;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyVararg;
@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
-import org.funny.pictures.generator.api.ThumbnailContext;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.process.OutputConsumer;
@@ -27,6 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.optigra.funnypictures.generator.BaseAdviceMemeGenerator;
 import com.optigra.funnypictures.generator.BaseThumbnailGenerator;
+import com.optigra.funnypictures.generator.api.ThumbnailContext;
 import com.optigra.funnypictures.model.content.MimeType;
 
 @RunWith(MockitoJUnitRunner.class)

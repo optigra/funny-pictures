@@ -1,4 +1,4 @@
-package org.funny.pictures.generator.api;
+package com.optigra.funnypictures.generator.api;
 
 /**
  * An interface for generators of image thumbnails.

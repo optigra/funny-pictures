@@ -6,13 +6,14 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.funny.pictures.generator.api.ImageHandle;
-import org.funny.pictures.generator.api.ThumbnailContext;
-import org.funny.pictures.generator.api.ThumbnailGenerator;
+import org.springframework.stereotype.Component;
 
 import com.optigra.funnypictures.content.model.Content;
 import com.optigra.funnypictures.content.model.ThumbnailContent;
 import com.optigra.funnypictures.content.service.ContentService;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.api.ThumbnailContext;
+import com.optigra.funnypictures.generator.api.ThumbnailGenerator;
 import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 
 /**
@@ -20,6 +21,7 @@ import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
  * @author odisseus
  *
  */
+@Component("thumbnailGeneratorService")
 public class DefaultThumbnailGeneratorService implements
 		ThumbnailGeneratorService {
 	
@@ -33,7 +35,8 @@ public class DefaultThumbnailGeneratorService implements
 	public List<ThumbnailContent> generateThumbnails(final Content content) {
 		List<ThumbnailContent> thumbnails = new ArrayList<ThumbnailContent>();
 		for (ThumbnailType thumbnailType : ThumbnailType.values()) {
-			ThumbnailContent thumbnail = generateThumbnail(contentService.getContentByPath(content.getPath()), thumbnailType);
+			Content generatorInputContent = contentService.getContentByPath(content.getPath());
+			ThumbnailContent thumbnail = generateThumbnail(generatorInputContent, thumbnailType);
 			thumbnails.add(thumbnail);
 		}
 		return thumbnails;

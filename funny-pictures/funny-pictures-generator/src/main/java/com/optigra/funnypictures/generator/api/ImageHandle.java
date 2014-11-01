@@ -1,4 +1,4 @@
-package org.funny.pictures.generator.api;
+package com.optigra.funnypictures.generator.api;
 
 import java.io.InputStream;
 

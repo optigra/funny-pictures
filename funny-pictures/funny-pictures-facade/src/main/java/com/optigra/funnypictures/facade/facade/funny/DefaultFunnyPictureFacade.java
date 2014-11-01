@@ -6,10 +6,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.funny.pictures.generator.api.AdviceMemeContext;
-import org.funny.pictures.generator.api.AdviceMemeGenerator;
-import org.funny.pictures.generator.api.ImageHandle;
-import org.funny.pictures.generator.api.ThumbnailGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,6 +23,10 @@ import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
+import com.optigra.funnypictures.generator.api.AdviceMemeContext;
+import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.api.ThumbnailGenerator;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
@@ -79,6 +79,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	@Resource(name = "namingStrategy")
 	private ContentResourceNamingStrategy namingStrategy;
 
+	@Resource(name = "thumbnailGeneratorService")
 	private ThumbnailGeneratorService thumbnailGeneratorService;
 
 	@Override
@@ -118,7 +119,14 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
 
 		List<ThumbnailContent> thumbnails = thumbnailGeneratorService.generateThumbnails(content);
-		List<FunnyPictureThumbnail> funnyPictureThumbnails = createFunnyPictureThumbnail(thumbnails, funnyPicture);
+		for(ThumbnailContent thumbnailContent : thumbnails){
+			ContentResource thumbnailResource = new ContentResource();
+			thumbnailResource.setMimeType(thumbnailContent.getMimeType());
+			String thumbnailUrl = namingStrategy.createIdentifier(thumbnailResource);
+			thumbnailContent.setPath(thumbnailUrl);
+			contentService.saveContent(thumbnailContent);
+		}
+		List<FunnyPictureThumbnail> funnyPictureThumbnails = createFunnyPictureThumbnails(thumbnails, funnyPicture);
 		funnyPicture.setThumbnails(funnyPictureThumbnails);
 		
 		
@@ -131,7 +139,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	 * @param funnyPicture funny picture.
 	 * @return list of funny picture thumbnails.
 	 */
-	private List<FunnyPictureThumbnail> createFunnyPictureThumbnail(final List<ThumbnailContent> thumbnails, final FunnyPicture funnyPicture) {
+	private List<FunnyPictureThumbnail> createFunnyPictureThumbnails(final List<ThumbnailContent> thumbnails, final FunnyPicture funnyPicture) {
 		List<FunnyPictureThumbnail> funnyPictureThumbnails = new ArrayList<FunnyPictureThumbnail>();
 		
 		for (ThumbnailContent content : thumbnails) {
@@ -140,7 +148,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 			funnyPictureThumbnail.setFunnyPicture(funnyPicture);
 			funnyPictureThumbnail.setThumbnailType(content.getThumbnailType());
 			funnyPictureThumbnail.setUpdateDate(new Date());
-			funnyPictureThumbnail.setUrl(content.getPath());
+			funnyPictureThumbnail.setUrl(content.getPath()); ///!!!
 			
 			funnyPictureThumbnailService.createFunnyPictureThumbnail(funnyPictureThumbnail);
 			funnyPictureThumbnails.add(funnyPictureThumbnail);
@@ -148,79 +156,6 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		
 		return funnyPictureThumbnails;
 	}
-
-/*
-	*//**
-	 * Method for generating thumbnails for each funny picture.
-	 * @param funnyPicture funny picture.
-	 * @param content  content.
-	 * @return list of thumbnails.
-	 *//*
-	private List<FunnyPictureThumbnail> generateThumbnails(final FunnyPicture funnyPicture, final Content content) {
-		List<FunnyPictureThumbnail> thumbnails = new ArrayList<FunnyPictureThumbnail>();
-		
-		FunnyPictureThumbnail smallFunnyPictureThumbnail = 
-				createFunnyPictureThumbnail(funnyPicture, contentService.getContentByPath(content.getPath()), ThumbnailType.SMALL);
-		FunnyPictureThumbnail mediumFunnyPictureThumbnail = 
-				createFunnyPictureThumbnail(funnyPicture, contentService.getContentByPath(content.getPath()), ThumbnailType.MEDIUM);
-		FunnyPictureThumbnail bigFunnyPictureThumbnail = 
-				createFunnyPictureThumbnail(funnyPicture, contentService.getContentByPath(content.getPath()), ThumbnailType.BIG);
-		
-		thumbnails.add(smallFunnyPictureThumbnail);
-		thumbnails.add(mediumFunnyPictureThumbnail);
-		thumbnails.add(bigFunnyPictureThumbnail);
-		
-		return thumbnails;
-	}*/
-/*	
-	*//**
-	 * Method for creating funny picture.
-	 * @param funnyPicture funny picture.
-	 * @param content content.
-	 * @param thumbnailType
-	 * @return Funny Picture Thumbnail entity.
-	 *//*
-	private FunnyPictureThumbnail createFunnyPictureThumbnail(final FunnyPicture funnyPicture, final Content content, final ThumbnailType thumbnailType) {
-		
-		FunnyPictureThumbnail funnyPictureThumbnail = createThumbnail(funnyPicture, content, thumbnailType);
-		funnyPictureThumbnailService.createFunnyPictureThumbnail(funnyPictureThumbnail);
-		
-		return funnyPictureThumbnail;
-	}*/
-/*
-	*//**
-	 * Method for creating dimensions.
-	 * @param funnyPicture
-	 * @param content
-	 * @param thumbnailType
-	 * @return Thumbnail entity.
-	 *//*
-	private FunnyPictureThumbnail createThumbnail(final FunnyPicture funnyPicture, final Content inputContent, final ThumbnailType thumbnailType) {
-		Content content = contentService.getContentByPath(inputContent.getPath());
-		Dimension thumbnailDimension = new Dimension(thumbnailType.getWidth(), thumbnailType.getHeight());
-		ThumbnailContext thumbnailcontext = new ThumbnailContext(content.getContentStream(), content.getMimeType(), thumbnailDimension);
-		ImageHandle imageHandle = thumbnailGenerator.generate(thumbnailcontext);
-		
-		ContentResource memeResource = new ContentResource();
-		memeResource.setMimeType(imageHandle.getImageFormat());
-		String memePath = namingStrategy.createIdentifier(memeResource);
-
-		Content thumbnailContent = new Content();
-		thumbnailContent.setPath(memePath);
-		thumbnailContent.setContentStream(imageHandle.getImageInputStream());
-		
-		contentService.saveContent(thumbnailContent);
-		
-		FunnyPictureThumbnail funnyPictureThumbnail = new FunnyPictureThumbnail();
-		funnyPictureThumbnail.setUrl(memePath);
-		funnyPictureThumbnail.setThumbnailType(thumbnailType);
-		funnyPictureThumbnail.setCreateDate(new Date());
-		funnyPictureThumbnail.setUpdateDate(new Date());
-		funnyPictureThumbnail.setFunnyPicture(funnyPicture);
-		
-		return funnyPictureThumbnail;
-	}*/
-	
 
 	/**
 	 * Method save funny picture into database.

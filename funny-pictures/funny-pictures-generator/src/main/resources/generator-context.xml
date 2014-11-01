@@ -7,14 +7,14 @@
 
 
 	<alias name="simpleMemeGenerator" alias="memeGenerator"/>
-	<bean id="simpleMemeGenerator" class="org.funny.pictures.generator.BaseAdviceMemeGenerator">
+	<bean id="simpleMemeGenerator" class="com.optigra.funnypictures.generator.BaseAdviceMemeGenerator">
 		<property name="outputFormat" value="${generator.output.format}" />
 		<property name="imageInfoExtractor" ref="imageInformationExtractor"/>
 	</bean>
 	
-	<bean id="imageInformationExtractor" class="org.funny.pictures.generator.util.ImageInformationExtractor"/>
+	<bean id="imageInformationExtractor" class="com.optigra.funnypictures.generator.util.ImageInformationExtractor"/>
 
-	<bean id="thumbnailGenerator" class="org.funny.pictures.generator.BaseThumbnailGenerator">
+	<bean id="thumbnailGenerator" class="com.optigra.funnypictures.generator.BaseThumbnailGenerator">
 		<property name="outputFormat" value="${generator.output.format}" />
 	</bean>
 

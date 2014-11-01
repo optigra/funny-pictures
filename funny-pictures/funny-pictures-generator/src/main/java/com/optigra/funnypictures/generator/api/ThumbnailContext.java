@@ -1,4 +1,4 @@
-package org.funny.pictures.generator.api;
+package com.optigra.funnypictures.generator.api;
 
 import java.awt.Dimension;
 import java.io.InputStream;

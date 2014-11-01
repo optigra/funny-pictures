@@ -9,10 +9,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
-import org.funny.pictures.generator.api.GeneratorException;
-import org.funny.pictures.generator.api.ImageHandle;
-import org.funny.pictures.generator.api.ThumbnailContext;
-import org.funny.pictures.generator.api.ThumbnailGenerator;
+import com.optigra.funnypictures.generator.api.GeneratorException;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.api.ThumbnailContext;
+import com.optigra.funnypictures.generator.api.ThumbnailGenerator;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;

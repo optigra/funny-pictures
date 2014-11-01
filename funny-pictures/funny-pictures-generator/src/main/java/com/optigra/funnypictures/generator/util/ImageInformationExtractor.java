@@ -1,4 +1,4 @@
-package org.funny.pictures.generator.util;
+package com.optigra.funnypictures.generator.util;
 
 import java.awt.Dimension;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.funny.pictures.generator.api.ImageAccessException;
+import com.optigra.funnypictures.generator.api.ImageAccessException;
 import org.im4java.core.CompareCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;

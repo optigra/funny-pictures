@@ -1,4 +1,4 @@
-package org.funny.pictures.generator.api;
+package com.optigra.funnypictures.generator.api;
 
 /**
  * A runtime exception that can be thrown by image reading utilities.

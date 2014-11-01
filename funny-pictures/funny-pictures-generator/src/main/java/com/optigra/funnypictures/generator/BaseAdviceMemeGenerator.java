@@ -11,11 +11,13 @@ import java.nio.file.StandardCopyOption;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
-import org.funny.pictures.generator.api.AdviceMemeContext;
-import org.funny.pictures.generator.api.AdviceMemeGenerator;
-import org.funny.pictures.generator.api.GeneratorException;
-import org.funny.pictures.generator.api.ImageHandle;
-import org.funny.pictures.generator.util.ImageInformationExtractor;
+
+import com.optigra.funnypictures.generator.api.AdviceMemeContext;
+import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
+import com.optigra.funnypictures.generator.api.GeneratorException;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.util.ImageInformationExtractor;
+
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;

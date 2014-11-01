@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.funny.pictures.generator.api.ThumbnailGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -23,6 +22,7 @@ import com.optigra.funnypictures.facade.resources.ApiResource;
 import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
+import com.optigra.funnypictures.generator.api.ThumbnailGenerator;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
