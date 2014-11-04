@@ -22,6 +22,11 @@ import com.optigra.funnypictures.generator.api.GeneratorException;
 import com.optigra.funnypictures.generator.api.ImageHandle;
 import com.optigra.funnypictures.model.content.MimeType;
 
+/**
+ * Generator of free-form comics with an rbitrary number of rectangular text blocks.
+ * @author odisseus
+ *
+ */
 public class BaseComicGenerator implements ComicGenerator {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(BaseThumbnailGenerator.class);
@@ -86,7 +91,17 @@ public class BaseComicGenerator implements ComicGenerator {
 		}
 	}
 	
-	private void insertTextBlock(final Path targetImage, final Rectangle position, final String caption) throws IOException, InterruptedException, IM4JavaException{
+	/**
+	 * Inserts a text block into an image.
+ 	 * @param targetImage path to the target image
+	 * @param position size and location of the block
+	 * @param caption contents of the block
+	 * @throws IOException when an IO problem occurs
+	 * @throws InterruptedException when thread is interrupted
+	 * @throws IM4JavaException when an im4java problem occurs
+ 	 */
+	private void insertTextBlock(final Path targetImage, final Rectangle position, final String caption) 
+		throws IOException, InterruptedException, IM4JavaException {
 		IMOperation op = new IMOperation();
 		
 		op.addImage();
