@@ -9,16 +9,16 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
-import com.optigra.funnypictures.generator.api.GeneratorException;
-import com.optigra.funnypictures.generator.api.ImageHandle;
-import com.optigra.funnypictures.generator.api.ThumbnailContext;
-import com.optigra.funnypictures.generator.api.ThumbnailGenerator;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.optigra.funnypictures.generator.api.GeneratorException;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.api.ThumbnailContext;
+import com.optigra.funnypictures.generator.api.ThumbnailGenerator;
 import com.optigra.funnypictures.model.content.MimeType;
 
 /**
@@ -47,7 +47,7 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 			
 			originalInputStream = context.getTemplateInputStream();
 			templateInput = toTempFile(originalInputStream, context.getInputMimeType().getExtension());			
-			result = Files.createTempFile("caption", outputFormat.getExtension());
+			result = Files.createTempFile("thumbnail", outputFormat.getExtension());
 			
 			Dimension targetDimension = context.getThumbnailDimension();
 			IMOperation op = new IMOperation();
@@ -82,7 +82,7 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 				}
 				LOG.debug("Temporary files deleted");
 			} catch (Exception e) {
-				LOG.error("Error file file delete", e);
+				LOG.error("Could not delete temporary file", e);
 			}
 		}
 	}

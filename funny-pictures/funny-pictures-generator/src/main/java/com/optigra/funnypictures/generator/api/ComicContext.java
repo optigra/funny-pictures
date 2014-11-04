@@ -1,9 +1,9 @@
 package com.optigra.funnypictures.generator.api;
 
+import java.awt.Rectangle;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
-import java.awt.Rectangle;
 
 import com.optigra.funnypictures.model.content.MimeType;
 
@@ -38,7 +38,7 @@ public class ComicContext {
 		return templateInputStream;
 	}
 
-	public MimeType getMimeType() {
+	public MimeType getInputMimeType() {
 		return inputMimeType;
 	}
 
