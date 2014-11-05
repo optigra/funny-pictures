@@ -115,7 +115,7 @@ public class BaseComicGenerator implements ComicGenerator {
 		op.background("transparent");
 		op.gravity("center");
 		op.size(position.width, position.height);
-		op.caption(caption);
+		op.addImage("caption:" + caption);
 		op.geometry(position.width, position.height, position.x, position.y);
 		op.gravity("none");
 		op.composite();

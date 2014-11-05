@@ -75,10 +75,10 @@ public class BaseComicGeneratorTest {
 		
 		String expectedConvertCommand1 = "?img? ?img? ";
 		String expectedConvertCommand2 = "?img? -fill white -draw roundrectangle 10,20,110,70,10,10 " +
-				"-fill black -background transparent -gravity center -size 100x50 -caption Lorem ipsum dolor sit amet " +
+				"-fill black -background transparent -gravity center -size 100x50 caption:Lorem ipsum dolor sit amet " +
 				"-geometry 100x50+10+20 -gravity none -composite ?img? ";
 		String expectedConvertCommand3 = "?img? -fill white -draw roundrectangle 110,40,150,90,10,10 " +
-				"-fill black -background transparent -gravity center -size 40x50 -caption ?\\/|'\" -abc " +
+				"-fill black -background transparent -gravity center -size 40x50 caption:?\\/|'\" -abc " +
 				"-geometry 40x50+110+40 -gravity none -composite ?img? ";
 		String expectedConvertCommand4 = "?img? ?img? ";
 		

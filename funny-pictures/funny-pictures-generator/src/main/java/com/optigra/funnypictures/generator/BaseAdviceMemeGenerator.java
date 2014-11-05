@@ -11,20 +11,17 @@ import java.nio.file.StandardCopyOption;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.input.AutoCloseInputStream;
-
-import com.optigra.funnypictures.generator.api.AdviceMemeContext;
-import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
-import com.optigra.funnypictures.generator.api.GeneratorException;
-import com.optigra.funnypictures.generator.api.ImageHandle;
-import com.optigra.funnypictures.generator.util.ImageInformationExtractor;
-
-import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.optigra.funnypictures.generator.api.AdviceMemeContext;
+import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
+import com.optigra.funnypictures.generator.api.GeneratorException;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.util.ImageInformationExtractor;
 import com.optigra.funnypictures.model.content.MimeType;
 
 /**
@@ -48,8 +45,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 	private ConvertCmd convertCommand = new ConvertCmd();
 
-	private CompositeCmd compositeCommand = new CompositeCmd();
-	
 	@Resource(name = "imageInformationExtractor")
 	private ImageInformationExtractor imageInfoExtractor;
 
@@ -57,7 +52,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		return imageInfoExtractor;
 	}
 
-	//TODO check whether this setter is necessary
 	public final void setImageInfoExtractor(
 			final ImageInformationExtractor imageInfoExtractor) {
 		this.imageInfoExtractor = imageInfoExtractor;
@@ -70,8 +64,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 
 		InputStream templateInputStream = null;
 		Path templateInput = null;
-		Path topCaption = null;
-		Path bottomCaption = null;
 		Path workingCopy = null;
 		Path result = null;
 		try {			
@@ -84,11 +76,8 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 			Dimension originalDimension = imageInfoExtractor.getImageDimension(workingCopy);
 			int captionHeight =  (int) (captionHeightRatio * originalDimension.height);
 			
-			topCaption = generateCaption(context.getTopCaption(), originalDimension.width, captionHeight);
-			bottomCaption = generateCaption(context.getBottomCaption(), originalDimension.width, captionHeight);
-
-			superimpose(workingCopy, topCaption, originalDimension, 0, 0);
-			superimpose(workingCopy, bottomCaption, originalDimension, 0, originalDimension.height - captionHeight);
+			insertCaption(workingCopy, context.getTopCaption(), originalDimension.width, captionHeight, "North");
+			insertCaption(workingCopy, context.getBottomCaption(), originalDimension.width, captionHeight, "South");
 			
 			result = convert(workingCopy, outputFormat);
 			
@@ -109,12 +98,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 				if (templateInput != null) {
 					Files.deleteIfExists(templateInput);
 				}
-				if (topCaption != null) {
-					Files.deleteIfExists(topCaption);
-				}
-				if (bottomCaption != null) {
-					Files.deleteIfExists(bottomCaption);
-				}
 				if (workingCopy != null) {
 					Files.deleteIfExists(workingCopy);
 				}
@@ -126,35 +109,38 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	}
 
 	/**
-	 * Renders an intermediate image with caption.
-	 * Tries to use the font size that fits best into the specified dimensions.
-	 * @param text caption text
+	 * Inserts a caption into an image.
+ 	 * @param targetImage path to the target image
+	 * @param caption contents of the block
 	 * @param width width of caption area
 	 * @param height height of caption area
-	 * @return path to generated image
+	 * @param gravity the direction the caption should stick to (usually "North" or "South")
 	 * @throws IOException when an IO problem occurs
 	 * @throws InterruptedException when thread is interrupted
 	 * @throws IM4JavaException when an im4java problem occurs
-	 */
-	private Path generateCaption(final String text, final int width, final int height) throws IOException, InterruptedException, IM4JavaException {
-		Path result = Files.createTempFile("caption", internalFormat.getExtension());
+ 	 */
+	private void insertCaption(final Path targetImage, final String caption, 
+			final int width, final int height, final String gravity) 
+		throws IOException, InterruptedException, IM4JavaException {
 		IMOperation op = new IMOperation();
+		
+		op.addImage();
 		op.size(width, height);
-		op.background("none");
 		op.fill("white");
 		op.stroke("black");
-		op.strokewidth((int) Math.ceil(((double) height) / 40));
-		op.font("Impact-Regular");
+		op.strokewidth(height / 40 + 1);
+		op.background("none");
 		op.gravity("Center");
-		op.addImage("label:" + text);
+		op.font("Impact-Regular");
+		op.addImage("caption:" + caption);
+		op.gravity(gravity);
+		op.composite();
 		op.addImage();
 
-		Object[] args = new String[] {result.toString()};
+		Object[] args = new String[] {targetImage.toString(), targetImage.toString()};
 		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
 
 		convertCommand.run(op, args);
-
-		return result;
 	}
 
 	/**
@@ -178,32 +164,6 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		convertCommand.run(op, args);
 
 		return result;
-	}
-
-	/**
-	 * Superimposes one image on top of another, with specified
-	 * size of resulting image and offset of top layer.
-	 * @param bottom bottom layer
-	 * @param top top layer
-	 * @param resultDimension dimension of the resulting image; required for IM backend
-	 * @param offsetX horizontal offset of top layer
-	 * @param offsetY vertical offset of top layer
-	 * @throws IOException when an IO problem occurs
-	 * @throws InterruptedException when thread is interrupted
-	 * @throws IM4JavaException when an im4java problem occurs
-	 */
-	private void superimpose(final Path bottom, final Path top, final Dimension resultDimension, final int offsetX, final int offsetY) 
-			throws IOException, InterruptedException, IM4JavaException {
-
-		IMOperation op = new IMOperation();
-		op.geometry(resultDimension.width, resultDimension.height, offsetX, offsetY);
-		op.addImage();
-		op.addImage();
-		op.addImage();
-
-		Object[] args = new String[] {top.toString(), bottom.toString(), bottom.toString()};
-		LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
-		compositeCommand.run(op, args);
 	}
 
 	/**
