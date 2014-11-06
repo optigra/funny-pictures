@@ -8,7 +8,7 @@ import javax.persistence.MappedSuperclass;
 import com.optigra.funnypictures.model.Model;
 
 /**
- * Abstract Thumbnail entity.
+ * Abstract Thumbnail entity .
  * @author ivanursul
  *
  */
