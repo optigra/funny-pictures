@@ -1,30 +1,28 @@
-package com.optigra.funnypictures.facade.resources.picture;
+package com.optigra.funnypictures.facade.resources.thumbnail;
 
 import java.text.MessageFormat;
-import java.util.List;
 
 import com.optigra.funnypictures.facade.resources.ApiResource;
-import com.optigra.funnypictures.facade.resources.thumbnail.PictureThumbnailResource;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 
 /**
- * Picture model with id, name and picture url.
  * 
- * @author rostyslav
+ * @author ivanursul
  *
  */
-public class PictureResource extends ApiResource {
+public class PictureThumbnailResource extends ApiResource {
 
 	private Long id;
-	
-	private String name;
+    
+	private Long pictureId;
 	
 	private String url;
 	
-	private List<PictureThumbnailResource> thumbnails;
-
+	private ThumbnailType thumbnailType;
+	
 	@Override
 	public String getUri() {
-		return MessageFormat.format("/pictures/{0}", id);
+		return MessageFormat.format("/pictures/thumbnails/{0}", id);
 	}
 
 	public Long getId() {
@@ -35,12 +33,12 @@ public class PictureResource extends ApiResource {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public Long getPictureId() {
+		return pictureId;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setPictureId(final Long pictureId) {
+		this.pictureId = pictureId;
 	}
 
 	public String getUrl() {
@@ -51,12 +49,12 @@ public class PictureResource extends ApiResource {
 		this.url = url;
 	}
 
-	public List<PictureThumbnailResource> getThumbnails() {
-		return thumbnails;
+	public ThumbnailType getThumbnailType() {
+		return thumbnailType;
 	}
 
-	public void setThumbnails(final List<PictureThumbnailResource> thumbnails) {
-		this.thumbnails = thumbnails;
+	public void setThumbnailType(final ThumbnailType thumbnailType) {
+		this.thumbnailType = thumbnailType;
 	}
 
 	@Override
@@ -64,9 +62,10 @@ public class PictureResource extends ApiResource {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
-				+ ((thumbnails == null) ? 0 : thumbnails.hashCode());
+				+ ((pictureId == null) ? 0 : pictureId.hashCode());
+		result = prime * result
+				+ ((thumbnailType == null) ? 0 : thumbnailType.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
 	}
@@ -82,7 +81,7 @@ public class PictureResource extends ApiResource {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		PictureResource other = (PictureResource) obj;
+		PictureThumbnailResource other = (PictureThumbnailResource) obj;
 		if (id == null) {
 			if (other.id != null) {
 				return false;
@@ -90,18 +89,14 @@ public class PictureResource extends ApiResource {
 		} else if (!id.equals(other.id)) {
 			return false;
 		}
-		if (name == null) {
-			if (other.name != null) {
+		if (pictureId == null) {
+			if (other.pictureId != null) {
 				return false;
 			}
-		} else if (!name.equals(other.name)) {
+		} else if (!pictureId.equals(other.pictureId)) {
 			return false;
 		}
-		if (thumbnails == null) {
-			if (other.thumbnails != null) {
-				return false;
-			}
-		} else if (!thumbnails.equals(other.thumbnails)) {
+		if (thumbnailType != other.thumbnailType) {
 			return false;
 		}
 		if (url == null) {
@@ -116,8 +111,9 @@ public class PictureResource extends ApiResource {
 
 	@Override
 	public String toString() {
-		return "PictureResource [id=" + id + ", name=" + name + ", url=" + url
-				+ ", thumbnails=" + thumbnails + "]";
+		return "PictureThumbnailResource [id=" + id + ", pictureId="
+				+ pictureId + ", url=" + url + ", thumbnailType="
+				+ thumbnailType + "]";
 	}
 
 }

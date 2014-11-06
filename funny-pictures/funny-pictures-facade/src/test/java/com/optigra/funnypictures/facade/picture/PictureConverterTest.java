@@ -3,23 +3,33 @@ package com.optigra.funnypictures.facade.picture;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.converter.picture.PictureConverter;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.PictureThumbnailResource;
 import com.optigra.funnypictures.model.Picture;
+import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PictureConverterTest {
 
 	private String contentRootUrl = "";
+
+	@Mock
+	private Converter<PictureThumbnail, PictureThumbnailResource> pictureThumbnailConverter;
 	
-	private PictureConverter unit = new PictureConverter();
+	@InjectMocks
+	private PictureConverter unit;
 	
 	@Before
 	public void setUp(){
@@ -44,6 +54,7 @@ public class PictureConverterTest {
 		expectedResource.setId(id);
 		expectedResource.setName(name);
 		expectedResource.setUrl(url);
+		expectedResource.setThumbnails(Collections.<PictureThumbnailResource>emptyList());
 
 		// When
 		PictureResource actualResource = unit.convert(picture1);
@@ -81,6 +92,7 @@ public class PictureConverterTest {
 		expectedResource.setId(id);
 		expectedResource.setName(name);
 		expectedResource.setUrl(url);
+		expectedResource.setThumbnails(Collections.<PictureThumbnailResource>emptyList());
 
 		// When
 		PictureResource actualResource = new PictureResource();
@@ -117,12 +129,14 @@ public class PictureConverterTest {
 		expectedResource1.setId(id1);
 		expectedResource1.setName(name1);
 		expectedResource1.setUrl(url1);
+		expectedResource1.setThumbnails(Collections.<PictureThumbnailResource>emptyList());
 
 		PictureResource expectedResource2= new PictureResource();
 		
 		expectedResource2.setId(id2);
 		expectedResource2.setName(name2);
 		expectedResource2.setUrl(url2);
+		expectedResource2.setThumbnails(Collections.<PictureThumbnailResource>emptyList());
 
 		List<PictureResource> expectedResource = Arrays.asList(expectedResource1,expectedResource2);
 		

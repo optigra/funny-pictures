@@ -6,6 +6,7 @@
         <class>com.optigra.funnypictures.model.Picture</class>
         <class>com.optigra.funnypictures.model.FunnyPicture</class>
         <class>com.optigra.funnypictures.model.feedback.Feedback</class>
+        <class>com.optigra.funnypictures.model.thumbnail.PictureThumbnail</class>
         <class>com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail</class>
         
         <properties>

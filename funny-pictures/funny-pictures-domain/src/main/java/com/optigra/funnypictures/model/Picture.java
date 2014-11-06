@@ -1,6 +1,7 @@
 package com.optigra.funnypictures.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -10,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 
 /**
  * Entity, that describes Template for Funny Pictures.
@@ -34,6 +37,9 @@ public class Picture implements Serializable {
 
 	@OneToMany(mappedBy = "picture")
 	private Set<FunnyPicture> funnyPictures;
+	
+	@OneToMany(mappedBy = "picture")
+	private List<PictureThumbnail> thumbnails;
 	
 	public Long getId() {
 		return id;
@@ -61,6 +67,18 @@ public class Picture implements Serializable {
 
 	public Set<FunnyPicture> getFunnyPictures() {
 		return funnyPictures;
+	}
+
+	public List<PictureThumbnail> getThumbnails() {
+		return thumbnails;
+	}
+
+	public void setThumbnails(final List<PictureThumbnail> thumbnails) {
+		this.thumbnails = thumbnails;
+	}
+
+	public void setFunnyPictures(final Set<FunnyPicture> funnyPictures) {
+		this.funnyPictures = funnyPictures;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.optigra.funnypictures.facade.facade.picture;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -7,15 +9,23 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.optigra.funnypictures.content.model.Content;
+import com.optigra.funnypictures.content.model.ThumbnailContent;
+import com.optigra.funnypictures.content.service.ContentService;
 import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.resources.ApiResource;
+import com.optigra.funnypictures.facade.resources.content.ContentResource;
+import com.optigra.funnypictures.facade.resources.content.ContentResourceNamingStrategy;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.model.Picture;
+import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.picture.PictureService;
+import com.optigra.funnypictures.service.thumbnail.PictureThumbnailService;
+import com.optigra.funnypictures.service.thumbnail.ThumbnailGeneratorService;
 
 /**
  * Default implementation of PictureFacade.
@@ -42,6 +52,18 @@ public class DefaultPictureFacade implements PictureFacade {
 	@Resource(name = "pictureService")
 	private PictureService pictureService;
 
+	@Resource(name = "pictureThumbnailService")
+	private PictureThumbnailService pictureThumbnailService;
+	
+	@Resource(name = "namingStrategy")
+	private ContentResourceNamingStrategy namingStrategy;
+	
+	@Resource(name = "thumbnailGeneratorService")
+	private ThumbnailGeneratorService thumbnailGeneratorService;
+	
+	@Resource(name = "contentService")
+	private ContentService contentService;
+
 	@Override
 	public PagedResultResource<PictureResource> getPictures(final PagedRequest pagedRequest) {
 		// Convert PagedRequest to PagedSearch
@@ -66,10 +88,58 @@ public class DefaultPictureFacade implements PictureFacade {
 	@Override
 	public PictureResource createPicture(final PictureResource pictureResource) {
 
-		Picture pictureForService = pictureResourceConverter.convert(pictureResource);
-		pictureService.createPicture(pictureForService);
+		Picture picture = pictureResourceConverter.convert(pictureResource);
+		pictureService.createPicture(picture);
 		
-		return pictureConverter.convert(pictureForService);
+		Content content = contentService.getContentByPath(picture.getUrl());
+		List<ThumbnailContent> thumbnails = thumbnailGeneratorService.generateThumbnails(content);
+		
+		List<PictureThumbnail> pictureThumbnails = new ArrayList<PictureThumbnail>();
+		for (ThumbnailContent thumbnailContent : thumbnails) {
+			String thumbnailUrl = generateThumbnail(thumbnailContent);
+			
+			PictureThumbnail pictureThumbnail = createPictureThumbnail(picture, thumbnailContent, thumbnailUrl);
+			
+			pictureThumbnailService.createPictureThumbnail(pictureThumbnail);
+			pictureThumbnails.add(pictureThumbnail);
+		}
+		
+		picture.setThumbnails(pictureThumbnails);
+		
+		return pictureConverter.convert(picture);
+	}
+
+	/**
+	 * Method for creating Picture Thumbnail.
+	 * @param picture
+	 * @param thumbnailContent
+	 * @param thumbnailUrl
+	 * @return Picture Thumbnail Entity.
+	 */
+	private PictureThumbnail createPictureThumbnail(final Picture picture, final ThumbnailContent thumbnailContent, final String thumbnailUrl) {
+		
+		PictureThumbnail pictureThumbnail = new PictureThumbnail();
+		pictureThumbnail.setCreateDate(new Date());
+		pictureThumbnail.setPicture(picture);
+		pictureThumbnail.setThumbnailType(thumbnailContent.getThumbnailType());
+		pictureThumbnail.setUpdateDate(new Date());
+		pictureThumbnail.setUrl(thumbnailUrl);
+		
+		return pictureThumbnail;
+	}
+
+	/**
+	 * Method for generating thumbnail.
+	 * @param thumbnailContent
+	 * @return Thumbnail url.
+	 */
+	private String generateThumbnail(final ThumbnailContent thumbnailContent) {
+		ContentResource thumbnailResource = new ContentResource();
+		thumbnailResource.setMimeType(thumbnailContent.getMimeType());
+		String thumbnailUrl = namingStrategy.createIdentifier(thumbnailResource);
+		thumbnailContent.setPath(thumbnailUrl);
+		contentService.saveContent(thumbnailContent);
+		return thumbnailUrl;
 	}
 
 	@Override

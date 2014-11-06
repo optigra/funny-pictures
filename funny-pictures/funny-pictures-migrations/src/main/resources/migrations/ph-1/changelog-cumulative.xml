@@ -133,4 +133,26 @@
 		</addColumn>
 		
 	</changeSet>
+	<changeSet id="createPictureThumbnailTable" author="Ivan Ursul">
+		<createTable tableName="picture_thumbnail">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="picture_id" type="bigint">
+				<constraints nullable="false" foreignKeyName="fk_picture_thumbnail" references="picture(id)" />
+			</column>
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="url" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="type" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>					
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

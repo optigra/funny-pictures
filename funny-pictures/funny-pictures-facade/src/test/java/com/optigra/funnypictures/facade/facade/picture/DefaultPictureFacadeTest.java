@@ -17,8 +17,10 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.optigra.funnypictures.content.service.ContentService;
 import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.resources.ApiResource;
+import com.optigra.funnypictures.facade.resources.content.ContentResourceNamingStrategy;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
@@ -26,6 +28,8 @@ import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.picture.PictureService;
+import com.optigra.funnypictures.service.thumbnail.PictureThumbnailService;
+import com.optigra.funnypictures.service.thumbnail.ThumbnailGeneratorService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultPictureFacadeTest {
@@ -47,6 +51,18 @@ public class DefaultPictureFacadeTest {
 
 	@Mock
 	private PictureService pictureService;
+
+	@Mock
+	private PictureThumbnailService pictureThumbnailService;
+
+	@Mock
+	private ContentResourceNamingStrategy namingStrategy;
+
+	@Mock
+	private ThumbnailGeneratorService thumbnailGeneratorService;
+
+	@Mock
+	private ContentService contentService;
 
 	@Test
 	public void testGetPictures() throws Exception {
