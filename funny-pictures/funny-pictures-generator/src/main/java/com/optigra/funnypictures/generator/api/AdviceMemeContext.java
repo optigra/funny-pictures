@@ -28,7 +28,6 @@ public class AdviceMemeContext {
 	 */
 	public AdviceMemeContext(final InputStream templateInputStream, final MimeType mimeType,
 			final String topCaption, final String bottomCaption) {
-		super();
 		this.templateInputStream = templateInputStream;
 		this.inputMimeType = mimeType;
 		this.topCaption = topCaption;

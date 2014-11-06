@@ -25,7 +25,6 @@ public class ThumbnailContext {
 	 */
 	public ThumbnailContext(final InputStream templateInputStream,
 			final MimeType inputMimeType, final Dimension thumbnailDimension) {
-		super();
 		this.templateInputStream = templateInputStream;
 		this.inputMimeType = inputMimeType;
 		this.thumbnailDimension = thumbnailDimension;
