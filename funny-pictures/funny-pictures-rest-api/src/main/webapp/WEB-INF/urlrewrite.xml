@@ -7,4 +7,8 @@
            <from>/api/content/(.*)</from>
            <to>/api/content?contentPath=/$1</to>
        </rule>
+       <rule>
+           <from>/meme/(.*)</from>
+           <to>/api/content?contentPath=/$1</to>
+       </rule>
 </urlrewrite>
