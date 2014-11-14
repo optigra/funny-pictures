@@ -23,7 +23,7 @@ import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
 @Component("funnyPictureConverter")
 public class FunnyPictureConverter extends AbstractConverter<FunnyPicture, FunnyPictureResource> {
 
-	@Value("${api.domain.content.url}")
+	@Value("${api.domain.meme.url}")
 	private String contentRootUrl;
 
 	@Resource(name = "pictureConverter")

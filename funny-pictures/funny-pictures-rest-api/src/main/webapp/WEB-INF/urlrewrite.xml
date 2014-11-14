@@ -11,4 +11,8 @@
            <from>/meme/(.*)</from>
            <to>/api/content?contentPath=/$1</to>
        </rule>
+       <rule>
+           <from>/picture/(.*)</from>
+           <to>/api/content?contentPath=/$1</to>
+       </rule>
 </urlrewrite>
