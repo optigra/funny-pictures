@@ -14,8 +14,6 @@ import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureTh
  */
 public class FunnyPictureResource extends ApiResource {
 
-	private Long id;
-
 	private String url;
 
 	private String name;
@@ -30,15 +28,7 @@ public class FunnyPictureResource extends ApiResource {
 	
 	@Override
 	public String getUri() {
-		return MessageFormat.format("/funnies/{0}", id);
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(final Long id) {
-		this.id = id;
+		return MessageFormat.format("/funnies/{0}", getId());
 	}
 
 	public String getUrl() {
@@ -95,7 +85,6 @@ public class FunnyPictureResource extends ApiResource {
 		int result = 1;
 		result = prime * result + ((footer == null) ? 0 : footer.hashCode());
 		result = prime * result + ((header == null) ? 0 : header.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
 				+ ((template == null) ? 0 : template.hashCode());
@@ -131,13 +120,6 @@ public class FunnyPictureResource extends ApiResource {
 		} else if (!header.equals(other.header)) {
 			return false;
 		}
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
 		if (name == null) {
 			if (other.name != null) {
 				return false;
@@ -171,7 +153,7 @@ public class FunnyPictureResource extends ApiResource {
 
 	@Override
 	public String toString() {
-		return "FunnyPictureResource [id=" + id + ", url=" + url + ", name="
+		return "FunnyPictureResource [url=" + url + ", name="
 				+ name + ", header=" + header + ", footer=" + footer
 				+ ", template=" + template + ", thumbnails=" + thumbnails + "]";
 	}

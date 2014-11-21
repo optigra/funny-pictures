@@ -21,4 +21,5 @@
 		<property name="maxUploadSize" value="${content.upload.maxSize}"/>
 	</bean>
 
+	<bean id="springSwaggerConig" class = "com.mangofactory.swagger.configuration.SpringSwaggerConfig"/>
 </beans>

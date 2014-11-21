@@ -1,5 +1,8 @@
 package com.optigra.funnypictures.dao;
 
+import com.optigra.funnypictures.pagination.PagedResult;
+import com.optigra.funnypictures.pagination.PagedSearch;
+
 /**
  * DAO interface to make CRUD operations with entities.
  * 
@@ -45,4 +48,10 @@ public interface Dao<E, T> {
 	 */
 	void delete(E entity);
 
+	/**
+	 * Method for getting paged Result.
+	 * @param pagedSearch
+	 * @return paged result.
+	 */
+	PagedResult<E> getEntities(PagedSearch<E> pagedSearch);
 }

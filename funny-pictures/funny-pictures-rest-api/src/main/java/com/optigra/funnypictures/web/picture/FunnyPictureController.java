@@ -28,6 +28,7 @@ import com.optigra.funnypictures.web.BaseController;
 @RequestMapping("/funnies")
 public class FunnyPictureController extends BaseController {
 	private static final Logger LOG = LoggerFactory.getLogger(FunnyPictureController.class);
+	
 	@Resource(name = "funnyPictureFacade")
 	private FunnyPictureFacade funnyPictureFacade;
 

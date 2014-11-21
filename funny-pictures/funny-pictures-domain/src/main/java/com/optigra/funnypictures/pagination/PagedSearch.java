@@ -18,6 +18,7 @@ public class PagedSearch<T> {
     private Queries query;
     private Map<String, Object> parameters;
     private Class<T> clazz;
+	private T entity;
 	
     /**
      * Base constructor.
@@ -84,6 +85,14 @@ public class PagedSearch<T> {
 
 	public void setClazz(final Class<T> clazz) {
 		this.clazz = clazz;
+	}
+
+	public T getEntity() {
+		return entity;
+	}
+
+	public void setEntity(final T entity) {
+		this.entity = entity;
 	}
 
 	@Override

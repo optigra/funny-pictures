@@ -49,8 +49,8 @@ public class FeedbackControllerTest extends AbstractControllerTest {
 		feedbackResource.setEmail(email);
 
 		// When
-		String response = getJson(feedbackResource, true);
-		String request = getJson(feedbackResource, false);
+		String request = getJson(feedbackResource, true);
+		String response = getJson(feedbackResource, false);
 		
 		when(feedbackFacade.createFeedback(any(FeedbackResource.class))).thenReturn(feedbackResource);
 		

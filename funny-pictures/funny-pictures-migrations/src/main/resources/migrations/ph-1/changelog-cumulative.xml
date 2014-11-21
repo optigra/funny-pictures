@@ -155,4 +155,28 @@
 			</column>					
 		</createTable>
 	</changeSet>
+	<changeSet id="createFunnyPictureComment" author="Ivan Ursul">
+		<createTable tableName="funny_picture_comment">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="funny_picture_id" type="bigint">
+				<constraints nullable="false" foreignKeyName="fk_picture_thumbnail" references="funny_picture(id)" />
+			</column>
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			
+			<column name="parent_id" type="bigint">
+				<constraints foreignKeyName="fk_funny_picture_comment_parent" references="funny_picture_comment(id)"/>
+			</column>
+			<column name="comment" type="text">
+				<constraints nullable="false"/>
+			</column>
+			<column name="author" type="varchar(255)" />
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

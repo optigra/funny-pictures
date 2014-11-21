@@ -31,7 +31,7 @@ public class Queries {
      * @param queryName
      * @param query
      */
-    private Queries(final String queryName, final String query) {
+    public Queries(final String queryName, final String query) {
         this.queryName = queryName;
         this.query = query;
     }

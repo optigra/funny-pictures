@@ -2,8 +2,6 @@ package com.optigra.funnypictures.facade.resources.search;
 
 import java.util.List;
 
-import com.optigra.funnypictures.facade.resources.ApiResource;
-
 /**
  * 
  * @author rostyslav
@@ -11,7 +9,7 @@ import com.optigra.funnypictures.facade.resources.ApiResource;
  * @param <R>
  *            Paged result resource type
  */
-public class PagedResultResource<R> extends ApiResource {
+public class PagedResultResource<R> {
 
 	private Integer offset;
 	private Integer limit;
@@ -35,7 +33,6 @@ public class PagedResultResource<R> extends ApiResource {
 		this.uri = uri;
 	}
 
-	@Override
 	public String getUri() {
 		return uri;
 	}

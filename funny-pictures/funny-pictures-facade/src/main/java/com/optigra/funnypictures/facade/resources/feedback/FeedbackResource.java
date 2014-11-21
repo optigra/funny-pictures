@@ -1,13 +1,15 @@
 package com.optigra.funnypictures.facade.resources.feedback;
 
+import java.text.MessageFormat;
+
+import com.optigra.funnypictures.facade.resources.ApiResource;
+
 /**
  * Resource, that describes Feedback entity.
  * @author ivanursul
  *
  */
-public class FeedbackResource {
-
-	private Long id;
+public class FeedbackResource extends ApiResource {
 	
 	private String name;
 	
@@ -17,14 +19,11 @@ public class FeedbackResource {
 	
 	private String text;
 
-	public Long getId() {
-		return id;
+	@Override
+	public String getUri() {
+		return MessageFormat.format("/feedbacks/{0}", getId());
 	}
-
-	public void setId(final Long id) {
-		this.id = id;
-	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -62,7 +61,6 @@ public class FeedbackResource {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((subject == null) ? 0 : subject.hashCode());
 		result = prime * result + ((text == null) ? 0 : text.hashCode());
@@ -86,13 +84,6 @@ public class FeedbackResource {
 				return false;
 			}
 		} else if (!email.equals(other.email)) {
-			return false;
-		}
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
 			return false;
 		}
 		if (name == null) {
@@ -121,7 +112,7 @@ public class FeedbackResource {
 
 	@Override
 	public String toString() {
-		return "FeedbackResource [id=" + id + ", name=" + name + ", email="
+		return "FeedbackResource [name=" + name + ", email="
 				+ email + ", subject=" + subject + ", text=" + text + "]";
 	}
 

@@ -2,9 +2,11 @@ package com.optigra.funnypictures.dao;
 
 import javax.annotation.Resource;
 
+import com.optigra.funnypictures.builder.QueryBuilder;
 import com.optigra.funnypictures.dao.persistence.PersistenceManager;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
+import com.optigra.funnypictures.queries.Queries;
 
 /**
  * Abstract class with implemented CRUD methods.
@@ -21,6 +23,12 @@ public abstract class AbstractDao<E, T> implements Dao<E, T> {
 	@Resource(name = "persistenceManager")
 	private PersistenceManager<E, T> persistenceManager;
 
+	private QueryBuilder<E> queryBuilder;
+	
+	public void setQueryBuilder(final QueryBuilder<E> queryBuilder) {
+		this.queryBuilder = queryBuilder;
+	}
+	
 	/**
 	 * Method to get Class of an Entity.
 	 * @return Class of an Entity.
@@ -55,5 +63,17 @@ public abstract class AbstractDao<E, T> implements Dao<E, T> {
 	 */
 	protected PagedResult<E> search(final PagedSearch<E> searchRequest) {
 		return persistenceManager.search(searchRequest);
+	}
+	
+	@Override
+	public PagedResult<E> getEntities(final PagedSearch<E> pagedSearch) {
+
+		Queries query = queryBuilder.build(pagedSearch.getEntity());
+
+		pagedSearch.setClazz(getEntityClass());
+		pagedSearch.setParameters(pagedSearch.getParameters());
+		pagedSearch.setQuery(query);
+
+		return persistenceManager.search(pagedSearch);
 	}
 }
