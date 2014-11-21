@@ -20,6 +20,14 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
+	<repositories>
+	    <repository>
+	      <id>jcenter-snapshots</id>
+	      <name>jcenter</name>
+	      <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
+	    </repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>funny-pictures</groupId>
