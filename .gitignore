@@ -10,3 +10,5 @@ target
 .metadata
 .idea
 /target
+/node_modules
+/bower_components
