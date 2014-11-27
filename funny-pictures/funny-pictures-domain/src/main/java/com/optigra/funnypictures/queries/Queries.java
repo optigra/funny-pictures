@@ -10,10 +10,10 @@ package com.optigra.funnypictures.queries;
 public class Queries {
 	
 	private static final String FIND_PICTURES_QUERY_NAME = "Pictures.findPictures";
-	private static final String FIND_PICTURES_QUERY = "SELECT p FROM Picture p";
+	private static final String FIND_PICTURES_QUERY = "SELECT p FROM Picture p ORDER BY p.id DESC";
 	
 	private static final String FIND_FUNNY_PICTURES_QUERY_NAME = "FunnyPictures.findPictures";
-	private static final String FIND_FUNNY_PICTURES_QUERY = "SELECT p FROM FunnyPicture p";
+	private static final String FIND_FUNNY_PICTURES_QUERY = "SELECT p FROM FunnyPicture p ORDER BY p.id DESC";
 	
 	private static final String FIND_FUNNY_PICTURES_BY_PIC_QUERY_NAME = "FunnyPictures.findFunniesByPicture";
 	private static final String FIND_FUNNY_PICTURES_BY_PIC_QUERY = "SELECT p FROM FunnyPicture p WHERE p.picture = :picture";
