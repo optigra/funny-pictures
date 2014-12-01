@@ -5,7 +5,7 @@ package com.optigra.funnypictures.generator.api;
  * @author odisseus
  *
  */
-public interface ComicGenerator {
+public interface ComicGenerator extends ImageGenerator<ComicContext> {
 	
 	/**
 	 * Generates a comic.

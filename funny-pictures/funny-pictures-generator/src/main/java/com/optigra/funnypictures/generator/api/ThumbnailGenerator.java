@@ -5,7 +5,7 @@ package com.optigra.funnypictures.generator.api;
  * @author odisseus
  *
  */
-public interface ThumbnailGenerator {
+public interface ThumbnailGenerator extends ImageGenerator<ThumbnailContext> {
 	
 	/**
 	 * Generates a thumbnail.

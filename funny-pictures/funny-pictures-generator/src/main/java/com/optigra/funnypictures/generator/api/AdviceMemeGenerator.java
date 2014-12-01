@@ -5,7 +5,7 @@ package com.optigra.funnypictures.generator.api;
  * @author odisseus
  *
  */
-public interface AdviceMemeGenerator {
+public interface AdviceMemeGenerator extends ImageGenerator<AdviceMemeContext> {
 	
 	/**
 	 * Generates an advice comic.
