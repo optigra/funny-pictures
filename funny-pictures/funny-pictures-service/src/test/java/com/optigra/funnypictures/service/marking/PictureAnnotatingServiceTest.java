@@ -9,7 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class PictureAnnotatingServiceTest {
 	
 	@InjectMocks
-	private PictureAnnotatingService unit;
+	private PictureLabellingService unit;
 	
 	@Test
 	public void testName() throws Exception {

@@ -9,7 +9,7 @@ import com.optigra.funnypictures.model.content.MimeType;
  * @author odisseus
  *
  */
-public class ImageAnnotationContext {
+public class ImageLabellingContext {
 	
 	private final InputStream sourceInputStream;
 	
@@ -23,7 +23,7 @@ public class ImageAnnotationContext {
 	 * @param inputMimeType MIME type of the source image
 	 * @param annotationText text of the annotation
 	 */
-	public ImageAnnotationContext(final InputStream sourceInputStream,
+	public ImageLabellingContext(final InputStream sourceInputStream,
 			final MimeType inputMimeType, final String annotationText) {
 		super();
 		this.sourceInputStream = sourceInputStream;
