@@ -16,7 +16,7 @@ public class BaseLabelledImageGenerator implements LabelledImageGenerator {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(BaseAdviceMemeGenerator.class);
 	
-	private static final String labelBackgroundColor = "khaki";
+	private static String labelBackgroundColor = "khaki";
 
 	@Override
 	public ImageHandle generate(final ImageLabellingContext context) {
