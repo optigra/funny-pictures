@@ -37,6 +37,7 @@ import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.generator.api.AdviceMemeContext;
 import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
 import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.api.ImageLabellingContext;
 import com.optigra.funnypictures.generator.api.LabelledImageGenerator;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
@@ -138,7 +139,11 @@ public class DefaultFunnyPictureFacadeTest {
 		byte[] pictureData = new byte[]{125, 126, 127};
 		InputStream pictureStream = new ByteArrayInputStream(pictureData);
 		ImageHandle pictureHandle = new ImageHandle(pictureStream, MimeType.IMAGE_JPEG_JPG);
-		String pictureID = "id-for-database";
+		byte[] labelledPictureData = new byte[]{-1, -2, -3};
+		InputStream labelledPictureStream = new ByteArrayInputStream(labelledPictureData);
+		ImageHandle labelledPictureHandle = new ImageHandle(labelledPictureStream, MimeType.IMAGE_JPEG_JPG);
+		String unlabelledPictureID = "picture-id";
+		String labelledPictureID = "labelled-id";
 		ThumbnailContent thumbnail = new ThumbnailContent();
 		thumbnail.setPath("path/to/thumbnail");
 		FunnyPictureResource expected = new FunnyPictureResource();
@@ -149,7 +154,8 @@ public class DefaultFunnyPictureFacadeTest {
 		when(pictureService.getPicture(any(Long.class))).thenReturn(dbEntity);
 		when(contentService.getContentByPath(any(String.class))).thenReturn(content);
 		when(memeGenerator.generate(any(AdviceMemeContext.class))).thenReturn(pictureHandle);
-		when(namingStrategy.createIdentifier(any(ContentResource.class))).thenReturn(pictureID);
+		when(imageLabeller.generate(any(ImageLabellingContext.class))).thenReturn(labelledPictureHandle);
+		when(namingStrategy.createIdentifier(any(ContentResource.class))).thenReturn(unlabelledPictureID).thenReturn(labelledPictureID);
 		when(thumbnailGeneratorService.generateThumbnails(any(Content.class))).thenReturn(Collections.singletonList(thumbnail));
 		when(funnyPictureService.createFunnyPicture(any(FunnyPicture.class))).thenReturn(new FunnyPicture());
 		when(funnyPictureConverter.convert(any(FunnyPicture.class))).thenReturn(expected);
@@ -161,14 +167,16 @@ public class DefaultFunnyPictureFacadeTest {
 		verify(pictureService).getPicture(inputId);
 		verify(contentService).getContentByPath(inputUrl);
 		verify(memeGenerator).generate(any(AdviceMemeContext.class));
-		verify(contentService, times(2)).saveContent(contentCaptor.capture());
+		verify(imageLabeller).generate(any(ImageLabellingContext.class));
+		verify(contentService, times(3)).saveContent(contentCaptor.capture());
 		verify(funnyPictureService).createFunnyPicture(any(FunnyPicture.class));
 		verify(thumbnailGeneratorService).generateThumbnails(any(Content.class));
 		verify(contentService).saveContent(thumbnail);
 		
 		List<Content> capturedContents = contentCaptor.getAllValues();
-		assertEquals(pictureStream, capturedContents.get(0).getContentStream());
-		assertEquals(thumbnail, capturedContents.get(1));
+		assertEquals(unlabelledPictureID, capturedContents.get(0).getPath());
+		assertEquals(labelledPictureID, capturedContents.get(1).getPath());
+		assertEquals(thumbnail, capturedContents.get(2));
 		assertEquals(expected, actual);
 	}
 	

@@ -44,6 +44,7 @@
 		<jpa.showSql>true</jpa.showSql>
 		<content.repository.path>${user.home}/tmp/funny-pictures</content.repository.path>
 		<content.upload.maxSize>2048000</content.upload.maxSize>
+		<facade.picture.label.text>drawmeme.com</facade.picture.label.text>
 		<generator.output.format>IMAGE_PNG_PNG</generator.output.format>
 		<api.output.json.pretty>true</api.output.json.pretty>
 		<api.domain.content.url>http://localhost:8080/funny-pictures-rest-api/api/content</api.domain.content.url>

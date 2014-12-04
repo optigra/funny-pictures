@@ -38,7 +38,7 @@ public class DefaultContentFacade implements ContentFacade {
 
 		Content content = contentService.getContentByPath(uri);
 
-		return convertConverter(content);
+		return toContentResource(content);
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class DefaultContentFacade implements ContentFacade {
 	 *            Content to convert
 	 * @return converted Content to ContentResource
 	 */
-	private ContentResource convertConverter(final Content content) {
+	private ContentResource toContentResource(final Content content) {
 		ContentResource contentResource = new ContentResource();
 		contentResource.setContentStream(content.getContentStream());
 		contentResource.setMimeType(content.getMimeType());
@@ -71,6 +71,6 @@ public class DefaultContentFacade implements ContentFacade {
 
 		contentService.saveContent(content);
 
-		return convertConverter(content);
+		return toContentResource(content);
 	}
 }

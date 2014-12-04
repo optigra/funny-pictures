@@ -17,5 +17,8 @@
 	<bean id="thumbnailGenerator" class="com.optigra.funnypictures.generator.BaseThumbnailGenerator">
 		<property name="outputFormat" value="${generator.output.format}" />
 	</bean>
+	
+	<bean id="imageLabeller" class="com.optigra.funnypictures.generator.BaseLabelledImageGenerator">
+	</bean>
 
 </beans>

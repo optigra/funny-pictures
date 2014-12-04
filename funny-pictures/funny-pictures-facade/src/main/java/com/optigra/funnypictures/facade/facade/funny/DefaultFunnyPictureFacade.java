@@ -26,6 +26,7 @@ import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.generator.api.AdviceMemeContext;
 import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
 import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.api.ImageLabellingContext;
 import com.optigra.funnypictures.generator.api.LabelledImageGenerator;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
@@ -48,6 +49,9 @@ import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailSe
 public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultFunnyPictureFacade.class);
+	
+	//@Value("#{facade.picture.label.text}")
+	private String labelText = "REPLACE ME";
 
 	@Resource(name = "funnyPictureService")
 	private FunnyPictureService funnyPictureService;
@@ -110,16 +114,32 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		// Get template
 		Picture template = pictureService.getPicture(picture.getId());
 		// Load template content
-		Content templateConntent = contentService.getContentByPath(template.getUrl());
+		Content templateContent = contentService.getContentByPath(template.getUrl());
+		
 		// Generate meme
-		Content content = generateMeme(funny, templateConntent);
-		// Save generated meme's content
+		AdviceMemeContext context = new AdviceMemeContext(templateContent.getContentStream(), 
+				templateContent.getMimeType(), funny.getHeader(), funny.getFooter());
+		ImageHandle generatedMeme = memeGenerator.generate(context);
+		Content unlabelledPictureContent = toContent(generatedMeme);
+		contentService.saveContent(unlabelledPictureContent);
+		String unlabelledPicturePath = unlabelledPictureContent.getPath();
+		
+		// Append label		
+		ImageLabellingContext labellingContext = new ImageLabellingContext(
+				contentService.getContentByPath(unlabelledPicturePath).getContentStream(), 
+				generatedMeme.getImageFormat(), labelText);
+		ImageHandle labelledImage = imageLabeller.generate(labellingContext);
+		
+		Content content = toContent(labelledImage);
+		// Save generated meme's content to data storage
 		contentService.saveContent(content);
 		
-		// Save funny picture
+		// Save funny picture to DB
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
 
-		List<ThumbnailContent> thumbnails = thumbnailGeneratorService.generateThumbnails(content);
+		// Generate thumbnails from the unlabelled version of the image
+		List<ThumbnailContent> thumbnails = thumbnailGeneratorService
+				.generateThumbnails(contentService.getContentByPath(unlabelledPicturePath));
 		for (ThumbnailContent thumbnailContent : thumbnails) {
 			ContentResource thumbnailResource = new ContentResource();
 			thumbnailResource.setMimeType(thumbnailContent.getMimeType());
@@ -181,28 +201,22 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		return funnyPictureService.createFunnyPicture(funnyPicture);
 	}
 
+
 	/**
-	 * Method generates advice.
-	 * 
-	 * @param funny
-	 *            FunnyPictureResource for generating advice.
-	 * @param templateConntent
-	 *            content with stream and mimeType.
-	 * @return Generated content.
+	 * Converts an ImageHandle to a Content with an assigned identifier.
+	 * @param handle the handle to the data stream of an image
+	 * @return a Content with the same data stream
 	 */
-	private Content generateMeme(final FunnyPictureResource funny, final Content templateConntent) {
-		AdviceMemeContext context = new AdviceMemeContext(templateConntent.getContentStream(), templateConntent.getMimeType(), funny.getHeader(),
-				funny.getFooter());
-		ImageHandle generatedMeme = memeGenerator.generate(context);
+	private Content toContent(final ImageHandle handle) {
 
 		ContentResource memeResource = new ContentResource();
-		memeResource.setMimeType(generatedMeme.getImageFormat());
+		memeResource.setMimeType(handle.getImageFormat());
 		String memePath = namingStrategy.createIdentifier(memeResource);
 
 		Content content = new Content();
 		content.setPath(memePath);
-		content.setMimeType(generatedMeme.getImageFormat());
-		content.setContentStream(generatedMeme.getImageInputStream());
+		content.setMimeType(handle.getImageFormat());
+		content.setContentStream(handle.getImageInputStream());
 
 		return content;
 	}
