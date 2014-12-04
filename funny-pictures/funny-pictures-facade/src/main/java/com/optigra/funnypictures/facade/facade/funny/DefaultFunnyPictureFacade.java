@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -50,8 +51,8 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultFunnyPictureFacade.class);
 	
-	//@Value("#{facade.picture.label.text}")
-	private String labelText = "REPLACE ME";
+	@Value("${facade.picture.label.text}")
+	private String labelText;
 
 	@Resource(name = "funnyPictureService")
 	private FunnyPictureService funnyPictureService;

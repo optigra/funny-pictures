@@ -50,8 +50,9 @@ public class FileSystemContentService implements ContentService {
 			content.setMimeType(MimeType.fromExtension(EXTENSION_SEPARATOR + fileExtension));
 
 		} catch (FileNotFoundException e) {
+			String message = "Content not found";
 			LOG.error("Can't read file from file system", e);
-			throw new ContentReadException(e);
+			throw new ContentReadException(message);
 		}
 		
 		return content;
