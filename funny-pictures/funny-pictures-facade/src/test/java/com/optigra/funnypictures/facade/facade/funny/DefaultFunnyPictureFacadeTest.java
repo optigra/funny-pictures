@@ -52,8 +52,6 @@ import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailSe
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultFunnyPictureFacadeTest {
 	
-	private int times = 0;
-
 	@Mock
 	private FunnyPictureService funnyPictureService;
 	
