@@ -26,7 +26,7 @@ import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.generator.api.AdviceMemeContext;
 import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
 import com.optigra.funnypictures.generator.api.ImageHandle;
-import com.optigra.funnypictures.generator.api.ThumbnailGenerator;
+import com.optigra.funnypictures.generator.api.LabelledImageGenerator;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
@@ -61,9 +61,9 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	@Resource(name = "memeGenerator")
 	private AdviceMemeGenerator memeGenerator;
 	
-	@Resource(name = "thumbnailGenerator")
-	private ThumbnailGenerator thumbnailGenerator;
-
+	@Resource(name = "imageLabeller")
+	private LabelledImageGenerator imageLabeller;
+	
 	@Resource(name = "funnyPictureThumbnailService")
 	private FunnyPictureThumbnailService funnyPictureThumbnailService;
 	
@@ -81,6 +81,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	@Resource(name = "thumbnailGeneratorService")
 	private ThumbnailGeneratorService thumbnailGeneratorService;
+	
 
 	@Override
 	public PagedResultResource<FunnyPictureResource> getFunnies(final PagedRequest pagedRequest) {

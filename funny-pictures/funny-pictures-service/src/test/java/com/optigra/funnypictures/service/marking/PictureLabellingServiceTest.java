@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PictureAnnotatingServiceTest {
+public class PictureLabellingServiceTest {
 	
 	@InjectMocks
 	private PictureLabellingService unit;
