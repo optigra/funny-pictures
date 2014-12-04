@@ -69,8 +69,9 @@ public class FileSystemContentService implements ContentService {
 			}
 
 		} catch (Exception e) {
+			String message = "Could not store content";
 			LOG.error("Can't save file", e);
-			throw new ContentSaveException("Could not save content to file", e);
+			throw new ContentSaveException(message);
 		} finally {
 			try {
 				if (content.getContentStream() != null) {
