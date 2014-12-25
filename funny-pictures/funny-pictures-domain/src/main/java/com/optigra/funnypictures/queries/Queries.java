@@ -18,10 +18,20 @@ public class Queries {
 	private static final String FIND_FUNNY_PICTURES_BY_PIC_QUERY_NAME = "FunnyPictures.findFunniesByPicture";
 	private static final String FIND_FUNNY_PICTURES_BY_PIC_QUERY = "SELECT p FROM FunnyPicture p WHERE p.picture = :picture";
 	
+	public static final String FIND_THUMBNAILS_BY_PICTURE_QUERY_NAME = "PictureThumbnails.findThumbnailsByPicture";
+	public static final String FIND_THUMBNAILS_BY_PICTURE_QUERY = "SELECT t FROM PictureThumbnail t WHERE t.picture.id IN :pictureList AND t.type = :type";
+	
+	public static final String FIND_THUMBNAILS_QUERY_NAME = "PictureThumbnails.findThumbnails";
+	public static final String FIND_THUMBNAILS_QUERY = "SELECT t FROM PictureThumbnail t WHERE t.type = :type ORDER BY t.picture.id DESC";
+	
 
 	public static final Queries FIND_PICTURES = new Queries(FIND_PICTURES_QUERY_NAME, FIND_PICTURES_QUERY);
 	public static final Queries FIND_FUNNY_PICTURES = new Queries(FIND_FUNNY_PICTURES_QUERY_NAME, FIND_FUNNY_PICTURES_QUERY);
 	public static final Queries FIND_FUNNY_PICTURES_BY_PICTURE = new Queries(FIND_FUNNY_PICTURES_BY_PIC_QUERY_NAME, FIND_FUNNY_PICTURES_BY_PIC_QUERY);
+	public static final Queries FIND_THUMBNAILS_BY_PICTURE = new Queries(FIND_THUMBNAILS_BY_PICTURE_QUERY_NAME, FIND_THUMBNAILS_BY_PICTURE_QUERY);
+	public static final Queries FIND_THUMBNAILS = new Queries(FIND_THUMBNAILS_QUERY_NAME, FIND_THUMBNAILS_QUERY);
+	
+	
 
     private final String queryName;
     private final String query;
