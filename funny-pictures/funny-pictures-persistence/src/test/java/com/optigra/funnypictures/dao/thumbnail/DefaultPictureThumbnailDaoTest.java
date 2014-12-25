@@ -43,7 +43,7 @@ public class DefaultPictureThumbnailDaoTest {
 		pagedSearch.setOffset(offset);
 		pagedSearch.setClazz(PictureThumbnail.class);
 		pagedSearch.setParameters(Collections.<String, Object>emptyMap());
-		pagedSearch.setQuery(Queries.FIND_PICTURE_THUMBNAILS);
+		pagedSearch.setQuery(Queries.GET_PICTURE_THUMBNAILS);
 		
 		PagedResult<PictureThumbnail> expected = new PagedResult<PictureThumbnail>(offset, limit, count, entities);
 		

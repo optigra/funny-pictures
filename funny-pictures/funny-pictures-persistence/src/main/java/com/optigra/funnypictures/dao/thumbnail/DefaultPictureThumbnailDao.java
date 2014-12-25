@@ -24,7 +24,7 @@ public class DefaultPictureThumbnailDao extends AbstractDao<PictureThumbnail, Lo
 	@Override
 	public PagedResult<PictureThumbnail> getThumbnails(
 			final PagedSearch<PictureThumbnail> pagedSearch) {
-		Queries query = Queries.FIND_PICTURE_THUMBNAILS;
+		Queries query = Queries.GET_PICTURE_THUMBNAILS;
 
 		pagedSearch.setClazz(getEntityClass());
 		pagedSearch.setParameters(pagedSearch.getParameters());

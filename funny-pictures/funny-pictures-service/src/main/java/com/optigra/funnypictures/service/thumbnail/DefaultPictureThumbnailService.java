@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.optigra.funnypictures.dao.thumbnail.PictureThumbnailDao;
 import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
+import com.optigra.funnypictures.pagination.PagedResult;
+import com.optigra.funnypictures.pagination.PagedSearch;
 
 /**
  * Picture Thumbnail Service.
@@ -21,6 +23,12 @@ public class DefaultPictureThumbnailService implements PictureThumbnailService {
 	@Override
 	public void createPictureThumbnail(final PictureThumbnail pictureThumbnail) {
 		pictureThumbnailDao.save(pictureThumbnail);
+	}
+
+	@Override
+	public PagedResult<PictureThumbnail> getPictureThumbnails(
+			final PagedSearch<PictureThumbnail> pagedSearch) {
+		return pictureThumbnailDao.getThumbnails(pagedSearch);
 	}
 
 }
