@@ -18,16 +18,19 @@ public class FunnyPictureThumbnailConverterTest {
 	public void testConverter() throws Exception {
 		// Given
 		FunnyPicture funnyPicture = new FunnyPicture();
+		String url = "url";
 
 		FunnyPictureThumbnail source = new FunnyPictureThumbnail();
 		source.setCreateDate(new Date());
 		source.setFunnyPicture(funnyPicture);
+		source.setUrl(url);
 		
 		FunnyPictureThumbnailResource expected = new FunnyPictureThumbnailResource();
 		expected.setFunnyPictureId(source.getFunnyPicture().getId());
+		expected.setUrl(url);
 		
 		// When
-		FunnyPictureThumbnailResource actual = unit.convert(source);
+		FunnyPictureThumbnailResource actual = unit.convert(source, expected);
 
 		// Then
 		assertEquals(expected, actual);

@@ -20,7 +20,8 @@ import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.web.BaseController;
 
 /**
- * Controller for funny picture thumbnails
+ * Controller for funny picture thumbnails.
+ * 
  * @author oleh.zasadnyy
  *
  */
@@ -46,7 +47,8 @@ private static final Logger LOG = LoggerFactory.getLogger(FunnyPictureThumbnailC
 	 */
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(method = RequestMethod.GET)
-	public PagedResultResource<FunnyPictureThumbnailResource> getFunnyPicturesThumbnails(@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
+	public PagedResultResource<FunnyPictureThumbnailResource> getFunnyPicturesThumbnails(
+			@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
 			@RequestParam(value = "limit", defaultValue = "20") final Integer limit,
 			@RequestParam(value = "thumbnailType", defaultValue = "MEDIUM") final String thumbnailType) {
 		LOG.info("Get pictures thumbnails: offset [{}] limit [{}] ", offset, limit);

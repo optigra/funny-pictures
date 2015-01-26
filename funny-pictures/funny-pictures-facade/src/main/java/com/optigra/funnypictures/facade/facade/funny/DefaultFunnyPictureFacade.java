@@ -239,7 +239,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	}
 
 	@Override
-	public FunnyPictureResource getFunnyPicture(Long id) {
+	public FunnyPictureResource getFunnyPicture(final Long id) {
 		FunnyPicture funnyPicture = funnyPictureService
 				.getFunnyPicture(id);
 		return funnyPictureConverter.convert(funnyPicture);

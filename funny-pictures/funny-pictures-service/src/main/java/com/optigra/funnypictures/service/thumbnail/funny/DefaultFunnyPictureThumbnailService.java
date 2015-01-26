@@ -29,13 +29,13 @@ public class DefaultFunnyPictureThumbnailService implements FunnyPictureThumbnai
 	}
 
 	@Override
-	public FunnyPictureThumbnail getFunnyPictureThumbnail(Long id) {
+	public FunnyPictureThumbnail getFunnyPictureThumbnail(final Long id) {
 		return funnyPictureThumbnailDao.findById(id);
 	}
 
 	@Override
 	public PagedResult<FunnyPictureThumbnail> getFunnyPictureThumbnails(
-			PagedSearch<FunnyPictureThumbnail> pagedSearch) {
+			final PagedSearch<FunnyPictureThumbnail> pagedSearch) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("type", pagedSearch.getEntity().getThumbnailType());
 		

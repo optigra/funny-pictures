@@ -23,7 +23,7 @@ public class DefaultFunnyPictureThumbnailDao extends AbstractDao<FunnyPictureThu
 
 	@Override
 	public PagedResult<FunnyPictureThumbnail> getThumbnails(
-			PagedSearch<FunnyPictureThumbnail> pagedSearch) {
+			final PagedSearch<FunnyPictureThumbnail> pagedSearch) {
 		Queries query = Queries.GET_FUNNY_PICTURE_THUMBNAILS;
 
 		pagedSearch.setClazz(getEntityClass());

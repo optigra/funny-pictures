@@ -12,8 +12,22 @@ import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureTh
  */
 public interface FunnyPictureThumbnailFacade {
 	
+	/**
+	 * Method returns paged result for requested funny pictures thumbnails.
+	 * 
+	 * @param pagedRequest
+	 *            request with offset and limit
+	 * @return Paged result with funny picture thumbnail resource
+	 */
 	PagedResultResource<FunnyPictureThumbnailResource> getFunnyPicturesThumbnails(PagedRequest<FunnyPictureThumbnailResource> pagedRequest);
 	
+	/**
+	 * Get funny picture thumbnail by identifier.
+	 * 
+	 * @param id FunnyPicture identifier
+	 *            funny picture to create.
+	 * @return FunnyPictureThumbnailResource.
+	 */
 	FunnyPictureThumbnailResource getFunnyPictureThumbnail(Long id);
 
 }

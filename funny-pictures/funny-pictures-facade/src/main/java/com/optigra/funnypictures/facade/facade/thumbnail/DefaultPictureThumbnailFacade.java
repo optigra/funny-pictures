@@ -44,7 +44,7 @@ public class DefaultPictureThumbnailFacade implements PictureThumbnailFacade {
 
 	@Override
 	public PagedResultResource<PictureThumbnailResource> getPicturesThumbnails(
-			PagedRequest<PictureThumbnailResource> pagedRequest) {
+			final PagedRequest<PictureThumbnailResource> pagedRequest) {
 		// Convert PagedRequest to PagedSearch
 		PagedSearch<PictureThumbnail> pagedSearch = pagedRequestConverter
 				.convert(pagedRequest);
@@ -70,7 +70,7 @@ public class DefaultPictureThumbnailFacade implements PictureThumbnailFacade {
 	}
 
 	@Override
-	public PictureThumbnailResource getPictureThumbnail(Long id) {
+	public PictureThumbnailResource getPictureThumbnail(final Long id) {
 		PictureThumbnail pictureThumbnail = pictureThumbnailService
 				.getPictureThumbnail(id);
 		return pictureThumbnailConverter.convert(pictureThumbnail);

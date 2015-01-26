@@ -20,7 +20,8 @@ import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.web.BaseController;
 
 /**
- * Controller for picture thumbnails
+ * Controller for picture thumbnails.
+ * 
  * @author oleh.zasadnyy
  *
  */

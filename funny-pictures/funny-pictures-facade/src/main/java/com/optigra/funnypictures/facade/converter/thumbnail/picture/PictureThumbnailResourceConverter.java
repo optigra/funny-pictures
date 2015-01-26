@@ -16,8 +16,8 @@ import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 public class PictureThumbnailResourceConverter extends AbstractConverter<PictureThumbnailResource, PictureThumbnail> {
 
 	@Override
-	public PictureThumbnail convert(PictureThumbnailResource source,
-			PictureThumbnail target) {
+	public PictureThumbnail convert(final PictureThumbnailResource source,
+			final PictureThumbnail target) {
 		target.setId(source.getId());
 		Picture picture = new Picture();
 		picture.setId(source.getPictureId());
@@ -29,7 +29,7 @@ public class PictureThumbnailResourceConverter extends AbstractConverter<Picture
 	}
 
 	@Override
-	public PictureThumbnail convert(PictureThumbnailResource source) {
+	public PictureThumbnail convert(final PictureThumbnailResource source) {
 		return convert(source, new PictureThumbnail());
 	}
 

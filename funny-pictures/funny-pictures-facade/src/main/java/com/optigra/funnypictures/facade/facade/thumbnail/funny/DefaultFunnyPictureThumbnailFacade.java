@@ -17,6 +17,12 @@ import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
 
+/**
+ * Default facade for funny pictures thumbnails.
+ * 
+ * @author oleh.zasadnyy
+ *
+ */
 @Component("funnyPictureThumbnailFacade")
 @Transactional
 public class DefaultFunnyPictureThumbnailFacade implements
@@ -39,7 +45,7 @@ public class DefaultFunnyPictureThumbnailFacade implements
 
 	@Override
 	public PagedResultResource<FunnyPictureThumbnailResource> getFunnyPicturesThumbnails(
-			PagedRequest<FunnyPictureThumbnailResource> pagedRequest) {
+			final PagedRequest<FunnyPictureThumbnailResource> pagedRequest) {
 		// Convert PagedRequest to PagedSearch
 		PagedSearch<FunnyPictureThumbnail> pagedSearch = pagedRequestConverter
 				.convert(pagedRequest);
@@ -66,7 +72,7 @@ public class DefaultFunnyPictureThumbnailFacade implements
 	}
 
 	@Override
-	public FunnyPictureThumbnailResource getFunnyPictureThumbnail(Long id) {
+	public FunnyPictureThumbnailResource getFunnyPictureThumbnail(final Long id) {
 		FunnyPictureThumbnail funnyPictureThumbnail = funnyPictureThumbnailService
 				.getFunnyPictureThumbnail(id);
 		return funnyPictureThumbnailConverter.convert(funnyPictureThumbnail);

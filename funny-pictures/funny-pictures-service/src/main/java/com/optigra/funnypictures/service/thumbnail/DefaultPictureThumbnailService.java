@@ -39,7 +39,7 @@ public class DefaultPictureThumbnailService implements PictureThumbnailService {
 	}
 
 	@Override
-	public PictureThumbnail getPictureThumbnail(Long id) {
+	public PictureThumbnail getPictureThumbnail(final Long id) {
 		return pictureThumbnailDao.findById(id);
 	}
 

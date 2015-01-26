@@ -6,6 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.optigra.funnypictures.dao.thumbnail.PictureThumbnailDao;
 import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 
@@ -47,7 +50,13 @@ public class DefaultPictureThumbnailServiceTest {
 		PictureThumbnail pictureThumbnail = new PictureThumbnail();
 		int offset = 5;
 		int limit = 20;
+		ThumbnailType thumbnailType = ThumbnailType.MEDIUM;
+		PictureThumbnail entity = new PictureThumbnail();
+		entity.setThumbnailType(thumbnailType);
+		Map<String, Object> parameters = new HashMap<String, Object>();
 		PagedSearch<PictureThumbnail> search = new PagedSearch<PictureThumbnail>();
+		search.setParameters(parameters);
+		search.setEntity(entity);
 		PagedResult<PictureThumbnail> expected = new PagedResult<PictureThumbnail>(offset, limit, 1, Collections.singletonList(pictureThumbnail));
 		when(pictureDao.getThumbnails(any(PagedSearch.class))).thenReturn(expected);
 		

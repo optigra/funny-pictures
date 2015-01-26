@@ -32,7 +32,7 @@ public interface FunnyPictureFacade {
 	/**
 	 * Get funny picture by identifier.
 	 * 
-	 * @param id Funny Picture idetifier
+	 * @param id Funny Picture identifier
 	 *            funny picture to create.
 	 * @return FunnyPictureResource.
 	 */
