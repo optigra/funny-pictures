@@ -14,12 +14,9 @@
                    close="closeAlert($index)">{{alert.msg}}
             </alert>
             <div class="row" style="text-align: center;">
-                <div ng-repeat="picture in pictures"
+                <div ng-repeat="pictureThumbnail in pictureThumbnails"
                      class="col-lg-3 col-md-4 col-xs-6 thumb">
-                    <a ng-click="createFunnyPicture(picture.id)" class="thumbnail">
-                        <img class="img-responsive" ng-src="{{picture.url}}">
-                    </a>
-                    {{picture.name}}
+                    <a ng-click="createFunnyPicture(pictureThumbnail.pictureId)" class="flow-img" style="background-image: url({{pictureThumbnail.url}})"></a>
                 </div>
             </div>
         </div>

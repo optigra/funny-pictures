@@ -10,13 +10,10 @@
     </div>
 </div>
 <div class="container" id="mainContainer">
-
     <div class="row">
-        <div ng-repeat="funny in funnies"
+        <div ng-repeat="funnyThumbnail in funniesThumbnails"
              class="col-lg-3 col-md-4 col-xs-6 thumb">
-            <a class="thumbnail" ng-click="modalOpen(funny)"> <img class="img-responsive"
-                                                ng-src="{{funny.url}}" alt="">
-            </a>
+            <a ng-click="modalOpen(funnyThumbnail)" class="flow-img" style="background-image: url({{funnyThumbnail.url}})"></a>
         </div>
     </div>
     <div class="row align-center">

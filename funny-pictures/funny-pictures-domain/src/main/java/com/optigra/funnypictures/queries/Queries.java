@@ -19,17 +19,20 @@ public class Queries {
 	private static final String FIND_FUNNY_PICTURES_BY_PIC_QUERY = "SELECT p FROM FunnyPicture p WHERE p.picture = :picture";
 	
 	public static final String FIND_THUMBNAILS_BY_PICTURE_QUERY_NAME = "PictureThumbnails.findThumbnailsByPicture";
-	public static final String FIND_THUMBNAILS_BY_PICTURE_QUERY = "SELECT t FROM PictureThumbnail t WHERE t.picture.id IN :pictureList AND t.type = :type";
+	public static final String FIND_THUMBNAILS_BY_PICTURE_QUERY = "SELECT t FROM PictureThumbnail t WHERE t.picture.id IN :pictureList AND t.thumbnailType = :type";
 	
 	public static final String GET_PICTURE_THUMBNAILS_QUERY_NAME = "PictureThumbnails.findThumbnails";
-	public static final String GET_PICTURE_THUMBNAILS_QUERY = "SELECT t FROM PictureThumbnail t WHERE t.type = :type ORDER BY t.picture.id DESC";
-	
+	public static final String GET_PICTURE_THUMBNAILS_QUERY = "SELECT t FROM PictureThumbnail t WHERE t.thumbnailType = :type ORDER BY t.picture.id DESC";
+
+	public static final String GET_FUNNY_PICTURE_THUMBNAILS_QUERY_NAME = "FunnyPictureThumbnails.findThumbnails";
+	public static final String GET_FUNNY_PICTURE_THUMBNAILS_QUERY = "SELECT t FROM FunnyPictureThumbnail t WHERE t.thumbnailType = :type ORDER BY t.funnyPicture.id DESC";
 
 	public static final Queries FIND_PICTURES = new Queries(FIND_PICTURES_QUERY_NAME, FIND_PICTURES_QUERY);
 	public static final Queries FIND_FUNNY_PICTURES = new Queries(FIND_FUNNY_PICTURES_QUERY_NAME, FIND_FUNNY_PICTURES_QUERY);
 	public static final Queries FIND_FUNNY_PICTURES_BY_PICTURE = new Queries(FIND_FUNNY_PICTURES_BY_PIC_QUERY_NAME, FIND_FUNNY_PICTURES_BY_PIC_QUERY);
 	public static final Queries FIND_THUMBNAILS_BY_PICTURE = new Queries(FIND_THUMBNAILS_BY_PICTURE_QUERY_NAME, FIND_THUMBNAILS_BY_PICTURE_QUERY);
 	public static final Queries GET_PICTURE_THUMBNAILS = new Queries(GET_PICTURE_THUMBNAILS_QUERY_NAME, GET_PICTURE_THUMBNAILS_QUERY);
+	public static final Queries GET_FUNNY_PICTURE_THUMBNAILS = new Queries(GET_FUNNY_PICTURE_THUMBNAILS_QUERY_NAME, GET_FUNNY_PICTURE_THUMBNAILS_QUERY);
 	
 	
 

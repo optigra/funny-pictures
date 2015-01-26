@@ -7,8 +7,16 @@ funnyPicturesApp.factory('Pictures', function ($resource, SharedProperties) {
     return $resource(SharedProperties.getApiUrl() + '/pictures/:id', {}, {'query': {method: 'GET', isArray: false}});
 });
 
+funnyPicturesApp.factory('PicturesThumbnails', function ($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/picturesthumb/:id', {}, {'query': {method: 'GET', isArray: false}});
+});
+
 funnyPicturesApp.factory('Funnies', function ($resource, SharedProperties) {
     return $resource(SharedProperties.getApiUrl() + '/funnies/:id', {}, {'query': {method: 'GET', isArray: false}});
+});
+
+funnyPicturesApp.factory('FunnyPicturesThumbnails', function ($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/funniesthumb/:id', {}, {'query': {method: 'GET', isArray: false}});
 });
 
 funnyPicturesApp.factory('Feedback', function ($resource, SharedProperties) {

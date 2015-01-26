@@ -4,6 +4,9 @@ import org.springframework.stereotype.Repository;
 
 import com.optigra.funnypictures.dao.AbstractDao;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import com.optigra.funnypictures.pagination.PagedResult;
+import com.optigra.funnypictures.pagination.PagedSearch;
+import com.optigra.funnypictures.queries.Queries;
 
 /**
  * Default implementation of funny picture thumbnail dao.
@@ -16,6 +19,18 @@ public class DefaultFunnyPictureThumbnailDao extends AbstractDao<FunnyPictureThu
 	@Override
 	public Class<FunnyPictureThumbnail> getEntityClass() {
 		return FunnyPictureThumbnail.class;
+	}
+
+	@Override
+	public PagedResult<FunnyPictureThumbnail> getThumbnails(
+			PagedSearch<FunnyPictureThumbnail> pagedSearch) {
+		Queries query = Queries.GET_FUNNY_PICTURE_THUMBNAILS;
+
+		pagedSearch.setClazz(getEntityClass());
+		pagedSearch.setParameters(pagedSearch.getParameters());
+		pagedSearch.setQuery(query);
+
+		return search(pagedSearch);
 	}
 
 }

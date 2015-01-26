@@ -1,5 +1,8 @@
 package com.optigra.funnypictures.service.thumbnail;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -28,7 +31,16 @@ public class DefaultPictureThumbnailService implements PictureThumbnailService {
 	@Override
 	public PagedResult<PictureThumbnail> getPictureThumbnails(
 			final PagedSearch<PictureThumbnail> pagedSearch) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("type", pagedSearch.getEntity().getThumbnailType());
+		
+		pagedSearch.setParameters(params);
 		return pictureThumbnailDao.getThumbnails(pagedSearch);
+	}
+
+	@Override
+	public PictureThumbnail getPictureThumbnail(Long id) {
+		return pictureThumbnailDao.findById(id);
 	}
 
 }

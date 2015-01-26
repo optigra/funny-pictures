@@ -237,4 +237,11 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		
 		return pagedResultResource;
 	}
+
+	@Override
+	public FunnyPictureResource getFunnyPicture(Long id) {
+		FunnyPicture funnyPicture = funnyPictureService
+				.getFunnyPicture(id);
+		return funnyPictureConverter.convert(funnyPicture);
+	}
 }

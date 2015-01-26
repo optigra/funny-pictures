@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,6 +53,20 @@ public class FunnyPictureController extends BaseController {
 		PagedRequest pagedRequest = new PagedRequest(offset, limit);
 
 		return funnyPictureFacade.getFunnies(pagedRequest);
+	}
+	
+	/**
+	 * Controller method for getting funny picture by id. Requested
+	 * method GET.
+	 * 
+	 * @param id
+	 *            FunnyPicture Identifier
+	 * @return Serialized Funny Picture Resource with all required fields.
+	 */
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public FunnyPictureResource getFunnyPictur(@PathVariable("id") final Long id) {
+		LOG.info("Getting Funny Picture resource with id: {}", id);
+		return funnyPictureFacade.getFunnyPicture(id);
 	}
 
 	/**

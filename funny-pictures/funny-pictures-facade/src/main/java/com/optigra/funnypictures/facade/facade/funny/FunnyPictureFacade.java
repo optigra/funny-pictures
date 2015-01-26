@@ -30,6 +30,15 @@ public interface FunnyPictureFacade {
 	FunnyPictureResource createFunnyPicture(FunnyPictureResource funny);
 	
 	/**
+	 * Get funny picture by identifier.
+	 * 
+	 * @param id Funny Picture idetifier
+	 *            funny picture to create.
+	 * @return FunnyPictureResource.
+	 */
+	FunnyPictureResource getFunnyPicture(Long id);
+	
+	/**
 	 * Get funnies for picture.
 	 * 
 	 * @param id Picture identifier.

@@ -1,6 +1,7 @@
 package com.optigra.funnypictures.web.picture;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -77,6 +78,27 @@ public class FunnyPictureControllerTest extends AbstractControllerTest {
     		.andExpect(content().string(expectedResponse));
     	
     	verify(funnyPictureFacade).getFunnies(pagedRequest);
+	}
+    
+    @Test
+	public void testGetFunnyPicture() throws Exception {
+    	Long id = 1L;
+    	
+    	FunnyPictureResource funnyPictureResource = new FunnyPictureResource();
+    	funnyPictureResource.setId(id);
+    	funnyPictureResource.setUrl("url");
+    	
+    	String expectedResponse = getJson(funnyPictureResource, false);
+		
+		// When
+		when(funnyPictureFacade.getFunnyPicture(anyLong())).thenReturn(funnyPictureResource);
+    	
+		// Then
+    	mockMvc.perform(get("/funnies/{id}", id))
+    		.andExpect(status().isOk())
+    		.andExpect(content().string(expectedResponse));
+    	
+    	verify(funnyPictureFacade).getFunnyPicture(id);
 	}
     
     @Test

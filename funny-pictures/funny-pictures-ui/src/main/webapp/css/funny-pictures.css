@@ -28,7 +28,14 @@ body>.container {
 	padding-right: 15px;
 	padding-left: 15px;
 }
-
+.flow-img {
+	overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background-position: center center;
+    background-size: cover;
+    display: block;
+}
 code {
 	font-size: 80%;
 }
@@ -43,11 +50,11 @@ img[src=""] {
 
 .thumb {
 	margin-bottom: 30px;
+	display: block;
+	height: 200px;
 }
-
-.thumb a img {
-	width: 100%;
-	height: 300px;
+.thumb a {
+	cursor: pointer;
 }
 
 .input-form {
