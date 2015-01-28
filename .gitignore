@@ -12,3 +12,5 @@ target
 /target
 /node_modules
 /bower_components
+/.tmp
+/node
