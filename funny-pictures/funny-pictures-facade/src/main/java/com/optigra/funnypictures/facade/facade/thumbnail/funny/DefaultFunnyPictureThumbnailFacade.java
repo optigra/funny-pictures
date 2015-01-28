@@ -78,4 +78,24 @@ public class DefaultFunnyPictureThumbnailFacade implements
 		return funnyPictureThumbnailConverter.convert(funnyPictureThumbnail);
 	}
 
+	@Override
+	public PagedResultResource<FunnyPictureThumbnailResource> getFunniesThumbnailForPicture(
+			final Long id, final PagedRequest<FunnyPictureThumbnailResource> pagedRequest) {
+		
+		PagedSearch<FunnyPictureThumbnail> pagedSearch = pagedRequestConverter
+				.convert(pagedRequest);
+		pagedSearch.setEntity(funnyPictureThumbnailResourceConverter
+				.convert(pagedRequest.getResource()));
+		
+		PagedResult<FunnyPictureThumbnail> pagedResult = funnyPictureThumbnailService.getFunnyPictureThumbnailsByPicture(pagedSearch, id);
+		
+		List<FunnyPictureThumbnailResource> resources = funnyPictureThumbnailConverter.convertAll(pagedResult.getEntities());
+		
+		PagedResultResource<FunnyPictureThumbnailResource> pagedResultResource = new PagedResultResource<>("/funnies");
+		pagedResultResource.setEntities(resources);
+		pagedResultConverter.convert(pagedResult, pagedResultResource);
+		
+		return pagedResultResource;
+	}
+
 }

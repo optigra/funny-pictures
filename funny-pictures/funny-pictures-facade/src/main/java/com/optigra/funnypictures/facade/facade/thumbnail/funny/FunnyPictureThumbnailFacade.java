@@ -29,5 +29,13 @@ public interface FunnyPictureThumbnailFacade {
 	 * @return FunnyPictureThumbnailResource.
 	 */
 	FunnyPictureThumbnailResource getFunnyPictureThumbnail(Long id);
-
+	
+	/**
+	 * Get funnies thumbnail for picture.
+	 * 
+	 * @param id Picture identifier.
+	 * @param pagedRequest Paged request.
+	 * @return Paged result of funnies.
+	 */
+	PagedResultResource<FunnyPictureThumbnailResource> getFunniesThumbnailForPicture(Long id, PagedRequest<FunnyPictureThumbnailResource> pagedRequest);
 }

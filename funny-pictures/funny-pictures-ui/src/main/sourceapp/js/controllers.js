@@ -86,7 +86,7 @@ funnyControllers.controller('FunniesController', [ '$scope', '$modal',
 					}
 				});
 			};
-
+			
 			FunnyPicturesThumbnails.query({
 				offset : ($scope.currentPage - 1) * $scope.itemsPerPage,
 				limit : $scope.itemsPerPage,
@@ -120,11 +120,11 @@ funnyControllers.controller('FunnyPreviewModalController', [ '$scope',
 		'$window', '$modalInstance', 'funnyThumbnail', 'Funnies',
 		function($scope, $window, $modalInstance, funnyThumbnail, Funnies) {
 			var funnyPictureId = funnyThumbnail.funnyPictureId;
-			Funnies.get({
-				id : funnyPictureId
-			}, function(funnyPicture) {
-				$scope.funnyPicture = funnyPicture;
-			});
+				Funnies.get({
+					id : funnyPictureId
+				}, function(funnyPicture) {
+					$scope.funnyPicture = funnyPicture;
+				});
 
 			$scope.cancel = function() {
 				$modalInstance.dismiss('cancel');
@@ -187,7 +187,6 @@ funnyControllers.controller('CreateFunnyPictureController', [
 			$scope.currentPage = 1;
 			$scope.totalItems = 0;
 			$scope.itemsPerPage = 6;
-			$scope.thumbnailType = "BIG";
 
 			Pictures.get({
 				id : SharedProperties.getTemplateId()
@@ -196,13 +195,12 @@ funnyControllers.controller('CreateFunnyPictureController', [
 				$http(
 						{
 							url : SharedProperties.getApiUrl() + "/pictures/"
-									+ $scope.template.id + "/funniesThumb",
+									+ $scope.template.id + "/funnies",
 							method : "GET",
 							params : {
 								offset : ($scope.currentPage - 1)
 										* $scope.itemsPerPage,
-								limit : $scope.itemsPerPage,
-								thumbnailType : $scope.thumbnailType
+								limit : $scope.itemsPerPage
 							}
 						}).success(function(data, status) {
 					$scope.funniesByTemplate = data.entities;
@@ -247,14 +245,13 @@ funnyControllers.controller('CreateFunnyPictureController', [
 
 			};
 
-			$scope.modalOpen = function(funnyThumbnail) {
-				console.log(funnyThumbnail);
+			$scope.modalOpen = function(funnyPicture) {
 				$modal.open({
 					templateUrl : 'html/modal/funnyPreviewModal.html',
 					controller : 'FunnyPreviewModalController',
 					resolve : {
-						funnyThumbnail : function() {
-							return funnyThumbnail;
+						funnyPicture : function() {
+							return funnyPicture;
 						}
 					}
 				});

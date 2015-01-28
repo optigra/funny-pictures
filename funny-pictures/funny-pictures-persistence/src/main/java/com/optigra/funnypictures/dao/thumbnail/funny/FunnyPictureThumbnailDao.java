@@ -19,4 +19,12 @@ public interface FunnyPictureThumbnailDao extends Dao<FunnyPictureThumbnail, Lon
 	 * @return a list of funny picture thumbnails.
 	 */
 	PagedResult<FunnyPictureThumbnail> getThumbnails(PagedSearch<FunnyPictureThumbnail> pagedSearch);
+	
+	/**
+	 * Retrieves a paged list of Funny Picture thumbnails by Picture id of given thumbnail type 
+	 * ordered by id of corresponding picture descending.
+	 * @param pagedSearch
+	 * @return a list of funny picture thumbnails.
+	 */
+	PagedResult<FunnyPictureThumbnail> getThumbnailsByPicture(PagedSearch<FunnyPictureThumbnail> pagedSearch);
 }

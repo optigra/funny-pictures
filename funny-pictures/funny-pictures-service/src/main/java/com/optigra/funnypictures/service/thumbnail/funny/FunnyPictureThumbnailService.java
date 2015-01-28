@@ -30,5 +30,13 @@ public interface FunnyPictureThumbnailService {
 	 * @return a section of the result list
 	 */
 	PagedResult<FunnyPictureThumbnail> getFunnyPictureThumbnails(PagedSearch<FunnyPictureThumbnail> pagedSearch);
+	
+	/**
+	 * Retrieves a paged list of funny picture thumbnails.
+	 * @param pagedSearch search conditions that should specify results offset and limit.
+	 * @param id of Picture
+	 * @return a section of the result list
+	 */
+	PagedResult<FunnyPictureThumbnail> getFunnyPictureThumbnailsByPicture(PagedSearch<FunnyPictureThumbnail> pagedSearch, final Long id);
 
 }
