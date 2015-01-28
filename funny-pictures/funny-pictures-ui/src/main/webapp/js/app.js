@@ -25,7 +25,7 @@ funnyPicturesApp.factory('Feedback', function ($resource, SharedProperties) {
 
 funnyPicturesApp.service('SharedProperties', function () {
     var generatedFunny = { };
-    var apiUrl = "http://localhost:8080/funny-pictures-rest-api/api";
+    var apiUrl = "http://drawmeme.com/api";
     var templateId = 0;
     return {
         getApiUrl: function () {
