@@ -23,30 +23,6 @@ funnyPicturesApp.factory('Feedback', function ($resource, SharedProperties) {
     return $resource(SharedProperties.getApiUrl() + '/feedbacks/:id', {}, {'query': {method: 'GET', isArray: false}});
 });
 
-funnyPicturesApp.service('SharedProperties', function () {
-    var generatedFunny = { };
-    var apiUrl = "http://localhost:8080/funny-pictures-rest-api/api";
-    var templateId = 0;
-    return {
-        getApiUrl: function () {
-            return apiUrl;
-        },
-        getGeneratedFunny: function () {
-            return generatedFunny;
-        },
-        setGeneratedFunny: function (value) {
-            generatedFunny = value;
-        },
-        setTemplateId: function (id) {
-            templateId = id;
-        },
-        getTemplateId: function () {
-            return templateId;
-        }
-
-    };
-});
-
 funnyPicturesApp.service('FileUpload', ['$http', function ($http) {
     this.uploadFileToUrl = function (file, uploadUrl) {
         var fd = new FormData();

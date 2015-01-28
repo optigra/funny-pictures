@@ -61,7 +61,7 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>grunt-build</id>
+						<id>grunt</id>
 						<goals>
 							<goal>grunt</goal>
 						</goals>
@@ -72,7 +72,7 @@
 								<triggerfile>Gruntfile.js</triggerfile>
 								<triggerfile>package.json</triggerfile>
 							</triggerfiles>
-							<arguments>build</arguments>
+							<arguments>${target.environment}</arguments>
 						</configuration>
 					</execution>
 				</executions>

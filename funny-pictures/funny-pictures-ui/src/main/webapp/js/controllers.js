@@ -1,310 +1,164 @@
-/**
- * Created by rostyslav on 9/29/14.
- */
-var funnyControllers = angular.module('funnyControllers', []);
+var funnyControllers = angular.module("funnyControllers", []);
 
-funnyControllers.controller('HomeController', [
-		'$scope',
-		'$modal',
-		'$location',
-		'PicturesThumbnails',
-		'Funnies',
-		'SharedProperties',
-		function($scope, $modal, $location, PicturesThumbnails, Funnies,
-				SharedProperties) {
-			$scope.headerText = "";
-			$scope.footerText = "";
-			$scope.currentPage = 1;
-			$scope.totalItems = 0;
-			$scope.itemsPerPage = 8;
-			$scope.thumbnailType = "BIG";
-
-			PicturesThumbnails.query({
-				offset : ($scope.currentPage - 1) * $scope.itemsPerPage,
-				limit : $scope.itemsPerPage,
-				thumbnailType : $scope.thumbnailType
-			}, function(data) {
-				$scope.pictureThumbnails = data.entities;
-				$scope.totalItems = data.count;
-			}, function() {
-				$scope.totalItems = 0;
-			});
-
-			$scope.pageChanged = function() {
-				PicturesThumbnails.query({
-					offset : ($scope.currentPage - 1) * $scope.itemsPerPage,
-					limit : $scope.itemsPerPage,
-					thumbnailType : $scope.thumbnailType
-				}, function(data) {
-					$scope.pictureThumbnails = data.entities;
-					$scope.totalItems = data.count;
-				}, function() {
-					$scope.totalItems = 0;
-				});
-			};
-
-			$scope.showPagination = function() {
-				return $scope.totalItems > $scope.itemsPerPage;
-			};
-
-			$scope.createFunnyPicture = function(templateId) {
-				SharedProperties.setTemplateId(templateId);
-				$location.path('/createFunnyPicture');
-			};
-
-		} ]);
-
-funnyControllers.controller('PreviewFunnyController', [ '$scope',
-		'SharedProperties', function($scope, SharedProperties) {
-			$scope.generatedImage = SharedProperties.getGeneratedFunny();
-		} ]);
-
-funnyControllers.controller('HeaderController', [ '$scope', '$location',
-		function($scope, $location) {
-			$scope.isActive = function(viewLocation) {
-				return viewLocation === $location.path();
-			};
-		} ]);
-
-funnyControllers.controller('FunniesController', [ '$scope', '$modal',
-		'FunnyPicturesThumbnails',
-		function($scope, $modal, FunnyPicturesThumbnails) {
-			$scope.funnies = {};
-			$scope.currentPage = 1;
-			$scope.totalItems = 0;
-			$scope.itemsPerPage = 8;
-			$scope.thumbnailType = "BIG";
-
-			$scope.modalOpen = function(funnyThumbnail) {
-				var modalInstance = $modal.open({
-					templateUrl : 'html/modal/funnyPreviewModal.html',
-					controller : 'FunnyPreviewModalController',
-					resolve : {
-						funnyThumbnail : function() {
-							return funnyThumbnail;
-						}
-					}
-				});
-			};
-
-			FunnyPicturesThumbnails.query({
-				offset : ($scope.currentPage - 1) * $scope.itemsPerPage,
-				limit : $scope.itemsPerPage,
-				thumbnailType : $scope.thumbnailType
-			}, function(data) {
-				$scope.funniesThumbnails = data.entities;
-				$scope.totalItems = data.count;
-			}, function() {
-				$scope.totalItems = 0;
-			});
-
-			$scope.pageChanged = function() {
-				FunnyPicturesThumbnails.query({
-					offset : ($scope.currentPage - 1) * $scope.itemsPerPage,
-					limit : $scope.itemsPerPage,
-					thumbnailType : $scope.thumbnailType
-				}, function(data) {
-					$scope.funniesThumbnails = data.entities;
-					$scope.totalItems = data.count;
-				}, function() {
-					$scope.totalItems = 0;
-				});
-			};
-
-			$scope.showPagination = function() {
-				return $scope.totalItems > $scope.itemsPerPage;
-			};
-		} ]);
-
-funnyControllers.controller('FunnyPreviewModalController', [ '$scope',
-		'$window', '$modalInstance', 'funnyThumbnail', 'Funnies',
-		function($scope, $window, $modalInstance, funnyThumbnail, Funnies) {
-			var funnyPictureId = funnyThumbnail.funnyPictureId;
-			Funnies.get({
-				id : funnyPictureId
-			}, function(funnyPicture) {
-				$scope.funnyPicture = funnyPicture;
-			});
-
-			$scope.cancel = function() {
-				$modalInstance.dismiss('cancel');
-			};
-			$scope.fullSize = function() {
-				$window.open($scope.funnyPicture.url);
-			}
-		} ]);
-
-funnyControllers.controller('CreatePictureController', [
-		'$scope',
-		'$location',
-		'$window',
-		'FileUpload',
-		'SharedProperties',
-		'Pictures',
-		function($scope, $location, $window, FileUpload, SharedProperties,
-				Pictures) {
-			$scope.pictureTitle = "";
-			$scope.headerText = "";
-			$scope.uploadFile = function() {
-				var uploadUrl = SharedProperties.getApiUrl() + "/content";
-				var file = $scope.myFile;
-				if (file) {
-					FileUpload.uploadFileToUrl(file, uploadUrl).then(
-							function(data) {
-								var pictureObject = {
-									name : $scope.pictureTitle,
-									url : data.path
-								};
-								Pictures.save(pictureObject, function(data) {
-									$scope.headerText = "File " + data
-											+ " uploaded to server!";
-									$location.path('/home');
-
-								},
-										function(error) {
-											$scope.headerText = "Error"
-													+ error.message;
-										});
-							});
-				} else {
-					$window.alert("Please select the file!")
-				}
-			};
-		} ]);
-
-funnyControllers.controller('CreateFunnyPictureController', [
-		'$scope',
-		'$window',
-		'$modal',
-		'$http',
-		'SharedProperties',
-		'Pictures',
-		'Funnies',
-		function($scope, $window, $modal, $http, SharedProperties, Pictures,
-				Funnies) {
-			$scope.template = {};
-			$scope.funniesByTemplate = {};
-			$scope.currentPage = 1;
-			$scope.totalItems = 0;
-			$scope.itemsPerPage = 6;
-			$scope.thumbnailType = "BIG";
-
-			Pictures.get({
-				id : SharedProperties.getTemplateId()
-			}, function(picture) {
-				$scope.template = picture;
-				$http(
-						{
-							url : SharedProperties.getApiUrl() + "/pictures/"
-									+ $scope.template.id + "/funniesThumb",
-							method : "GET",
-							params : {
-								offset : ($scope.currentPage - 1)
-										* $scope.itemsPerPage,
-								limit : $scope.itemsPerPage,
-								thumbnailType : $scope.thumbnailType
-							}
-						}).success(function(data, status) {
-					$scope.funniesByTemplate = data.entities;
-					$scope.totalItems = data.count;
-				}).error(function(error) {
-					console.log(error.statusText + " " + error.status);
-				});
-			});
-
-			$scope.createFunnyPicture = function() {
-				var postObject = new Object();
-				postObject.name = $scope.template.name;
-				postObject.header = $scope.headerText;
-				postObject.footer = $scope.footerText;
-				postObject.template = {};
-				postObject.template.id = $scope.template.id;
-				Funnies.save(postObject, function(data) {
-					$scope.template = data;
-				}, function(error) {
-					console.log("Can't create picture" + error.statusText + " "
-							+ error.status);
-				});
-			};
-
-			$scope.pageChanged = function() {
-				$http(
-						{
-							url : SharedProperties.getApiUrl() + "/pictures/"
-									+ $scope.template.id + "/funnies",
-							method : "GET",
-							params : {
-								offset : ($scope.currentPage - 1)
-										* $scope.itemsPerPage,
-								limit : $scope.itemsPerPage
-							}
-						}).success(function(data, status) {
-					$scope.funniesByTemplate = data.entities;
-					$scope.totalItems = data.count;
-				}).error(function(error) {
-					console.log(error.statusText + " " + error.status);
-				});
-
-			};
-
-			$scope.modalOpen = function(funnyThumbnail) {
-				console.log(funnyThumbnail);
-				$modal.open({
-					templateUrl : 'html/modal/funnyPreviewModal.html',
-					controller : 'FunnyPreviewModalController',
-					resolve : {
-						funnyThumbnail : function() {
-							return funnyThumbnail;
-						}
-					}
-				});
-			};
-
-			$scope.isButtonDisabled = function() {
-				if ($scope.funnyPictureText.$valid) {
-					return false;
-				} else {
-					return true;
-				}
-			}
-
-			$scope.fullSize = function() {
-				$window.open($scope.template.url);
-			};
-
-			$scope.showPagination = function() {
-				return $scope.totalItems > $scope.itemsPerPage;
-			};
-
-		} ]);
-
-funnyControllers.controller('ContactController', [
-		'$scope',
-		'Feedback',
-		function($scope, Feedback) {
-			$scope.alerts = [];
-			$scope.feedback = {
-				subject : "Select subject..."
-			};
-			$scope.sendFeedback = function() {
-				Feedback.save($scope.feedback, function(data, status) {
-					$scope.alerts.push({
-						type : 'success',
-						msg : 'Thank you ' + $scope.feedback.name
-								+ ', your feedback was sent.'
-					});
-					console.log(data + " " + status);
-
-				}, function(error) {
-					console.log("Feedback can't sent " + error.statusText + " "
-							+ error.status);
-				});
-			};
-			$scope.isButtonDisabled = function() {
-				if ($scope.contactForm.$valid) {
-					return false;
-				} else {
-					return true;
-				}
-			}
-		} ]);
+funnyControllers.controller("HomeController", [ "$scope", "$modal", "$location", "PicturesThumbnails", "Funnies", "SharedProperties", function(a, b, c, d, e, f) {
+    a.headerText = "", a.footerText = "", a.currentPage = 1, a.totalItems = 0, a.itemsPerPage = 8, 
+    a.thumbnailType = "BIG", d.query({
+        offset: (a.currentPage - 1) * a.itemsPerPage,
+        limit: a.itemsPerPage,
+        thumbnailType: a.thumbnailType
+    }, function(b) {
+        a.pictureThumbnails = b.entities, a.totalItems = b.count;
+    }, function() {
+        a.totalItems = 0;
+    }), a.pageChanged = function() {
+        d.query({
+            offset: (a.currentPage - 1) * a.itemsPerPage,
+            limit: a.itemsPerPage,
+            thumbnailType: a.thumbnailType
+        }, function(b) {
+            a.pictureThumbnails = b.entities, a.totalItems = b.count;
+        }, function() {
+            a.totalItems = 0;
+        });
+    }, a.showPagination = function() {
+        return a.totalItems > a.itemsPerPage;
+    }, a.createFunnyPicture = function(a) {
+        f.setTemplateId(a), c.path("/createFunnyPicture");
+    };
+} ]), funnyControllers.controller("PreviewFunnyController", [ "$scope", "SharedProperties", function(a, b) {
+    a.generatedImage = b.getGeneratedFunny();
+} ]), funnyControllers.controller("HeaderController", [ "$scope", "$location", function(a, b) {
+    a.isActive = function(a) {
+        return a === b.path();
+    };
+} ]), funnyControllers.controller("FunniesController", [ "$scope", "$modal", "FunnyPicturesThumbnails", function(a, b, c) {
+    a.funnies = {}, a.currentPage = 1, a.totalItems = 0, a.itemsPerPage = 8, a.thumbnailType = "BIG", 
+    a.modalOpen = function(a) {
+        b.open({
+            templateUrl: "html/modal/funnyPreviewModal.html",
+            controller: "FunnyPreviewModalController",
+            resolve: {
+                funnyThumbnail: function() {
+                    return a;
+                }
+            }
+        });
+    }, c.query({
+        offset: (a.currentPage - 1) * a.itemsPerPage,
+        limit: a.itemsPerPage,
+        thumbnailType: a.thumbnailType
+    }, function(b) {
+        a.funniesThumbnails = b.entities, a.totalItems = b.count;
+    }, function() {
+        a.totalItems = 0;
+    }), a.pageChanged = function() {
+        c.query({
+            offset: (a.currentPage - 1) * a.itemsPerPage,
+            limit: a.itemsPerPage,
+            thumbnailType: a.thumbnailType
+        }, function(b) {
+            a.funniesThumbnails = b.entities, a.totalItems = b.count;
+        }, function() {
+            a.totalItems = 0;
+        });
+    }, a.showPagination = function() {
+        return a.totalItems > a.itemsPerPage;
+    };
+} ]), funnyControllers.controller("FunnyPreviewModalController", [ "$scope", "$window", "$modalInstance", "funnyThumbnail", "Funnies", function(a, b, c, d, e) {
+    var f = d.funnyPictureId;
+    e.get({
+        id: f
+    }, function(b) {
+        a.funnyPicture = b;
+    }), a.cancel = function() {
+        c.dismiss("cancel");
+    }, a.fullSize = function() {
+        b.open(a.funnyPicture.url);
+    };
+} ]), funnyControllers.controller("CreatePictureController", [ "$scope", "$location", "$window", "FileUpload", "SharedProperties", "Pictures", function(a, b, c, d, e, f) {
+    a.pictureTitle = "", a.headerText = "", a.uploadFile = function() {
+        var g = e.getApiUrl() + "/content", h = a.myFile;
+        h ? d.uploadFileToUrl(h, g).then(function(c) {
+            var d = {
+                name: a.pictureTitle,
+                url: c.path
+            };
+            f.save(d, function(c) {
+                a.headerText = "File " + c + " uploaded to server!", b.path("/home");
+            }, function(b) {
+                a.headerText = "Error" + b.message;
+            });
+        }) : c.alert("Please select the file!");
+    };
+} ]), funnyControllers.controller("CreateFunnyPictureController", [ "$scope", "$window", "$modal", "$http", "SharedProperties", "Pictures", "Funnies", function(a, b, c, d, e, f, g) {
+    a.template = {}, a.funniesByTemplate = {}, a.currentPage = 1, a.totalItems = 0, 
+    a.itemsPerPage = 6, a.thumbnailType = "BIG", f.get({
+        id: e.getTemplateId()
+    }, function(b) {
+        a.template = b, d({
+            url: e.getApiUrl() + "/pictures/" + a.template.id + "/funniesThumb",
+            method: "GET",
+            params: {
+                offset: (a.currentPage - 1) * a.itemsPerPage,
+                limit: a.itemsPerPage,
+                thumbnailType: a.thumbnailType
+            }
+        }).success(function(b) {
+            a.funniesByTemplate = b.entities, a.totalItems = b.count;
+        }).error(function(a) {
+            console.log(a.statusText + " " + a.status);
+        });
+    }), a.createFunnyPicture = function() {
+        var b = new Object();
+        b.name = a.template.name, b.header = a.headerText, b.footer = a.footerText, b.template = {}, 
+        b.template.id = a.template.id, g.save(b, function(b) {
+            a.template = b;
+        }, function(a) {
+            console.log("Can't create picture" + a.statusText + " " + a.status);
+        });
+    }, a.pageChanged = function() {
+        d({
+            url: e.getApiUrl() + "/pictures/" + a.template.id + "/funnies",
+            method: "GET",
+            params: {
+                offset: (a.currentPage - 1) * a.itemsPerPage,
+                limit: a.itemsPerPage
+            }
+        }).success(function(b) {
+            a.funniesByTemplate = b.entities, a.totalItems = b.count;
+        }).error(function(a) {
+            console.log(a.statusText + " " + a.status);
+        });
+    }, a.modalOpen = function(a) {
+        console.log(a), c.open({
+            templateUrl: "html/modal/funnyPreviewModal.html",
+            controller: "FunnyPreviewModalController",
+            resolve: {
+                funnyThumbnail: function() {
+                    return a;
+                }
+            }
+        });
+    }, a.isButtonDisabled = function() {
+        return a.funnyPictureText.$valid ? !1 : !0;
+    }, a.fullSize = function() {
+        b.open(a.template.url);
+    }, a.showPagination = function() {
+        return a.totalItems > a.itemsPerPage;
+    };
+} ]), funnyControllers.controller("ContactController", [ "$scope", "Feedback", function(a, b) {
+    a.alerts = [], a.feedback = {
+        subject: "Select subject..."
+    }, a.sendFeedback = function() {
+        b.save(a.feedback, function(b, c) {
+            a.alerts.push({
+                type: "success",
+                msg: "Thank you " + a.feedback.name + ", your feedback was sent."
+            }), console.log(b + " " + c);
+        }, function(a) {
+            console.log("Feedback can't sent " + a.statusText + " " + a.status);
+        });
+    }, a.isButtonDisabled = function() {
+        return a.contactForm.$valid ? !1 : !0;
+    };
+} ]);

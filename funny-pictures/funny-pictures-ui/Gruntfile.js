@@ -20,9 +20,7 @@ module.exports = function(grunt) {
 					}
 				},
 				clean : {
-					dist : [ '.tmp', '<%= yeoman.dist %>/css',
-					//					         '<%= yeoman.dist %>/js'
-					]
+					dist : [ '.tmp', '<%= yeoman.dist %>/css','<%= yeoman.dist %>/js' ]
 
 				},
 				copy : {
@@ -86,35 +84,75 @@ module.exports = function(grunt) {
 					}
 				},
 				uglify : {
-					options : {
-						preserveComments : false
-					},
-					dist : {
+					server : {
+						options : {
+							beautify : true
+						},
 						files : {
 							'<%= yeoman.dist %>/js/scripts.js' : [
-//									'bower_components/hammerjs/hammer.js',
+// 'bower_components/hammerjs/hammer.js',
 									'bower_components/angular/angular.js',
 									'bower_components/angular-resource/angular-resource.js',
 									'bower_components/angular-route/angular-route.js',
 									'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
 
-//									'bower_components/angular-animate/angular-animate.js',
-//									'bower_components/angular-aria/angular-aria.js',
-//									'bower_components/angular-material/angular-material.js',
+// 'bower_components/angular-animate/angular-animate.js',
+// 'bower_components/angular-aria/angular-aria.js',
+// 'bower_components/angular-material/angular-material.js',
 
-							//									'bower_components/jquery/dist/jquery.js',
-							//									'<%= yeoman.source %>/js/app.js',
-							//									'<%= yeoman.source %>/js/controllers.js'
+							// 'bower_components/jquery/dist/jquery.js',
+							// '<%= yeoman.source %>/js/app.js',
+							// '<%= yeoman.source %>/js/controllers.js'
+							],
+					
+							'<%= yeoman.dist %>/js/app.js' : [
+									'<%= yeoman.source %>/js/app.js',
+									'<%= yeoman.source %>/js/properties/development.js'
+							],
+						
+							'<%= yeoman.dist %>/js/controllers.js' : [
+									'<%= yeoman.source %>/js/controllers.js'
 							]
-						}
+						} 
+					},
+					dist : {
+						options : {
+							preserveComments : false,
+							report: 'min'
+						},
+						files : {
+							'<%= yeoman.dist %>/js/scripts.js' : [
+// 'bower_components/hammerjs/hammer.js',
+									'bower_components/angular/angular.js',
+									'bower_components/angular-resource/angular-resource.js',
+									'bower_components/angular-route/angular-route.js',
+									'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+
+// 'bower_components/angular-animate/angular-animate.js',
+// 'bower_components/angular-aria/angular-aria.js',
+// 'bower_components/angular-material/angular-material.js',
+
+							// 'bower_components/jquery/dist/jquery.js',
+							// '<%= yeoman.source %>/js/app.js',
+							// '<%= yeoman.source %>/js/controllers.js'
+							],
+							'<%= yeoman.dist %>/js/app.js' : [
+									'<%= yeoman.source %>/js/app.js',
+									'<%= yeoman.source %>/js/properties/production.js'
+							],
+							'<%= yeoman.dist %>/js/controllers.js' : [
+							      	'<%= yeoman.source %>/js/controllers.js'
+							]
+						} 
 					}
 				},
 			});
+	
 
 	grunt.registerTask('serve', [ 'clean', 'copy:css', 'sass:server',
-			'autoprefixer', 'uglify', 'watch' ]);
+			'autoprefixer', 'uglify:server' ]);
 	grunt.registerTask('build', [ 'clean', 'copy:css', 'sass:dist',
-			'autoprefixer', 'uglify' ]);
+			'autoprefixer', 'uglify:dist' ]);
 
 	grunt.registerTask('default', [ 'build' ]);
 };

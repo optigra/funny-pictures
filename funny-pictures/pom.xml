@@ -50,7 +50,7 @@
 		<api.domain.content.url>http://localhost:8080/funny-pictures-rest-api/api/content</api.domain.content.url>
 		<api.domain.meme.url>http://localhost:8080/funny-pictures-rest-api/meme</api.domain.meme.url>
 		<api.domain.picture.url>http://localhost:8080/funny-pictures-rest-api/picture</api.domain.picture.url>
-
+		<target.environment>serve</target.environment>	
 		<checkstyleDir>${basedir}/checks</checkstyleDir>
 		<findBugsDir>${basedir}/findbugs</findBugsDir>
 	</properties>
@@ -282,6 +282,7 @@
 				<api.output.json.pretty>true</api.output.json.pretty>
 				<api.domain.content.url>http://drawmeme.com/api/content</api.domain.content.url>
 				<migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
+				<target.environment>build</target.environment>	
 			</properties>
 		</profile>
 	</profiles>
