@@ -86,23 +86,27 @@ module.exports = function(grunt) {
 				uglify : {
 					server : {
 						options : {
+							mangle: false,
 							beautify : true
 						},
 						files : {
 							'<%= yeoman.dist %>/js/scripts.js' : [
-// 'bower_components/hammerjs/hammer.js',
+							  		'bower_components/jquery/dist/jquery.js',
+
+									'bower_components/masonry/dist/masonry.pkgd.js',
+									'bower_components/imagesloaded/imagesloaded.pkgd.js',
+							  		
+							        'bower_components/hammerjs/hammer.js',
 									'bower_components/angular/angular.js',
 									'bower_components/angular-resource/angular-resource.js',
 									'bower_components/angular-route/angular-route.js',
 									'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-
-// 'bower_components/angular-animate/angular-animate.js',
-// 'bower_components/angular-aria/angular-aria.js',
-// 'bower_components/angular-material/angular-material.js',
-
-							// 'bower_components/jquery/dist/jquery.js',
-							// '<%= yeoman.source %>/js/app.js',
-							// '<%= yeoman.source %>/js/controllers.js'
+									'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+									'<%= yeoman.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js',
+									'bower_components/angular-animate/angular-animate.js',
+								    'bower_components/angular-aria/angular-aria.js',
+									'bower_components/angular-material/angular-material.js',
+									'bower_components/angular-masonry/angular-masonry.js'
 							],
 					
 							'<%= yeoman.dist %>/js/app.js' : [
@@ -117,24 +121,28 @@ module.exports = function(grunt) {
 					},
 					dist : {
 						options : {
+							mangle: false,
 							preserveComments : false,
 							report: 'min'
 						},
 						files : {
 							'<%= yeoman.dist %>/js/scripts.js' : [
-// 'bower_components/hammerjs/hammer.js',
-									'bower_components/angular/angular.js',
-									'bower_components/angular-resource/angular-resource.js',
-									'bower_components/angular-route/angular-route.js',
-									'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+						       'bower_components/jquery/dist/jquery.js',
 
-// 'bower_components/angular-animate/angular-animate.js',
-// 'bower_components/angular-aria/angular-aria.js',
-// 'bower_components/angular-material/angular-material.js',
-
-							// 'bower_components/jquery/dist/jquery.js',
-							// '<%= yeoman.source %>/js/app.js',
-							// '<%= yeoman.source %>/js/controllers.js'
+								'bower_components/masonry/dist/masonry.pkgd.js',
+								'bower_components/imagesloaded/imagesloaded.pkgd.js',
+									
+								'bower_components/hammerjs/hammer.js',
+								'bower_components/angular/angular.js',
+								'bower_components/angular-resource/angular-resource.js',
+								'bower_components/angular-route/angular-route.js',
+								'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+								'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+								'<%= yeoman.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js',
+								'bower_components/angular-animate/angular-animate.js',
+								'bower_components/angular-aria/angular-aria.js',
+								'bower_components/angular-material/angular-material.js',
+								'bower_components/angular-masonry/angular-masonry.js'
 							],
 							'<%= yeoman.dist %>/js/app.js' : [
 									'<%= yeoman.source %>/js/app.js',

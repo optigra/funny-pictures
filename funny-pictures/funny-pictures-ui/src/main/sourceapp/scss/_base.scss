@@ -1,0 +1,21 @@
+// Font weights
+$light: 100;
+$regular: 300;
+$bold: 500;
+
+// Colors
+$main-color: #2196F3;
+$header-color: #333333;
+$text-color: #666666;
+$sub-text-color: #999999;
+$link-lighten-amount: 20%;
+
+// Animations
+$transition-duration: 0.2s;
+$transition-duration-long: 0.4s;
+$transition-animation: ease-in-out;
+$color-animation: color $transition-duration $transition-animation;
+$opacity-animation: opacity $transition-duration $transition-animation;
+$box-shadow-animation: box-shadow $transition-duration-long $transition-animation;
+
+@import "modules/utility";

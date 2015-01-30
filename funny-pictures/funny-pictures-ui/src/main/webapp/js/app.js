@@ -1,60 +1,60 @@
-var funnyPicturesApp = angular.module("mainModule", [ "ngResource", "ui.bootstrap", "ngRoute", "funnyControllers" ]);
+var funnyPicturesApp = angular.module("mainModule", [ "ngResource", "ui.bootstrap", "ngRoute", "funnyControllers", "ngMaterial", "wu.masonry" ]);
 
-funnyPicturesApp.factory("Pictures", function(a, b) {
-    return a(b.getApiUrl() + "/pictures/:id", {}, {
+funnyPicturesApp.factory("Pictures", function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + "/pictures/:id", {}, {
         query: {
             method: "GET",
             isArray: !1
         }
     });
-}), funnyPicturesApp.factory("PicturesThumbnails", function(a, b) {
-    return a(b.getApiUrl() + "/picturesthumb/:id", {}, {
+}), funnyPicturesApp.factory("PicturesThumbnails", function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + "/picturesthumb/:id", {}, {
         query: {
             method: "GET",
             isArray: !1
         }
     });
-}), funnyPicturesApp.factory("Funnies", function(a, b) {
-    return a(b.getApiUrl() + "/funnies/:id", {}, {
+}), funnyPicturesApp.factory("Funnies", function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + "/funnies/:id", {}, {
         query: {
             method: "GET",
             isArray: !1
         }
     });
-}), funnyPicturesApp.factory("FunnyPicturesThumbnails", function(a, b) {
-    return a(b.getApiUrl() + "/funniesthumb/:id", {}, {
+}), funnyPicturesApp.factory("FunnyPicturesThumbnails", function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + "/funniesthumb/:id", {}, {
         query: {
             method: "GET",
             isArray: !1
         }
     });
-}), funnyPicturesApp.factory("Feedback", function(a, b) {
-    return a(b.getApiUrl() + "/feedbacks/:id", {}, {
+}), funnyPicturesApp.factory("Feedback", function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + "/feedbacks/:id", {}, {
         query: {
             method: "GET",
             isArray: !1
         }
     });
-}), funnyPicturesApp.service("FileUpload", [ "$http", function(a) {
-    function b(a) {
-        return a.data.message;
+}), funnyPicturesApp.service("FileUpload", [ "$http", function($http) {
+    function handleError(response) {
+        return response.data.message;
     }
-    function c(a) {
-        return a.data;
+    function handleSuccess(response) {
+        return response.data;
     }
-    this.uploadFileToUrl = function(d, e) {
-        var f = new FormData();
-        f.append("content", d);
-        var g = a.post(e, f, {
+    this.uploadFileToUrl = function(file, uploadUrl) {
+        var fd = new FormData();
+        fd.append("content", file);
+        var request = $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
             headers: {
                 "Content-Type": void 0
             }
         });
-        return g.then(c, b);
+        return request.then(handleSuccess, handleError);
     };
-} ]), funnyPicturesApp.config([ "$routeProvider", function(a) {
-    a.when("/home", {
+} ]), funnyPicturesApp.config([ "$routeProvider", function($routeProvider) {
+    $routeProvider.when("/home", {
         templateUrl: "html/home.html",
         controller: "HomeController"
     }).when("/createTemplate", {
@@ -75,17 +75,20 @@ funnyPicturesApp.factory("Pictures", function(a, b) {
     }).otherwise({
         redirectTo: "/home"
     });
-} ]), funnyPicturesApp.directive("fileModel", [ "$parse", function(a) {
+} ]), funnyPicturesApp.directive("fileModel", [ "$parse", function($parse) {
     return {
         restrict: "A",
-        link: function(b, c, d) {
-            var e = a(d.fileModel), f = e.assign;
-            c.bind("change", function() {
-                var a = new FileReader();
-                a.onload = function(a) {
-                    $("#imagePreview").attr("src", a.target.result);
-                }, a.readAsDataURL(c[0].files[0]), b.$apply(function() {
-                    f(b, c[0].files[0]);
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel), modelSetter = model.assign;
+            element.bind("change", function() {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var image = $("#image-preview");
+                    image.fadeOut("fast", function() {
+                        image.attr("src", e.target.result), image.removeClass("hidden"), image.fadeIn("fast");
+                    });
+                }, reader.readAsDataURL(element[0].files[0]), scope.$apply(function() {
+                    modelSetter(scope, element[0].files[0]);
                 });
             });
         }
@@ -101,22 +104,22 @@ funnyPicturesApp.factory("Pictures", function(a, b) {
         templateUrl: "html/directives/footer.html"
     };
 }), funnyPicturesApp.service("SharedProperties", function() {
-    var a = {}, b = "http://localhost:8080/funny-pictures-rest-api/api", c = 0;
+    var generatedFunny = {}, apiUrl = "http://localhost:8080/funny-pictures-rest-api/api", templateId = 0;
     return {
         getApiUrl: function() {
-            return b;
+            return apiUrl;
         },
         getGeneratedFunny: function() {
-            return a;
+            return generatedFunny;
         },
-        setGeneratedFunny: function(b) {
-            a = b;
+        setGeneratedFunny: function(value) {
+            generatedFunny = value;
         },
-        setTemplateId: function(a) {
-            c = a;
+        setTemplateId: function(id) {
+            templateId = id;
         },
         getTemplateId: function() {
-            return c;
+            return templateId;
         }
     };
 });

@@ -1,164 +1,168 @@
 var funnyControllers = angular.module("funnyControllers", []);
 
-funnyControllers.controller("HomeController", [ "$scope", "$modal", "$location", "PicturesThumbnails", "Funnies", "SharedProperties", function(a, b, c, d, e, f) {
-    a.headerText = "", a.footerText = "", a.currentPage = 1, a.totalItems = 0, a.itemsPerPage = 8, 
-    a.thumbnailType = "BIG", d.query({
-        offset: (a.currentPage - 1) * a.itemsPerPage,
-        limit: a.itemsPerPage,
-        thumbnailType: a.thumbnailType
-    }, function(b) {
-        a.pictureThumbnails = b.entities, a.totalItems = b.count;
-    }, function() {
-        a.totalItems = 0;
-    }), a.pageChanged = function() {
-        d.query({
-            offset: (a.currentPage - 1) * a.itemsPerPage,
-            limit: a.itemsPerPage,
-            thumbnailType: a.thumbnailType
-        }, function(b) {
-            a.pictureThumbnails = b.entities, a.totalItems = b.count;
-        }, function() {
-            a.totalItems = 0;
+funnyControllers.controller("HomeController", [ "$scope", "$location", "$mdToast", "PicturesThumbnails", "Funnies", "SharedProperties", function($scope, $location, $mdToast, PicturesThumbnails, Funnies, SharedProperties) {
+    $scope.headerText = "", $scope.footerText = "", $scope.currentPage = 1, $scope.totalItems = 0, 
+    $scope.itemsPerPage = 8, $scope.thumbnailType = "MEDIUM", PicturesThumbnails.query({
+        offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+        limit: $scope.itemsPerPage,
+        thumbnailType: $scope.thumbnailType
+    }, function(data) {
+        $scope.pictureThumbnails = data.entities, $scope.totalItems = data.count;
+    }, function(error) {
+        $scope.totalItems = 0, $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
+    }), $scope.pageChanged = function() {
+        PicturesThumbnails.query({
+            offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+            limit: $scope.itemsPerPage,
+            thumbnailType: $scope.thumbnailType
+        }, function(data) {
+            $scope.pictureThumbnails = data.entities, $scope.totalItems = data.count;
+        }, function(error) {
+            $scope.totalItems = 0, $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
         });
-    }, a.showPagination = function() {
-        return a.totalItems > a.itemsPerPage;
-    }, a.createFunnyPicture = function(a) {
-        f.setTemplateId(a), c.path("/createFunnyPicture");
+    }, $scope.showPagination = function() {
+        return $scope.totalItems > $scope.itemsPerPage;
+    }, $scope.createFunnyPicture = function(templateId) {
+        SharedProperties.setTemplateId(templateId), $location.path("/createFunnyPicture");
+    }, $scope.go = function(path) {
+        $location.path(path);
     };
-} ]), funnyControllers.controller("PreviewFunnyController", [ "$scope", "SharedProperties", function(a, b) {
-    a.generatedImage = b.getGeneratedFunny();
-} ]), funnyControllers.controller("HeaderController", [ "$scope", "$location", function(a, b) {
-    a.isActive = function(a) {
-        return a === b.path();
+} ]), funnyControllers.controller("PreviewFunnyController", [ "$scope", "SharedProperties", function($scope, SharedProperties) {
+    $scope.generatedImage = SharedProperties.getGeneratedFunny();
+} ]), funnyControllers.controller("HeaderController", [ "$scope", "$location", function($scope, $location) {
+    $scope.isActive = function(viewLocation) {
+        return viewLocation === $location.path();
+    }, $scope.go = function(path) {
+        $location.path(path);
     };
-} ]), funnyControllers.controller("FunniesController", [ "$scope", "$modal", "FunnyPicturesThumbnails", function(a, b, c) {
-    a.funnies = {}, a.currentPage = 1, a.totalItems = 0, a.itemsPerPage = 8, a.thumbnailType = "BIG", 
-    a.modalOpen = function(a) {
-        b.open({
-            templateUrl: "html/modal/funnyPreviewModal.html",
+} ]), funnyControllers.controller("FunniesController", [ "$scope", "$mdDialog", "$mdToast", "FunnyPicturesThumbnails", function($scope, $mdDialog, $mdToast, FunnyPicturesThumbnails) {
+    $scope.funnies = {}, $scope.currentPage = 1, $scope.totalItems = 0, $scope.itemsPerPage = 8, 
+    $scope.thumbnailType = "MEDIUM", $scope.modalOpen = function(funnyThumbnail) {
+        $mdDialog.show({
             controller: "FunnyPreviewModalController",
+            templateUrl: "html/modal/funnyPreviewModal.tmpl.html",
             resolve: {
                 funnyThumbnail: function() {
-                    return a;
+                    return funnyThumbnail;
                 }
             }
         });
-    }, c.query({
-        offset: (a.currentPage - 1) * a.itemsPerPage,
-        limit: a.itemsPerPage,
-        thumbnailType: a.thumbnailType
-    }, function(b) {
-        a.funniesThumbnails = b.entities, a.totalItems = b.count;
-    }, function() {
-        a.totalItems = 0;
-    }), a.pageChanged = function() {
-        c.query({
-            offset: (a.currentPage - 1) * a.itemsPerPage,
-            limit: a.itemsPerPage,
-            thumbnailType: a.thumbnailType
-        }, function(b) {
-            a.funniesThumbnails = b.entities, a.totalItems = b.count;
-        }, function() {
-            a.totalItems = 0;
+    }, FunnyPicturesThumbnails.query({
+        offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+        limit: $scope.itemsPerPage,
+        thumbnailType: $scope.thumbnailType
+    }, function(data) {
+        $scope.funniesThumbnails = data.entities, $scope.totalItems = data.count;
+    }, function(error) {
+        $scope.totalItems = 0, $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
+    }), $scope.pageChanged = function() {
+        FunnyPicturesThumbnails.query({
+            offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+            limit: $scope.itemsPerPage,
+            thumbnailType: $scope.thumbnailType
+        }, function(data) {
+            $scope.funniesThumbnails = data.entities, $scope.totalItems = data.count;
+        }, function(error) {
+            $scope.totalItems = 0, $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
         });
-    }, a.showPagination = function() {
-        return a.totalItems > a.itemsPerPage;
+    }, $scope.showPagination = function() {
+        return $scope.totalItems > $scope.itemsPerPage;
     };
-} ]), funnyControllers.controller("FunnyPreviewModalController", [ "$scope", "$window", "$modalInstance", "funnyThumbnail", "Funnies", function(a, b, c, d, e) {
-    var f = d.funnyPictureId;
-    e.get({
-        id: f
-    }, function(b) {
-        a.funnyPicture = b;
-    }), a.cancel = function() {
-        c.dismiss("cancel");
-    }, a.fullSize = function() {
-        b.open(a.funnyPicture.url);
+} ]), funnyControllers.controller("FunnyPreviewModalController", [ "$scope", "$window", "$mdDialog", "funnyThumbnail", "Funnies", function($scope, $window, $mdDialog, funnyThumbnail, Funnies) {
+    var funnyPictureId = funnyThumbnail.funnyPictureId;
+    Funnies.get({
+        id: funnyPictureId
+    }, function(funnyPicture) {
+        $scope.funnyPicture = funnyPicture;
+    }), $scope.cancel = function() {
+        $mdDialog.cancel();
+    }, $scope.fullSize = function() {
+        $window.open($scope.funnyPicture.url);
     };
-} ]), funnyControllers.controller("CreatePictureController", [ "$scope", "$location", "$window", "FileUpload", "SharedProperties", "Pictures", function(a, b, c, d, e, f) {
-    a.pictureTitle = "", a.headerText = "", a.uploadFile = function() {
-        var g = e.getApiUrl() + "/content", h = a.myFile;
-        h ? d.uploadFileToUrl(h, g).then(function(c) {
-            var d = {
-                name: a.pictureTitle,
-                url: c.path
+} ]), funnyControllers.controller("CreatePictureController", [ "$scope", "$location", "$window", "$mdToast", "FileUpload", "SharedProperties", "Pictures", function($scope, $location, $window, $mdToast, FileUpload, SharedProperties, Pictures) {
+    $scope.pictureTitle = "", $scope.uploadFile = function() {
+        var uploadUrl = SharedProperties.getApiUrl() + "/content", file = $scope.myFile;
+        file ? FileUpload.uploadFileToUrl(file, uploadUrl).then(function(data) {
+            var pictureObject = {
+                name: $scope.pictureTitle,
+                url: data.path
             };
-            f.save(d, function(c) {
-                a.headerText = "File " + c + " uploaded to server!", b.path("/home");
-            }, function(b) {
-                a.headerText = "Error" + b.message;
+            Pictures.save(pictureObject, function(data) {
+                $mdToast.show($mdToast.simple().content("File " + data.name + " uploaded to server!").position("bottom left").hideDelay(5e3)), 
+                $location.path("/home");
+            }, function(error) {
+                $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
             });
-        }) : c.alert("Please select the file!");
+        }) : $mdToast.show($mdToast.simple().content("Please select the image!").position("bottom left").hideDelay(5e3));
+    }, $scope.isButtonDisabled = function() {
+        return !$scope.templateInputForm.$valid;
+    }, $scope.callUpload = function() {
+        $("#upload").click();
     };
-} ]), funnyControllers.controller("CreateFunnyPictureController", [ "$scope", "$window", "$modal", "$http", "SharedProperties", "Pictures", "Funnies", function(a, b, c, d, e, f, g) {
-    a.template = {}, a.funniesByTemplate = {}, a.currentPage = 1, a.totalItems = 0, 
-    a.itemsPerPage = 6, a.thumbnailType = "BIG", f.get({
-        id: e.getTemplateId()
-    }, function(b) {
-        a.template = b, d({
-            url: e.getApiUrl() + "/pictures/" + a.template.id + "/funniesThumb",
+} ]), funnyControllers.controller("CreateFunnyPictureController", [ "$scope", "$window", "$http", "$mdDialog", "$mdToast", "SharedProperties", "Pictures", "Funnies", function($scope, $window, $http, $mdDialog, $mdToast, SharedProperties, Pictures, Funnies) {
+    $scope.template = {}, $scope.funniesByTemplate = {}, $scope.currentPage = 1, $scope.totalItems = 0, 
+    $scope.itemsPerPage = 6, $scope.thumbnailType = "MEDIUM", Pictures.get({
+        id: SharedProperties.getTemplateId()
+    }, function(picture) {
+        $scope.template = picture, $http({
+            url: SharedProperties.getApiUrl() + "/pictures/" + $scope.template.id + "/funniesThumb",
             method: "GET",
             params: {
-                offset: (a.currentPage - 1) * a.itemsPerPage,
-                limit: a.itemsPerPage,
-                thumbnailType: a.thumbnailType
+                offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+                limit: $scope.itemsPerPage,
+                thumbnailType: $scope.thumbnailType
             }
-        }).success(function(b) {
-            a.funniesByTemplate = b.entities, a.totalItems = b.count;
-        }).error(function(a) {
-            console.log(a.statusText + " " + a.status);
+        }).success(function(data) {
+            $scope.funniesByTemplate = data.entities, $scope.totalItems = data.count;
+        }).error(function(error) {
+            $mdToast.show($mdToast.simple().content(error.statusText + " " + error.status).position("bottom left").hideDelay(5e3));
         });
-    }), a.createFunnyPicture = function() {
-        var b = new Object();
-        b.name = a.template.name, b.header = a.headerText, b.footer = a.footerText, b.template = {}, 
-        b.template.id = a.template.id, g.save(b, function(b) {
-            a.template = b;
-        }, function(a) {
-            console.log("Can't create picture" + a.statusText + " " + a.status);
+    }), $scope.createFunnyPicture = function() {
+        var postObject = new Object();
+        postObject.name = $scope.template.name, postObject.header = $scope.headerText, postObject.footer = $scope.footerText, 
+        postObject.template = {}, postObject.template.id = $scope.template.id, Funnies.save(postObject, function(data) {
+            $scope.template = data;
+        }, function(error) {
+            $mdToast.show($mdToast.simple().content("Can't create picture " + error.statusText + " " + error.status).position("bottom left").hideDelay(5e3));
         });
-    }, a.pageChanged = function() {
-        d({
-            url: e.getApiUrl() + "/pictures/" + a.template.id + "/funnies",
+    }, $scope.pageChanged = function() {
+        $http({
+            url: SharedProperties.getApiUrl() + "/pictures/" + $scope.template.id + "/funnies",
             method: "GET",
             params: {
-                offset: (a.currentPage - 1) * a.itemsPerPage,
-                limit: a.itemsPerPage
+                offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
+                limit: $scope.itemsPerPage
             }
-        }).success(function(b) {
-            a.funniesByTemplate = b.entities, a.totalItems = b.count;
-        }).error(function(a) {
-            console.log(a.statusText + " " + a.status);
+        }).success(function(data) {
+            $scope.funniesByTemplate = data.entities, $scope.totalItems = data.count;
+        }).error(function(error) {
+            $mdToast.show($mdToast.simple().content(error.statusText + " " + error.status).position("bottom left").hideDelay(5e3));
         });
-    }, a.modalOpen = function(a) {
-        console.log(a), c.open({
-            templateUrl: "html/modal/funnyPreviewModal.html",
+    }, $scope.modalOpen = function(funnyThumbnail) {
+        $mdDialog.show({
             controller: "FunnyPreviewModalController",
+            templateUrl: "html/modal/funnyPreviewModal.tmpl.html",
             resolve: {
                 funnyThumbnail: function() {
-                    return a;
+                    return funnyThumbnail;
                 }
             }
         });
-    }, a.isButtonDisabled = function() {
-        return a.funnyPictureText.$valid ? !1 : !0;
-    }, a.fullSize = function() {
-        b.open(a.template.url);
-    }, a.showPagination = function() {
-        return a.totalItems > a.itemsPerPage;
+    }, $scope.isButtonDisabled = function() {
+        return !$scope.funnyPictureText.$valid;
+    }, $scope.fullSize = function() {
+        $window.open($scope.template.url);
+    }, $scope.showPagination = function() {
+        return $scope.totalItems > $scope.itemsPerPage;
     };
-} ]), funnyControllers.controller("ContactController", [ "$scope", "Feedback", function(a, b) {
-    a.alerts = [], a.feedback = {
-        subject: "Select subject..."
-    }, a.sendFeedback = function() {
-        b.save(a.feedback, function(b, c) {
-            a.alerts.push({
-                type: "success",
-                msg: "Thank you " + a.feedback.name + ", your feedback was sent."
-            }), console.log(b + " " + c);
-        }, function(a) {
-            console.log("Feedback can't sent " + a.statusText + " " + a.status);
+} ]), funnyControllers.controller("ContactController", [ "$scope", "$mdToast", "Feedback", function($scope, $mdToast, Feedback) {
+    $scope.feedback = {}, $scope.sendFeedback = function() {
+        Feedback.save($scope.feedback, function() {
+            $mdToast.show($mdToast.simple().content("Thank you " + $scope.feedback.name + ", your feedback was sent.").position("bottom left").hideDelay(5e3));
+        }, function(error) {
+            $mdToast.show($mdToast.simple().content("Feedback can't sent " + error.statusText + " " + error.status).position("bottom left").hideDelay(5e3));
         });
-    }, a.isButtonDisabled = function() {
-        return a.contactForm.$valid ? !1 : !0;
+    }, $scope.isButtonDisabled = function() {
+        return !$scope.contactForm.$valid;
     };
 } ]);

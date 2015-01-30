@@ -1,0 +1,14 @@
+<md-dialog aria-label="{{funnyPicture.name}}">
+    <md-content>
+        <h2>{{funnyPicture.name}}</h2>
+        <img class="img-thumbnail" id="large-image" ng-src="{{funnyPicture.url}}">
+    </md-content>
+    <div class="md-actions" layout="row">
+        <md-button ng-click="fullSize()">
+            Open in full size
+        </md-button>
+        <md-button ng-click="cancel()" class="md-primary">
+            Close
+        </md-button>
+    </div>
+</md-dialog>

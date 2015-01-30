@@ -1,3 +1,11 @@
-@import "bootstrap-custom";
+// @import "vendor/bootstrap-custom";
+
+// @import "funny-pictures";
+
 @import "angular-material";
-@import "funny-pictures";
+@import "base";
+@import "partials/global";
+@import "partials/helper";
+@import "partials/home";
+@import "partials/create-picture";
+@import "partials/contact-us";

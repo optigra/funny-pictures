@@ -1,0 +1,35 @@
+a {
+    @include linkColor($main-color);
+    transition: $color-animation;
+}
+img {
+    height: auto;
+    max-width: 100%;
+    vertical-align: middle;
+    border: 0;
+}
+.pagination {
+    margin-top: 3em;
+}
+.md-toolbar-tools {
+    a {
+        &:hover, &:active, &:focus {
+            color: inherit;
+        }
+    }
+}
+md-input-container {
+    label {
+        color: rgba(0, 0, 0, .5) !important;
+    }
+}
+.footer {
+    margin: 60px auto 20px;
+    text-align: center;
+    color: $sub-text-color;
+    .copyright {
+        a {
+            color: $sub-text-color;
+        }
+    }
+}

@@ -1,44 +1,31 @@
-<div class="jumbotron jumbotron-sm">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 col-lg-12">
-                <h1 class="h1">
-                    Upload your template
-                </h1>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="container" id="mainContainer">
-    <div class="row">
-        <div class="col-lg-6">
-            <form name="templateInputForm" class="input-form">
-                <div class="form-group" ng-class="{ 'has-error': templateInputForm.pictureTitle.$invalid}">
-                    <label class="control-label"> Template title </label>
-                    <input type="text" placeholder="Picture title" name="pictureTitle" ng-model="pictureTitle"
-                           class="form-control" required/>
-                </div>
-                <div class="form-group" ng-class="{ 'has-error': templateInputForm.fileName.$invalid}">
-                    <label class="control-label">Browse path to file...</label>
-                    <div class="input-group">
-                        <span class="input-group-btn">
-                            <span class="btn btn-primary btn-file"> Browse&hellip;
-                                <input type="file" file-model="myFile" accept="image/*" >
-                            </span>
-                        </span>
-                        <input type="text" name="fileName" class="form-control" ng-model="myFile.name" readonly>
+<md-content class="md-padding create-piture" layout="row">
+    <div flex="50">
+        <md-card class="create-piture-form">
+            <h2>Upload your template</h2>
+            <md-card-content>
+                <form name="templateInputForm" class="input-form" novalidate>
+                    <md-input-container flex>
+                        <label>Template title</label>
+                        <input ng-model="pictureTitle" name="pictureTitle" required>
+                    </md-input-container>
+                    <div layout layout="column">
+                        <md-input-container layout="row" layout-align="center end">
+                            <md-button class="md-raised md-button" ng-click="callUpload()">Open image</md-button>
+                            <input id="upload" type="file" file-model="myFile" accept="image/*" style="display: none;" required>
+                        </md-input-container>
+                        <md-input-container flex>
+                            <label>File name</label>
+                            <input name="fileName" class="form-control" ng-model="myFile.name" readonly disabled required>
+                        </md-input-container>
                     </div>
-                </div>
-
-                <div>
-                    <button class="btn btn-primary" ng-click="uploadFile()" ng-disabled="isButtonDisabled()">
-                        Upload File
-                    </button>
-                </div>
-            </form>
-        </div>
-        <div class="col-lg-6 align-center">
-            <img id="imagePreview" src="" alt="your image" style="width: 100%"/>
-        </div>
+                    <div layout="row" layout-align="end center">
+                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="uploadFile()" ng-disabled="isButtonDisabled()">Upload File</md-button>
+                    </div>
+                </form>
+            </md-card-content>
+        </md-card>
     </div>
-</div>
+    <div class="image-preview-wrapper" flex="50">
+        <img id="image-preview" class="hidden" src alt="{{myFile.name}}" title="{{myFile.name}}" />
+    </div>
+</md-content>

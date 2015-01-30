@@ -1,85 +1,38 @@
-<div class="jumbotron jumbotron-sm">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 col-lg-12">
-                <h1 class="h1">
-                    Contact us
-                    <small>Feel free to contact us</small>
-                </h1>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="container">
-    <div class="row">
-        <div class="col-md-8">
-            <alert ng-repeat="alert in alerts" type="{{alert.type}}">{{alert.msg}}</alert>
-            <div class="well well-sm">
-                <form name="contactForm">
-
-                    <div class="row">
-                        <div class="col-md-6">
-
-                            <div class="form-group" ng-class="{ 'has-error': contactForm.name.$invalid }">
-                                <label class="control-label">Name</label>
-                                <input type="text" class="form-control" name="name" ng-model="feedback.name"
-                                       placeholder="Enter name" required/>
-                            </div>
-
-                            <div class="form-group" ng-class="{ 'has-error': contactForm.email.$invalid }">
-                                <label class="control-label">
-                                    Email Address</label>
-
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-envelope"></span>
-                                    </span>
-                                    <input type="email" class="form-control" ng-model="feedback.email"
-                                           name="email" placeholder="Enter email" required/>
-                                </div>
-                            </div>
-                            <div class="form-group">
-
-                                <label class="control-label">Subject</label>
-                                <select name="subject" ng-model="feedback.subject" class="form-control selectpicker"
-                                        required>
-                                    <option data-hidden="true">Select subject...</option>
-                                    <option value="Improvements">Improvements</option>
-                                    <option value="suggestions">Suggestions</option>
-                                    <option value="Report about bug">Report about bug</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group" ng-class="{ 'has-error': contactForm.message.$invalid }">
-                                <label class="control-label">Message</label>
-                                <textarea name="message" ng-model="feedback.text" class="form-control"
-                                          rows="9" cols="25" required placeholder="Message"></textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button ng-click="sendFeedback()" ng-disabled="isButtonDisabled()"
-                                    class="btn btn-primary pull-right">
-                                Send Message
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <form>
-                <legend><span class="glyphicon glyphicon-globe"></span> Our contacts</legend>
-                <address>
-                    <strong>Optigra</strong><br>
-                    12 Storozhenka St. Lviv <br>
-                    [Galicia] Ukraine<br>
-                </address>
-                <address>
-                    <strong>Full Name</strong><br>
-                    <a href="mailto:#">ask@optigra-soft.com</a>
-                </address>
+<md-content class="md-padding contact-us" layout="row">
+    <md-card class="contact-form" flex="66">
+        <h2>Feel free to contact us</h2>
+        <md-card-content>
+            <form name="contactForm">
+                <div layout layout="column">
+                    <md-input-container flex>
+                        <label>Name</label>
+                        <input ng-model="feedback.name" name="name" required>
+                    </md-input-container>
+                    <md-input-container flex>
+                        <label>Email</label>
+                        <input ng-model="feedback.email" name="email" type="email" required>
+                    </md-input-container>
+                </div>
+                <md-input-container flex>
+                    <label>Subject</label>
+                    <input ng-model="feedback.subject" name="subject" required>
+                </md-input-container>
+                <md-input-container flex>
+                    <label>Message</label>
+                    <textarea ng-model="feedback.text" columns="1" rows="4" name="message" required></textarea>
+                </md-input-container>
+                <div layout="row" layout-align="end center">
+                    <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="sendFeedback()" ng-disabled="isButtonDisabled()">Send Message</md-button>
+                </div>
             </form>
-        </div>
+        </md-card-content>
+    </md-card>
+    <div class="contact-details" flex="33">
+        <h3>Our contacts</h3>
+        <span>12 Storozhenka St., Lviv</span>
+        <span>[Galicia] Ukraine</span>
+        <strong>Email:</strong>
+        <a href="mailto:ask@optigra-soft.com" title="Send email">ask@optigra-soft.com</a>
     </div>
-</div>
+</md-content>
+

@@ -1,26 +1,10 @@
-<div class="jumbotron jumbotron-sm">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 col-lg-12">
-                <h1 class="h1">
-                    Created funny pictures
-                </h1>
-            </div>
+<div class="gallery-wrapper">
+    <div masonry="{ 'isFitWidth': true }" class="masonry">
+        <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyThumbnail in funniesThumbnails">
+            <a ng-click="modalOpen(funnyThumbnail)">
+                <img ng-src="{{funnyThumbnail.url}}" alt="">
+            </a>
         </div>
     </div>
-</div>
-<div class="container" id="mainContainer">
-    <div class="row">
-        <div ng-repeat="funnyThumbnail in funniesThumbnails"
-             class="col-lg-3 col-md-4 col-xs-6 thumb">
-            <a ng-click="modalOpen(funnyThumbnail)" class="flow-img" style="background-image: url({{funnyThumbnail.url}})"></a>
-        </div>
-    </div>
-    <div class="row align-center">
-        <div class="col-lg-12">
-            <pagination total-items="totalItems" ng-model="currentPage"
-                        items-per-page="itemsPerPage" ng-change="pageChanged()"
-                        ng-show="showPagination()"></pagination>
-        </div>
-    </div>
+    <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-show="showPagination()"></pagination>
 </div>

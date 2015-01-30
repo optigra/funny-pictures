@@ -1,50 +1,77 @@
 /**
  * Created by rostyslav on 9/29/14.
  */
-var funnyPicturesApp = angular.module('mainModule', ['ngResource', 'ui.bootstrap', 'ngRoute', 'funnyControllers']);
+var funnyPicturesApp = angular.module('mainModule', ['ngResource', 'ui.bootstrap', 'ngRoute', 'funnyControllers', 'ngMaterial', 'wu.masonry']);
 
-funnyPicturesApp.factory('Pictures', function ($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/pictures/:id', {}, {'query': {method: 'GET', isArray: false}});
+funnyPicturesApp.factory('Pictures', function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/pictures/:id', {}, {
+        'query': {
+            method: 'GET',
+            isArray: false
+        }
+    });
 });
 
-funnyPicturesApp.factory('PicturesThumbnails', function ($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/picturesthumb/:id', {}, {'query': {method: 'GET', isArray: false}});
+funnyPicturesApp.factory('PicturesThumbnails', function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/picturesthumb/:id', {}, {
+        'query': {
+            method: 'GET',
+            isArray: false
+        }
+    });
 });
 
-funnyPicturesApp.factory('Funnies', function ($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/funnies/:id', {}, {'query': {method: 'GET', isArray: false}});
+funnyPicturesApp.factory('Funnies', function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/funnies/:id', {}, {
+        'query': {
+            method: 'GET',
+            isArray: false
+        }
+    });
 });
 
-funnyPicturesApp.factory('FunnyPicturesThumbnails', function ($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/funniesthumb/:id', {}, {'query': {method: 'GET', isArray: false}});
+funnyPicturesApp.factory('FunnyPicturesThumbnails', function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/funniesthumb/:id', {}, {
+        'query': {
+            method: 'GET',
+            isArray: false
+        }
+    });
 });
 
-funnyPicturesApp.factory('Feedback', function ($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/feedbacks/:id', {}, {'query': {method: 'GET', isArray: false}});
+funnyPicturesApp.factory('Feedback', function($resource, SharedProperties) {
+    return $resource(SharedProperties.getApiUrl() + '/feedbacks/:id', {}, {
+        'query': {
+            method: 'GET',
+            isArray: false
+        }
+    });
 });
 
-funnyPicturesApp.service('FileUpload', ['$http', function ($http) {
-    this.uploadFileToUrl = function (file, uploadUrl) {
+funnyPicturesApp.service('FileUpload', ['$http', function($http) {
+    this.uploadFileToUrl = function(file, uploadUrl) {
         var fd = new FormData();
         fd.append('content', file);
         var request = $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
+            headers: {
+                'Content-Type': undefined
+            }
         });
-        return ( request.then(handleSuccess, handleError) );
+        return (request.then(handleSuccess, handleError));
     };
 
     function handleError(response) {
-        return(  response.data.message );
+        return (response.data.message);
     }
 
     function handleSuccess(response) {
-        return( response.data );
+        return (response.data);
     }
 
 }]);
 
-funnyPicturesApp.config(["$routeProvider" , function ($routeProvider) {
+funnyPicturesApp.config(["$routeProvider", function($routeProvider) {
     $routeProvider
         .when("/home", {
             templateUrl: "html/home.html",
@@ -70,25 +97,32 @@ funnyPicturesApp.config(["$routeProvider" , function ($routeProvider) {
             templateUrl: "html/contact.html",
             controller: 'ContactController'
         })
-        .otherwise({redirectTo: '/home'});
+        .otherwise({
+            redirectTo: '/home'
+        });
 }]);
 
-funnyPicturesApp.directive('fileModel', ['$parse', function ($parse) {
+funnyPicturesApp.directive('fileModel', ['$parse', function($parse) {
     return {
         restrict: 'A',
-        link: function (scope, element, attrs) {
+        link: function(scope, element, attrs) {
             var model = $parse(attrs.fileModel);
             var modelSetter = model.assign;
 
-            element.bind('change', function () {
+            element.bind('change', function() {
                 var reader = new FileReader();
 
-                reader.onload = function (e) {
-                    $('#imagePreview').attr('src', e.target.result);
+                reader.onload = function(e) {
+                    var image = $("#image-preview");
+                    image.fadeOut('fast', function() {
+                        image.attr('src', e.target.result);
+                        image.removeClass('hidden');
+                        image.fadeIn('fast');
+                    });
                 };
                 reader.readAsDataURL(element[0].files[0]);
 
-                scope.$apply(function () {
+                scope.$apply(function() {
                     modelSetter(scope, element[0].files[0]);
                 });
             });
@@ -97,7 +131,7 @@ funnyPicturesApp.directive('fileModel', ['$parse', function ($parse) {
 }]);
 
 
-funnyPicturesApp.directive('header', function () {
+funnyPicturesApp.directive('header', function() {
     return {
         restrict: 'E',
         templateUrl: "html/directives/header.html"
@@ -105,7 +139,7 @@ funnyPicturesApp.directive('header', function () {
     };
 });
 
-funnyPicturesApp.directive('footer', function () {
+funnyPicturesApp.directive('footer', function() {
     return {
         restrict: 'E',
         templateUrl: "html/directives/footer.html"

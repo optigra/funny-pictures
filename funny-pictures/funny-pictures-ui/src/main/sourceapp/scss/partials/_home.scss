@@ -1,0 +1,23 @@
+.gallery-wrapper {
+    margin: 3em auto 0;
+    width: 940px;
+    min-height: 1px;
+    text-align: center;
+}
+.masonry {
+    margin: 0 auto;
+}
+
+.masonry-brick {
+    margin: 0.6em;
+    display: none;
+    box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+    transition: $box-shadow-animation;
+    cursor: pointer;
+    &:hover {
+        box-shadow: 0px 8px 17px rgba(0, 0, 0, 0.2);
+    }
+    &.loaded {
+        display: block;
+    }
+}
