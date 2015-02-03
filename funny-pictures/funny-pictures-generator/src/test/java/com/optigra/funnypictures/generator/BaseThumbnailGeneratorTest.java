@@ -24,8 +24,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.optigra.funnypictures.generator.BaseAdviceMemeGenerator;
-import com.optigra.funnypictures.generator.BaseThumbnailGenerator;
 import com.optigra.funnypictures.generator.api.ThumbnailContext;
 import com.optigra.funnypictures.model.content.MimeType;
 
@@ -68,7 +66,7 @@ public class BaseThumbnailGeneratorTest {
 		
 		// Then
 		verify(convertCommand).run(convertOperationCaptor.capture(), anyVararg());
-		String expectedConvertCommand = "?img? -thumbnail 100x100^ -gravity center -extent 100x100 -unsharp 0.0x10.0 ?img? ";
+		String expectedConvertCommand = "?img? -thumbnail 100x100^ -gravity center -extent 100x100 ?img? ";
 		assertEquals(expectedConvertCommand, convertOperationCaptor.getAllValues().get(0).toString());
 	}
 
