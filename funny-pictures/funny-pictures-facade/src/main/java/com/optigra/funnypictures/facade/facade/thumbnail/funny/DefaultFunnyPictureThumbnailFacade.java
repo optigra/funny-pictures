@@ -90,7 +90,6 @@ public class DefaultFunnyPictureThumbnailFacade implements
 		PagedResult<FunnyPictureThumbnail> pagedResult = funnyPictureThumbnailService.getFunnyPictureThumbnailsByPicture(pagedSearch, id);
 		
 		List<FunnyPictureThumbnailResource> resources = funnyPictureThumbnailConverter.convertAll(pagedResult.getEntities());
-		
 		PagedResultResource<FunnyPictureThumbnailResource> pagedResultResource = new PagedResultResource<>("/funnies");
 		pagedResultResource.setEntities(resources);
 		pagedResultConverter.convert(pagedResult, pagedResultResource);

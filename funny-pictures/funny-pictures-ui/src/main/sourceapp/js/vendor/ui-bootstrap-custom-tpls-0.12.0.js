@@ -4,6 +4,8 @@
 
  * Version: 0.12.0 - 2014-11-16
  * License: MIT
+ * 
+ * Edited by Oleh Zasadnyy on 30.01.2015
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls","ui.bootstrap.pagination"]);
 angular.module("ui.bootstrap.tpls", ["template/pagination/pager.html","template/pagination/pagination.html"]);
@@ -224,14 +226,6 @@ angular.module('ui.bootstrap.pagination', [])
 
 angular.module("template/pagination/pager.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/pagination/pager.html",
-    "<ul class=\"pager\">\n" +
-    "  <li ng-class=\"{disabled: noPrevious(), previous: align}\"><a href ng-click=\"selectPage(page - 1)\">{{getText('previous')}}</a></li>\n" +
-    "  <li ng-class=\"{disabled: noNext(), next: align}\"><a href ng-click=\"selectPage(page + 1)\">{{getText('next')}}</a></li>\n" +
-    "</ul>");
-}]);
-
-angular.module("template/pagination/pager.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("template/pagination/pager.html",
     "<div class=\"pager\">" +
     "<md-button ng-disabled=\"noPrevious()\" ng-click=\"selectPage(1)\" class=\"md-primary\">{{getText('previous')}}</md-button>" +
     "<md-button ng-disabled=\"noNext()\" ng-click=\"selectPage(page + 1)\" class=\"md-primary\">{{getText('next')}}</md-button>" +
@@ -241,7 +235,7 @@ angular.module("template/pagination/pager.html", []).run(["$templateCache", func
 angular.module("template/pagination/pagination.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/pagination/pagination.html",
     "<div class=\"pagination\">" +
-    "<md-button ng-disabled=\"noPrevious()\" ng-click=\"selectPage(1)\" class=\"md-primary\">{{getText('previous')}}</md-button>" +
+    "<md-button ng-disabled=\"noPrevious()\" ng-click=\"selectPage(page - 1)\" class=\"md-primary\">{{getText('previous')}}</md-button>" +
     "<md-button ng-repeat=\"page in pages track by $index\" ng-disabled=\"page.active\" ng-click=\"selectPage(page.number)\" class=\"md-primary\">{{page.text}}</md-button>" +
     "<md-button ng-disabled=\"noNext()\" ng-click=\"selectPage(page + 1)\" class=\"md-primary\">{{getText('next')}}</md-button>" +
     "</div>");

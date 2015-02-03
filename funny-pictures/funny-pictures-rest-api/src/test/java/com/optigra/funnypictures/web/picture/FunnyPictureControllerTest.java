@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,6 +24,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.optigra.funnypictures.facade.facade.funny.FunnyPictureFacade;
+import com.optigra.funnypictures.facade.resources.message.MessageResource;
+import com.optigra.funnypictures.facade.resources.message.MessageType;
 import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
@@ -126,4 +129,22 @@ public class FunnyPictureControllerTest extends AbstractControllerTest {
        	
        	verify(funnyPictureFacade).createFunnyPicture(funnyPicture);
    	}
+    
+    @Test
+    public void testDeleteFunnyPicture() throws Exception {
+    	
+    	// Given
+    	Long id = 2L;
+    	
+    	// When
+    	MessageResource expectedResource = new MessageResource(MessageType.INFO, "Funny Picture Resource was deleted");
+    	String expectedResponse = objectMapper.writeValueAsString(expectedResource);
+    	
+    	// Then
+    	mockMvc.perform(delete("/funnies/{id}", id)
+    			.contentType(MediaType.APPLICATION_JSON))
+    			.andExpect(status().is(204))
+    			.andExpect(content().string(expectedResponse));
+    	verify(funnyPictureFacade).deleteFunnyPicture(id);
+    }
 }

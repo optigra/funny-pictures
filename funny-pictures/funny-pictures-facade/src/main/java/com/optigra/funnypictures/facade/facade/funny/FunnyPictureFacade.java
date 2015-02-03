@@ -46,4 +46,12 @@ public interface FunnyPictureFacade {
 	 * @return Paged result of funnies.
 	 */
 	PagedResultResource<FunnyPictureResource> getFunniesForPicture(Long id, PagedRequest pagedRequest);
+	
+	/**
+	 * Delete funny picture by id.
+	 * 
+	 * @param id
+	 *            funny picture id
+	 */
+	void deleteFunnyPicture(Long id);
 }

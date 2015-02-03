@@ -244,4 +244,10 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 				.getFunnyPicture(id);
 		return funnyPictureConverter.convert(funnyPicture);
 	}
+
+	@Override
+	public void deleteFunnyPicture(final Long id) {
+		FunnyPicture funnyPicture = funnyPictureService.getFunnyPicture(id);
+		funnyPictureService.deleteFunnyPicture(funnyPicture);
+	}
 }

@@ -3,6 +3,7 @@ package com.optigra.funnypictures.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -46,7 +47,7 @@ public class FunnyPicture implements Serializable {
 	@JoinColumn(name = "picture_id", nullable = false)
 	private Picture picture;
 	
-	@OneToMany(mappedBy = "funnyPicture")
+	@OneToMany(mappedBy = "funnyPicture", cascade = CascadeType.ALL)
 	private List<FunnyPictureThumbnail> thumbnails;
 	
 	public Long getId() {

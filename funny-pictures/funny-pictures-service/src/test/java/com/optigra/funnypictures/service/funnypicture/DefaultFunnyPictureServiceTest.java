@@ -14,7 +14,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.optigra.funnypictures.dao.funntypicture.FunnyPictureDao;
+import com.optigra.funnypictures.dao.funnypicture.FunnyPictureDao;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
