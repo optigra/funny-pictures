@@ -15,3 +15,7 @@ bower_components/
 .tmp/
 node/
 /node
+webapp/css/
+webapp/js/
+/webapp/css
+/webapp/js
