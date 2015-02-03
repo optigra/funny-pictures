@@ -6,6 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>funny-pictures-migrations</groupId>
 	<artifactId>funny-pictures-migrations</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>funny-pictures-migrations</name>
 	<url>http://maven.apache.org</url>
 
@@ -13,12 +14,6 @@
 		<checkstyleDir>${basedir}/../checks</checkstyleDir>
 		<findBugsDir>${basedir}/../findbugs</findBugsDir>
 	</properties>
-
-	<parent>
-		<groupId>funny-pictures</groupId>
-		<artifactId>funny-pictures</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
 
 	<dependencies>
 		<dependency>
