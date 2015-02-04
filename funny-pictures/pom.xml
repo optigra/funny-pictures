@@ -12,9 +12,9 @@
 	<url>http://maven.apache.org</url>
 
 	<scm>
-		<connection>scm:git:ssh://git@${vcs.release.alias}/path/to/funny-pictures.git</connection>
-		<developerConnection>scm:git:git@${vcs.release.alias}:path/to/funny-pictures.git</developerConnection>
-		<url>scm:git:ssh://git@${vcs.release.alias}/path/to/funny-pictures.git</url>
+		<connection>scm:git:ssh://git@${vcs.release.alias}/michael/funny-pictires.git</connection>
+		<developerConnection>scm:git:git@${vcs.release.alias}:michael/funny-pictires.git</developerConnection>
+		<url>scm:git:ssh://git@${vcs.release.alias}/michael/funny-pictires.git</url>
   	</scm>
   	
 	<distributionManagement>
