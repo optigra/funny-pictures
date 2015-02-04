@@ -1,16 +1,36 @@
-<div class="jumbotron jumbotron-sm">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 col-lg-12">
-                <h1 class="h1">
-                    Your funny picture. Enjoy :)
-                </h1>
+<md-content class="md-padding create-piture" layout="row">
+    <div flex="50">
+        <md-card class="create-piture-form">
+            <img ng-src="{{funnyPicture.url}}" ng-show="funnyPicture.url">
+            <md-card-content>
+                <div class="action-toolbar" layout="row" layout-align="space-between center">
+                    <div>
+                        <span>Share:</span>
+                        <ul class="social-share">
+                            <li>
+                                <a class="social-link flaticon-twitter" href="#" ng-click="shareSocial('https://twitter.com/home?status=',600,250)"></a>
+                            </li>
+                            <li>
+                                <a class="social-link flaticon-facebook" href="#" ng-click="shareSocial('https://www.facebook.com/sharer/sharer.php?u=',600,500)"></a>
+                            </li>
+                            <li>
+                                <a class="social-link flaticon-googleplus" href="#" ng-click="shareSocial('https://plus.google.com/share?url=',600,500)"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{funnyPicture.url}}" download="{{funnyPicture.name}}">Download</md-button>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <div class="image-preview-wrapper" flex="50">
+        <div masonry>
+            <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyByTemplate in funniesByTemplate">
+                <a ng-click="swapFunnyPicture(funnyByTemplate)">
+                    <img ng-src="{{funnyByTemplate.url}}" alt="">
+                </a>
             </div>
         </div>
+        <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-show="showPagination()"></pagination>
     </div>
-</div>
-<div class="container" id="mainContainer">
-    <div class="imagePreview">
-        <img class="img-thumbnail" ng-src="{{generatedImage.url}}">
-    </div>
-</div>
+</md-content>

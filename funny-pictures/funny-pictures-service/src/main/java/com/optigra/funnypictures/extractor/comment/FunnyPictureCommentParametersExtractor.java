@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import com.optigra.funnypictures.dao.comment.FunnyPictureCommentDao;
-import com.optigra.funnypictures.dao.funntypicture.FunnyPictureDao;
+import com.optigra.funnypictures.dao.funnypicture.FunnyPictureDao;
 import com.optigra.funnypictures.extractor.AbstractParametersExtractor;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.comment.FunnyPictureComment;

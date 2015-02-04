@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.optigra.funnypictures.facade.facade.funny.FunnyPictureFacade;
+import com.optigra.funnypictures.facade.resources.message.MessageResource;
+import com.optigra.funnypictures.facade.resources.message.MessageType;
 import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
@@ -64,7 +66,7 @@ public class FunnyPictureController extends BaseController {
 	 * @return Serialized Funny Picture Resource with all required fields.
 	 */
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public FunnyPictureResource getFunnyPictur(@PathVariable("id") final Long id) {
+	public FunnyPictureResource getFunnyPicture(@PathVariable("id") final Long id) {
 		LOG.info("Getting Funny Picture resource with id: {}", id);
 		return funnyPictureFacade.getFunnyPicture(id);
 	}
@@ -82,5 +84,20 @@ public class FunnyPictureController extends BaseController {
 		LOG.info("Create funny picture for {}", funnyPictureResource);
 
 		return funnyPictureFacade.createFunnyPicture(funnyPictureResource);
+	}
+	
+	/**
+	 * API for deleting FunnyPictureResource by it's identifier.
+	 * 
+	 * @param id Funny Picture Identifier.
+	 * 
+	 * @return Message with information about the result of operation.
+	 */
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public MessageResource deleteFunnyPicture(@PathVariable("id") final Long id) {
+		LOG.info("Deleting Funny Picture resource with id: {}", id);
+		funnyPictureFacade.deleteFunnyPicture(id);
+		return new MessageResource(MessageType.INFO, "Funny Picture Resource was deleted");
 	}
 }

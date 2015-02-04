@@ -1,10 +1,12 @@
-<div class="gallery-wrapper">
-    <div masonry="{ 'isFitWidth': true }" class="masonry">
-        <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyThumbnail in funniesThumbnails">
-            <a ng-click="modalOpen(funnyThumbnail)">
-                <img ng-src="{{funnyThumbnail.url}}" alt="">
-            </a>
-        </div>
-    </div>
-    <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-show="showPagination()"></pagination>
+<div layout="row">
+	<div class="gallery-wrapper" flex="80">
+	    <div masonry="{ 'isFitWidth': true }" class="masonry">
+	        <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyThumbnail in funniesThumbnails">
+	            <a ng-href="#/preview/{{funnyThumbnail.funnyPictureId}}">
+	                <img ng-src="{{funnyThumbnail.url}}" alt="">
+	            </a>
+	        </div>
+	    </div>
+	    <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-show="showPagination()"></pagination>
+	</div>
 </div>

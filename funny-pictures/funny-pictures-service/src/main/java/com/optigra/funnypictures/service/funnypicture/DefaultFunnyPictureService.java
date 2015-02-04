@@ -7,7 +7,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.optigra.funnypictures.dao.funntypicture.FunnyPictureDao;
+import com.optigra.funnypictures.dao.funnypicture.FunnyPictureDao;
 import com.optigra.funnypictures.dao.picture.PictureDao;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
@@ -56,6 +56,11 @@ public class DefaultFunnyPictureService implements FunnyPictureService {
 		pagedSearchWithParameter.setParameters(parameters);
 		
 		return funnyPictureDao.getFunnyPicturesByPicture(pagedSearchWithParameter);
+	}
+
+	@Override
+	public void deleteFunnyPicture(final FunnyPicture funnyPicture) {
+		funnyPictureDao.delete(funnyPicture);		
 	}
 
 }

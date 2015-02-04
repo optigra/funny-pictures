@@ -55,7 +55,6 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 			op.thumbnail(targetDimension.width, targetDimension.height, '^');
 			op.gravity("center");
 			op.extent(targetDimension.width, targetDimension.height);
-			op.unsharp(0.0, 10.0);
 			op.addImage();
 
 			Object[] args = new String[] {templateInput.toString(), result.toString()};

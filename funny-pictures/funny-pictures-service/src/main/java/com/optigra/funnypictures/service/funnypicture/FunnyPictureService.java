@@ -42,5 +42,9 @@ public interface FunnyPictureService {
 	 */
 	PagedResult<FunnyPicture> getFunnyPicturesByPicture(PagedSearch<FunnyPicture> pagedSearch, Long id);
 	
-	
+	/**
+	 * Method for deleting entity.
+	 * @param funnyPicture funny picture Appropriate entity.
+	 */
+	void deleteFunnyPicture(FunnyPicture funnyPicture);
 }
