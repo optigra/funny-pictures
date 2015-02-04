@@ -4,7 +4,7 @@
 
 	<groupId>funny-pictures</groupId>
 	<artifactId>funny-pictures</artifactId>
-	<version>0.0.7</version>
+	<version>0.0.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>funny-pictures</name>
@@ -14,7 +14,7 @@
 		<connection>scm:git:ssh://git@${vcs.release.alias}/michael/funny-pictires.git</connection>
 		<developerConnection>scm:git:git@${vcs.release.alias}:michael/funny-pictires.git</developerConnection>
 		<url>scm:git:ssh://git@${vcs.release.alias}/michael/funny-pictires.git</url>
-		<tag>v0.0.7-SNAPSHOT</tag>
+		<tag>HEAD</tag>
   </scm>
 	<distributionManagement>
 		<repository>
