@@ -12,9 +12,9 @@
 	<url>http://maven.apache.org</url>
 
 	<scm>
-		<connection>scm:git:ssh://git@git-release-host/path/to/funny-pictures.git</connection>
-		<developerConnection>scm:git:git@git-release-host:path/to/funny-pictures.git</developerConnection>
-		<url>scm:git:ssh://git@git-release-host/path/to/funny-pictures.git</url>
+		<connection>scm:git:ssh://git@${vcs.release.alias}/path/to/funny-pictures.git</connection>
+		<developerConnection>scm:git:git@${vcs.release.alias}:path/to/funny-pictures.git</developerConnection>
+		<url>scm:git:ssh://git@${vcs.release.alias}/path/to/funny-pictures.git</url>
   	</scm>
   	
 	<distributionManagement>
@@ -40,6 +40,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Release properties -->
+		<vcs.release.alias>git-release-host</vcs.release.alias>
 		<maven.release.plugin.version>2.5.1</maven.release.plugin.version>
 		<github.maven.repository>file:///home/jenkins/.build-artifacts</github.maven.repository>				
 		<release.arguments />
