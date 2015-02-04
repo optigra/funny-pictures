@@ -14,14 +14,14 @@
 	<parent>
 		<groupId>funny-pictures</groupId>
 		<artifactId>funny-pictures</artifactId>
-		<version>0.0.1</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>funny-pictures</groupId>
 			<artifactId>funny-pictures-domain</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
