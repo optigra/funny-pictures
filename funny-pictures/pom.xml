@@ -40,7 +40,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Release properties -->
-		<vcs.release.alias>git-release-host</vcs.release.alias>
+		<vcs.release.alias>gitserver</vcs.release.alias>
 		<maven.release.plugin.version>2.5.1</maven.release.plugin.version>
 		<github.maven.repository>file:///home/jenkins/.build-artifacts</github.maven.repository>				
 		<release.arguments />
