@@ -331,16 +331,6 @@
 				<module>funny-pictures-migrations</module>
 			</modules>
 			<properties>
-				<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
-				<jdbc.databaseurl>jdbc:postgresql://10.129.151.88:5432/optigra-funnypictures</jdbc.databaseurl>
-				<jdbc.username>postgres</jdbc.username>
-				<jdbc.password>hksda78_5!</jdbc.password>
-				<jpa.database>POSTGRESQL</jpa.database>
-				<jpa.showSql>true</jpa.showSql>
-				<content.repository.path>/home/duke/repository/funny-pictures</content.repository.path>
-				<api.output.json.pretty>true</api.output.json.pretty>
-				<api.domain.content.url>http://drawmeme.com/api/content</api.domain.content.url>
-				<migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
 				<target.environment>build</target.environment>
 			</properties>
 		</profile>
