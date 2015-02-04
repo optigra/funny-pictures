@@ -60,10 +60,10 @@ funnyPicturesApp.factory("Pictures", function($resource, SharedProperties) {
     }).when("/createTemplate", {
         templateUrl: "html/createPicture.html",
         controller: "CreatePictureController"
-    }).when("/createFunnyPicture", {
+    }).when("/createFunnyPicture/:templateId", {
         templateUrl: "html/createFunnyPicture.html",
         controller: "CreateFunnyPictureController"
-    }).when("/preview", {
+    }).when("/preview/:funnyPictureId", {
         templateUrl: "html/funnyPicturePreview.html",
         controller: "PreviewFunnyController"
     }).when("/funnies", {
@@ -93,6 +93,14 @@ funnyPicturesApp.factory("Pictures", function($resource, SharedProperties) {
             });
         }
     };
+} ]), funnyPicturesApp.run([ "$route", "$rootScope", "$location", function($route, $rootScope, $location) {
+    var original = $location.path;
+    $location.path = function(path, reload) {
+        if (reload === !1) var lastRoute = $route.current, un = $rootScope.$on("$locationChangeSuccess", function() {
+            $route.current = lastRoute, un();
+        });
+        return original.apply($location, [ path ]);
+    };
 } ]), funnyPicturesApp.directive("header", function() {
     return {
         restrict: "E",
@@ -104,7 +112,7 @@ funnyPicturesApp.factory("Pictures", function($resource, SharedProperties) {
         templateUrl: "html/directives/footer.html"
     };
 }), funnyPicturesApp.service("SharedProperties", function() {
-    var generatedFunny = {}, apiUrl = "http://localhost:8080/funny-pictures-rest-api/api", templateId = 0;
+    var generatedFunny = {}, apiUrl = "http://localhost:8080/funny-pictures-rest-api/api";
     return {
         getApiUrl: function() {
             return apiUrl;
@@ -114,12 +122,6 @@ funnyPicturesApp.factory("Pictures", function($resource, SharedProperties) {
         },
         setGeneratedFunny: function(value) {
             generatedFunny = value;
-        },
-        setTemplateId: function(id) {
-            templateId = id;
-        },
-        getTemplateId: function() {
-            return templateId;
         }
     };
 });

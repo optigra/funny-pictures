@@ -15,8 +15,8 @@
 		<connection>scm:git:ssh://git@${vcs.release.alias}/michael/funny-pictires.git</connection>
 		<developerConnection>scm:git:git@${vcs.release.alias}:michael/funny-pictires.git</developerConnection>
 		<url>scm:git:ssh://git@${vcs.release.alias}/michael/funny-pictires.git</url>
-  	</scm>
-  	
+	</scm>
+
 	<distributionManagement>
 		<repository>
 			<id>maven-repository</id>
@@ -42,7 +42,7 @@
 		<!-- Release properties -->
 		<vcs.release.alias>gitserver</vcs.release.alias>
 		<maven.release.plugin.version>2.5.1</maven.release.plugin.version>
-		<github.maven.repository>file:///home/jenkins/.build-artifacts</github.maven.repository>				
+		<github.maven.repository>file:///home/jenkins/.build-artifacts</github.maven.repository>
 		<release.arguments />
 
 		<version>0.0.1-SNAPSHOT</version>
@@ -55,7 +55,10 @@
 		<migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
 
 		<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
-		<jdbc.databaseurl>jdbc:postgresql://localhost:5432/optigra-funnypictures</jdbc.databaseurl>
+		<jdbc.host>localhost</jdbc.host>
+		<jdbc.port>5432</jdbc.port>
+		<jdbc.databasename>optigra-funnypictures</jdbc.databasename>
+		<jdbc.databaseurl>jdbc:postgresql://${jdbc.host}:${jdbc.port}/${jdbc.databasename}</jdbc.databaseurl>
 		<jdbc.username>postgres</jdbc.username>
 		<jdbc.password>postgres</jdbc.password>
 		<jpa.database>POSTGRESQL</jpa.database>
@@ -68,7 +71,7 @@
 		<api.domain.content.url>http://localhost:8080/funny-pictures-rest-api/api/content</api.domain.content.url>
 		<api.domain.meme.url>http://localhost:8080/funny-pictures-rest-api/meme</api.domain.meme.url>
 		<api.domain.picture.url>http://localhost:8080/funny-pictures-rest-api/picture</api.domain.picture.url>
-		<target.environment>serve</target.environment>	
+		<target.environment>serve</target.environment>
 		<checkstyleDir>${basedir}/checks</checkstyleDir>
 		<findBugsDir>${basedir}/findbugs</findBugsDir>
 	</properties>
@@ -115,7 +118,7 @@
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 
 		<!-- LOGGING -->
 		<dependency>
@@ -156,6 +159,34 @@
 	</dependencies>
 
 	<build>
+	<pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>org.liquibase</groupId>
+									<artifactId>liquibase-maven-plugin</artifactId>
+									<versionRange>[3.0.0,)</versionRange>
+									<goals>
+										<goal>update</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore />
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
+		</plugins>
+	</pluginManagement>	
 		<plugins>
 			<!-- Plugin for making releases -->
 			<plugin>
@@ -170,7 +201,7 @@
 					<localCheckout>true</localCheckout>
 					<!-- <goals>clean install</goals> -->
 				</configuration>
-			</plugin>			
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -290,12 +321,15 @@
 		</profile>
 		<profile>
 			<id>dump</id>
-			<properties>
-				<migrations.location>src/main/resources/migrations/db.changelog-initial-dataset.xml</migrations.location>
-			</properties>
+			<modules>
+				<module>funny-pictures-migrations</module>
+			</modules>
 		</profile>
 		<profile>
 			<id>production</id>
+			<modules>
+				<module>funny-pictures-migrations</module>
+			</modules>
 			<properties>
 				<jdbc.driverClassName>org.postgresql.Driver</jdbc.driverClassName>
 				<jdbc.databaseurl>jdbc:postgresql://10.129.151.88:5432/optigra-funnypictures</jdbc.databaseurl>
@@ -307,7 +341,7 @@
 				<api.output.json.pretty>true</api.output.json.pretty>
 				<api.domain.content.url>http://drawmeme.com/api/content</api.domain.content.url>
 				<migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
-				<target.environment>build</target.environment>	
+				<target.environment>build</target.environment>
 			</properties>
 		</profile>
 	</profiles>

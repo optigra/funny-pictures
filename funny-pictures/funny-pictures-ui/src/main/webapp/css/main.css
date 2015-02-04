@@ -6996,6 +6996,26 @@ md-tooltip[width-32="8"].md-show .md-background {
   -webkit-animation-duration: 200ms;
   animation-duration: 200ms; }
 
+@font-face {
+  font-family: "Flaticon";
+  src: url("../fonts/flaticon.eot");
+  src: url("../fonts/flaticon.eot#iefix") format("embedded-opentype"), url("../fonts/flaticon.woff") format("woff"), url("../fonts/flaticon.ttf") format("truetype"), url("../fonts/flaticon.svg") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+
+[class^="flaticon-"]:before, [class*=" flaticon-"]:before, [class^="flaticon-"]:after, [class*=" flaticon-"]:after {
+  font-family: Flaticon;
+  font-style: normal; }
+
+.flaticon-facebook:before {
+  content: "\e000"; }
+
+.flaticon-googleplus:before {
+  content: "\e001"; }
+
+.flaticon-twitter:before {
+  content: "\e002"; }
+
 a {
   color: #2196F3;
   transition: color 0.2s ease-in-out; }
@@ -7024,6 +7044,24 @@ md-input-container label {
   .footer .copyright a {
     color: #999999; }
 
+.loading {
+  background: rgba(255, 255, 255, 0.6);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1; }
+  .loading md-progress-circular {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); }
+
 .flow-img {
   overflow: hidden;
   width: 100%;
@@ -7041,7 +7079,6 @@ md-input-container label {
 
 .gallery-wrapper {
   margin: 3em auto 0;
-  width: 940px;
   min-height: 1px;
   text-align: center; }
 
@@ -7052,9 +7089,10 @@ md-input-container label {
   margin: 0.6em;
   display: none;
   box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
-  transition: box-shadow 0.4s ease-in-out;
+  transition: opacity 0.2s ease-in-out, box-shadow 0.4s ease-in-out;
   cursor: pointer; }
   .masonry-brick:hover {
+    opacity: 0.8;
     box-shadow: 0px 8px 17px rgba(0, 0, 0, 0.2); }
   .masonry-brick.loaded {
     display: block; }
@@ -7065,9 +7103,25 @@ md-input-container label {
     padding: 0 10px 20px; }
 
 .image-preview-wrapper {
-  padding: 50px; }
+  padding: 50px;
+  text-align: center; }
   .image-preview-wrapper img {
     width: 100%; }
+
+.action-toolbar {
+  margin-top: 0.8em; }
+  .action-toolbar button {
+    margin: 0 0.2em; }
+
+.social-share {
+  padding: 0;
+  display: inline-block;
+  list-style: none; }
+  .social-share li {
+    display: inline-block;
+    padding-left: 5px; }
+  .social-share .social-link {
+    text-decoration: none; }
 
 .contact-form {
   padding: 20px; }

@@ -6,14 +6,26 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>funny-pictures-migrations</groupId>
 	<artifactId>funny-pictures-migrations</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>funny-pictures-migrations</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
 		<checkstyleDir>${basedir}/../checks</checkstyleDir>
 		<findBugsDir>${basedir}/../findbugs</findBugsDir>
+		
+		<migration.username>${jdbc.username}</migration.username>
+		<migration.password>${jdbc.password}</migration.password>
+		<migration.host>${jdbc.host}</migration.host>
+		<migration.port>${jdbc.port}</migration.port>
+		<migration.databasename>${jdbc.databasename}</migration.databasename>
+		<migration.databaseurl>jdbc:postgresql://${migration.host}:${migration.port}/${migration.databasename}</migration.databaseurl>		
 	</properties>
+
+	<parent>
+		<groupId>funny-pictures</groupId>
+		<artifactId>funny-pictures</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
 
 	<dependencies>
 		<dependency>
@@ -31,17 +43,18 @@
 				<version>3.2.2</version>
 				<executions>
 					<execution>
+						<phase>process-resources</phase>
 						<goals>
-							<goal>status</goal>
+							<goal>update</goal>
 						</goals>
 					</execution>
 				</executions>
 				<configuration>
 					<changeLogFile>${migrations.location}</changeLogFile>
 					<driver>${jdbc.driverClassName}</driver>
-					<url>${jdbc.databaseurl}</url>
-					<username>${jdbc.username}</username>
-					<password>${jdbc.password}</password>
+					<url>${migration.databaseurl}</url>
+					<username>${migration.username}</username>
+					<password>${migration.password}</password>
 				</configuration>
 				<dependencies>
 					<dependency>
