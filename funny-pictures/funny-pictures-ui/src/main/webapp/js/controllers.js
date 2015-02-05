@@ -59,8 +59,8 @@ funnyControllers.controller("HomeController", [ "$scope", "$location", "$mdToast
 } ]), funnyControllers.controller("PreviewFunnyController", [ "$scope", "$routeParams", "$http", "$location", "$window", "$mdToast", "SharedProperties", "Funnies", function($scope, $routeParams, $http, $location, $window, $mdToast, SharedProperties, Funnies) {
     $scope.funnyPicture = {}, $scope.funniesByTemplate = {}, $scope.currentPage = 1, 
     $scope.totalItems = 0, $scope.itemsPerPage = 6, $scope.thumbnailType = "MEDIUM", 
-    $scope.currentUrl = encodeURIComponent($location.absUrl().split("#")[0] + "#/preview/"), 
-    $scope.currentLocation = $scope.currentUrl + $routeParams.funnyPictureId, Funnies.get({
+    $scope.currentUrl = $location.absUrl().split("#")[0] + "#/preview/", $scope.currentLocation = $scope.currentUrl + $routeParams.funnyPictureId, 
+    Funnies.get({
         id: $routeParams.funnyPictureId
     }, function(funnyPicture) {
         $scope.funnyPicture = funnyPicture, $http({
@@ -88,7 +88,7 @@ funnyControllers.controller("HomeController", [ "$scope", "$location", "$mdToast
                 thumbnailType: $scope.thumbnailType
             }
         }).success(function(data) {
-            $scope.funniesByTemplate = data.entities, console.log(data.entities), $scope.totalItems = data.count;
+            $scope.funniesByTemplate = data.entities, $scope.totalItems = data.count;
         }).error(function(error) {
             $mdToast.show($mdToast.simple().content(error.statusText + " " + error.status).position("bottom left").hideDelay(5e3));
         });
@@ -102,26 +102,30 @@ funnyControllers.controller("HomeController", [ "$scope", "$location", "$mdToast
             $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
         });
     }, $scope.shareSocial = function(baseUrl, width, height) {
-        var url = baseUrl + $scope.currentLocation;
+        var url = baseUrl + encodeURIComponent($scope.currentLocation);
         event.preventDefault(), $window.open(url, "_blank", "width=" + width + ",height=" + height);
     }, $scope.showPagination = function() {
         return $scope.totalItems > $scope.itemsPerPage;
     };
 } ]), funnyControllers.controller("CreatePictureController", [ "$scope", "$location", "$window", "$mdToast", "FileUpload", "SharedProperties", "Pictures", function($scope, $location, $window, $mdToast, FileUpload, SharedProperties, Pictures) {
-    $scope.pictureTitle = "", $scope.uploadFile = function() {
-        var uploadUrl = SharedProperties.getApiUrl() + "/content", file = $scope.myFile;
-        file ? FileUpload.uploadFileToUrl(file, uploadUrl).then(function(data) {
-            var pictureObject = {
-                name: $scope.pictureTitle,
-                url: data.path
-            };
-            Pictures.save(pictureObject, function(data) {
-                $mdToast.show($mdToast.simple().content("File " + data.name + " uploaded to server!").position("bottom left").hideDelay(5e3)), 
-                $location.path("/home");
-            }, function(error) {
-                $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
+    $scope.pictureTitle = "", $scope.pictureUrl = "", $scope.uploadFile = function() {
+        var uploadUrl = SharedProperties.getApiUrl() + "/content", file = $scope.myFile, urlToFile = $scope.pictureUrl;
+        if (file || urlToFile) {
+            var promiseFile = {};
+            file ? promiseFile = FileUpload.uploadFileToUrl(file, uploadUrl) : urlToFile && (promiseFile = FileUpload.uploadFileUrlToUrl(urlToFile, uploadUrl)), 
+            promiseFile.then(function(data) {
+                var pictureObject = {
+                    name: $scope.pictureTitle,
+                    url: data.path
+                };
+                Pictures.save(pictureObject, function(data) {
+                    $mdToast.show($mdToast.simple().content("File " + data.name + " uploaded to server!").position("bottom left").hideDelay(5e3)), 
+                    $location.path("/home");
+                }, function(error) {
+                    $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
+                });
             });
-        }) : $mdToast.show($mdToast.simple().content("Please select the image!").position("bottom left").hideDelay(5e3));
+        } else $mdToast.show($mdToast.simple().content("Please select the image!").position("bottom left").hideDelay(5e3));
     }, $scope.isButtonDisabled = function() {
         return !$scope.templateInputForm.$valid;
     }, $scope.callUpload = function() {

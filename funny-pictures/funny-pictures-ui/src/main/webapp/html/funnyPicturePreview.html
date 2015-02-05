@@ -2,6 +2,11 @@
     <div flex="50">
         <md-card class="create-piture-form">
             <img ng-src="{{funnyPicture.url}}" ng-show="funnyPicture.url">
+            <meta itemprop="image" content="{{funnyPicture.url}}">
+            <meta property="og:url" content="{{currentLocation}}" />
+            <meta property="og:image" content="{{funnyPicture.url}}" />
+            <meta name="twitter:site" content="{{currentLocation}}">
+            <meta name="twitter:image:src" content="{{funnyPicture.url}}">
             <md-card-content>
                 <div class="action-toolbar" layout="row" layout-align="space-between center">
                     <div>

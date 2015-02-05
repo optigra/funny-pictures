@@ -48,7 +48,20 @@ funnyPicturesApp.factory("Pictures", function($resource, SharedProperties) {
         var request = $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
             headers: {
+                content: "file",
                 "Content-Type": void 0
+            }
+        });
+        return request.then(handleSuccess, handleError);
+    }, this.uploadFileUrlToUrl = function(urlToFile, uploadUrl) {
+        var request = $http({
+            url: uploadUrl,
+            method: "POST",
+            headers: {
+                content: "url"
+            },
+            params: {
+                url: urlToFile
             }
         });
         return request.then(handleSuccess, handleError);

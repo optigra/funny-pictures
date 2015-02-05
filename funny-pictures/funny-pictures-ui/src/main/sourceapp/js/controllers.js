@@ -147,7 +147,7 @@ funnyControllers.controller('PreviewFunnyController', [
         $scope.totalItems = 0;
         $scope.itemsPerPage = 6;
         $scope.thumbnailType = "MEDIUM";
-        $scope.currentUrl = encodeURIComponent($location.absUrl().split('#')[0] + '#/preview/');
+        $scope.currentUrl = $location.absUrl().split('#')[0] + '#/preview/';
         $scope.currentLocation = $scope.currentUrl + $routeParams.funnyPictureId;
 
         Funnies.get({
@@ -222,7 +222,7 @@ funnyControllers.controller('PreviewFunnyController', [
         };
 
         $scope.shareSocial = function(baseUrl, width, height) {
-            var url = baseUrl + $scope.currentLocation;
+            var url = baseUrl + encodeURIComponent($scope.currentLocation);
             event.preventDefault();
             $window.open(url, "_blank", "width=" + width + ",height=" + height);
         };
