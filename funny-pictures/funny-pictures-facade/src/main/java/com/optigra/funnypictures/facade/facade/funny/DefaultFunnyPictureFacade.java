@@ -73,7 +73,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	private FunnyPictureThumbnailService funnyPictureThumbnailService;
 	
 	@Resource(name = "pagedRequestConverter")
-	private Converter<PagedRequest, PagedSearch<FunnyPicture>> pagedRequestConverter;
+	private Converter<PagedRequest<FunnyPictureResource>, PagedSearch<FunnyPicture>> pagedRequestConverter;
 
 	@Resource(name = "pagedSearchConverter")
 	private Converter<PagedResult<?>, PagedResultResource<? extends ApiResource>> pagedResultConverter;
@@ -86,16 +86,19 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	@Resource(name = "thumbnailGeneratorService")
 	private ThumbnailGeneratorService thumbnailGeneratorService;
-	
+
+	@Value("${funnies.missing.generate.thumbnails}")
+	private Boolean generateMissingFunnyThumbnails;
 
 	@Override
-	public PagedResultResource<FunnyPictureResource> getFunnies(final PagedRequest pagedRequest) {
+	public PagedResultResource<FunnyPictureResource> getFunnies(final PagedRequest<FunnyPictureResource> pagedRequest) {
 
 		LOG.info("Get funnies by paged request: {}", pagedRequest);
 
 		PagedSearch<FunnyPicture> pagedSearch = pagedRequestConverter.convert(pagedRequest);
 
 		PagedResult<FunnyPicture> pagedResult = funnyPictureService.getFunnyPictures(pagedSearch);
+		generateMissingFunnies(pagedResult.getEntities());
 
 		List<FunnyPictureResource> resources = funnyPictureConverter.convertAll(pagedResult.getEntities());
 
@@ -104,6 +107,26 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		pagedResultConverter.convert(pagedResult, pagedResultResource);
 
 		return pagedResultResource;
+	}
+
+	/**
+	 * Method for generating Missing Funnies.
+	 * @param funnies
+	 */
+	private void generateMissingFunnies(final List<FunnyPicture> funnies) {
+	
+		if (generateMissingFunnyThumbnails) {
+			
+			for (FunnyPicture picture : funnies) {
+				
+				if (picture.getThumbnails().isEmpty()) {
+					String path = picture.getUrl();
+					generateThumbnails(path, picture);
+				}
+			}
+			
+		}
+		
 	}
 
 	@Override
@@ -139,8 +162,20 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		FunnyPicture funnyPicture = saveFunnyPicture(funny, template, content);
 
 		// Generate thumbnails from the unlabelled version of the image
-		List<ThumbnailContent> thumbnails = thumbnailGeneratorService
-				.generateThumbnails(contentService.getContentByPath(unlabelledPicturePath));
+		generateThumbnails(unlabelledPicturePath, funnyPicture);
+		
+		return funnyPictureConverter.convert(funnyPicture);
+	}
+
+	/**
+	 * Method for generating Thumbnails.
+	 * @param path
+	 * @param funnyPicture
+	 */
+	private void generateThumbnails(final String path, final FunnyPicture funnyPicture) {
+		
+		List<ThumbnailContent> thumbnails = thumbnailGeneratorService.generateThumbnails(contentService.getContentByPath(path));
+		
 		for (ThumbnailContent thumbnailContent : thumbnails) {
 			ContentResource thumbnailResource = new ContentResource();
 			thumbnailResource.setMimeType(thumbnailContent.getMimeType());
@@ -148,11 +183,9 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 			thumbnailContent.setPath(thumbnailUrl);
 			contentService.saveContent(thumbnailContent);
 		}
+		
 		List<FunnyPictureThumbnail> funnyPictureThumbnails = createFunnyPictureThumbnails(thumbnails, funnyPicture);
 		funnyPicture.setThumbnails(funnyPictureThumbnails);
-		
-		
-		return funnyPictureConverter.convert(funnyPicture);
 	}
 	
 	/**
@@ -223,7 +256,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	}
 
 	@Override
-	public PagedResultResource<FunnyPictureResource> getFunniesForPicture(final Long id, final PagedRequest pagedRequest) {
+	public PagedResultResource<FunnyPictureResource> getFunniesForPicture(final Long id, final PagedRequest<FunnyPictureResource> pagedRequest) {
 		
 		PagedSearch<FunnyPicture> pagedSearch = pagedRequestConverter.convert(pagedRequest);
 		
@@ -250,4 +283,9 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		FunnyPicture funnyPicture = funnyPictureService.getFunnyPicture(id);
 		funnyPictureService.deleteFunnyPicture(funnyPicture);
 	}
+
+	public void setGenerateMissingFunnyThumbnails(final Boolean generateMissingFunnyThumbnails) {
+		this.generateMissingFunnyThumbnails = generateMissingFunnyThumbnails;
+	}
+
 }

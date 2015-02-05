@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -42,6 +43,7 @@ import com.optigra.funnypictures.generator.api.LabelledImageGenerator;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.content.MimeType;
+import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.queries.Queries;
@@ -69,7 +71,7 @@ public class DefaultFunnyPictureFacadeTest {
 	private FunnyPictureThumbnailService funnyPictureThumbnailService;
 
 	@Mock
-	private Converter<PagedRequest, PagedSearch<FunnyPicture>> pagedRequestConverter;
+	private Converter<PagedRequest<FunnyPictureResource>, PagedSearch<FunnyPicture>> pagedRequestConverter;
 
 	@Mock
 	private Converter<PagedResult<?>, PagedResultResource<? extends ApiResource>> pagedResultConverter;
@@ -91,22 +93,34 @@ public class DefaultFunnyPictureFacadeTest {
 	
 	@Captor
 	private ArgumentCaptor<Content> contentCaptor;
+
+	private Boolean generateMissingFunnyThumbnails = true;
+
+	@Before
+	public void setup() {
+		unit.setGenerateMissingFunnyThumbnails(generateMissingFunnyThumbnails);
+	}
 	
 	@Test
 	public void testGetFunnies() throws Exception {
 		// Given
-		PagedRequest pagedRequest = new PagedRequest(10, 10);
+		PagedRequest<FunnyPictureResource> pagedRequest = new PagedRequest<FunnyPictureResource>(10, 10);
 		List<FunnyPictureResource> funnyResources = Collections.singletonList(new FunnyPictureResource());
 		PagedResultResource<FunnyPictureResource> expectedFunnies = new PagedResultResource<>("/funnies");
 		expectedFunnies.setEntities(funnyResources);
 
 		PagedSearch<FunnyPicture> pagedSearch = new PagedSearch<FunnyPicture>(5, 7, Queries.FIND_PICTURES, Collections.<String, Object> emptyMap(),
 				FunnyPicture.class);
-		List<FunnyPicture> entities = Arrays.asList(new FunnyPicture());
+
+		FunnyPicture funnyPicture1 = new FunnyPicture();
+		FunnyPictureThumbnail thumbnail1 = new FunnyPictureThumbnail();
+		List<FunnyPictureThumbnail> thumbnails = Arrays.asList(thumbnail1);
+		funnyPicture1.setThumbnails(thumbnails);
+		List<FunnyPicture> entities = Arrays.asList(funnyPicture1);
 		PagedResult<FunnyPicture> pagedResult = new PagedResult<FunnyPicture>(8, 3, 5, entities);
 
 		// When
-		when(pagedRequestConverter.convert(any(PagedRequest.class))).thenReturn(pagedSearch);
+		when(pagedRequestConverter.convert(Matchers.<PagedRequest<FunnyPictureResource>>any())).thenReturn(pagedSearch);
 		when(funnyPictureService.getFunnyPictures(Matchers.<PagedSearch<FunnyPicture>> any())).thenReturn(pagedResult);
 		when(funnyPictureConverter.convertAll(anyListOf(FunnyPicture.class))).thenReturn(funnyResources);
 
@@ -117,7 +131,74 @@ public class DefaultFunnyPictureFacadeTest {
 		verify(funnyPictureService).getFunnyPictures(pagedSearch);
 		verify(funnyPictureConverter).convertAll(entities);
 		verify(pagedResultConverter).convert(pagedResult, expectedFunnies);
-
+		verify(thumbnailGeneratorService, times(0)).generateThumbnails(any(Content.class));
+		
+		assertEquals(expectedFunnies, actualFunnies);
+	}
+	
+	@Test
+	public void testGetFunniesWithEmptyThumbnails() throws Exception {
+		// Given
+		PagedRequest<FunnyPictureResource> pagedRequest = new PagedRequest<FunnyPictureResource>(10, 10);
+		List<FunnyPictureResource> funnyResources = Collections.singletonList(new FunnyPictureResource());
+		PagedResultResource<FunnyPictureResource> expectedFunnies = new PagedResultResource<>("/funnies");
+		expectedFunnies.setEntities(funnyResources);
+		
+		PagedSearch<FunnyPicture> pagedSearch = new PagedSearch<FunnyPicture>(5, 7, Queries.FIND_PICTURES, Collections.<String, Object> emptyMap(),
+				FunnyPicture.class);
+		
+		FunnyPicture funnyPicture1 = new FunnyPicture();
+		List<FunnyPictureThumbnail> thumbnails = Collections.emptyList();
+		funnyPicture1.setThumbnails(thumbnails);
+		List<FunnyPicture> entities = Arrays.asList(funnyPicture1);
+		PagedResult<FunnyPicture> pagedResult = new PagedResult<FunnyPicture>(8, 3, 5, entities);
+		
+		// When
+		when(pagedRequestConverter.convert(Matchers.<PagedRequest<FunnyPictureResource>>any())).thenReturn(pagedSearch);
+		when(funnyPictureService.getFunnyPictures(Matchers.<PagedSearch<FunnyPicture>> any())).thenReturn(pagedResult);
+		when(funnyPictureConverter.convertAll(anyListOf(FunnyPicture.class))).thenReturn(funnyResources);
+		
+		PagedResultResource<FunnyPictureResource> actualFunnies = unit.getFunnies(pagedRequest);
+		
+		// Then
+		verify(pagedRequestConverter).convert(pagedRequest);
+		verify(funnyPictureService).getFunnyPictures(pagedSearch);
+		verify(funnyPictureConverter).convertAll(entities);
+		verify(pagedResultConverter).convert(pagedResult, expectedFunnies);
+		verify(thumbnailGeneratorService).generateThumbnails(any(Content.class));
+		
+		assertEquals(expectedFunnies, actualFunnies);
+	}
+	
+	@Test
+	public void testGetFunniesWithDisabled() throws Exception {
+		// Given
+		unit.setGenerateMissingFunnyThumbnails(false);
+		
+		PagedRequest<FunnyPictureResource> pagedRequest = new PagedRequest<FunnyPictureResource>(10, 10);
+		List<FunnyPictureResource> funnyResources = Collections.singletonList(new FunnyPictureResource());
+		PagedResultResource<FunnyPictureResource> expectedFunnies = new PagedResultResource<>("/funnies");
+		expectedFunnies.setEntities(funnyResources);
+		
+		PagedSearch<FunnyPicture> pagedSearch = new PagedSearch<FunnyPicture>(5, 7, Queries.FIND_PICTURES, Collections.<String, Object> emptyMap(),
+				FunnyPicture.class);
+		List<FunnyPicture> entities = Arrays.asList(new FunnyPicture());
+		PagedResult<FunnyPicture> pagedResult = new PagedResult<FunnyPicture>(8, 3, 5, entities);
+		
+		// When
+		when(pagedRequestConverter.convert(Matchers.<PagedRequest<FunnyPictureResource>>any())).thenReturn(pagedSearch);
+		when(funnyPictureService.getFunnyPictures(Matchers.<PagedSearch<FunnyPicture>> any())).thenReturn(pagedResult);
+		when(funnyPictureConverter.convertAll(anyListOf(FunnyPicture.class))).thenReturn(funnyResources);
+		
+		PagedResultResource<FunnyPictureResource> actualFunnies = unit.getFunnies(pagedRequest);
+		
+		// Then
+		verify(pagedRequestConverter).convert(pagedRequest);
+		verify(funnyPictureService).getFunnyPictures(pagedSearch);
+		verify(funnyPictureConverter).convertAll(entities);
+		verify(pagedResultConverter).convert(pagedResult, expectedFunnies);
+		verify(thumbnailGeneratorService, times(0)).generateThumbnails(any(Content.class));
+		
 		assertEquals(expectedFunnies, actualFunnies);
 	}
 	

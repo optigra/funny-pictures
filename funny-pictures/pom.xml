@@ -73,6 +73,8 @@
 		<target.environment>serve</target.environment>
 		<checkstyleDir>${basedir}/checks</checkstyleDir>
 		<findBugsDir>${basedir}/findbugs</findBugsDir>
+		
+		<funnies.missing.generate.thumbnails>false</funnies.missing.generate.thumbnails>
 	</properties>
 
 	<dependencies>

@@ -48,11 +48,10 @@ public class FunnyPictureController extends BaseController {
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(method = RequestMethod.GET)
 	public PagedResultResource<FunnyPictureResource> getFunnies(@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
-			@RequestParam(value = "limit", defaultValue = "20") final Integer limit) {
-
+			@RequestParam(value = "limit", defaultValue = "20") final Integer limit,
+			final FunnyPictureResource resource) {
 		LOG.info("Get funnies: offset [{}] limit [{}] ", offset, limit);
-
-		PagedRequest pagedRequest = new PagedRequest(offset, limit);
+		PagedRequest<FunnyPictureResource> pagedRequest = new PagedRequest<FunnyPictureResource>(resource, offset, limit);
 
 		return funnyPictureFacade.getFunnies(pagedRequest);
 	}

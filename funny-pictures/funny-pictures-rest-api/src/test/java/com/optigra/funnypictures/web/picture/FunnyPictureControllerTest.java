@@ -67,7 +67,8 @@ public class FunnyPictureControllerTest extends AbstractControllerTest {
 		expectedResource.setUri(uri);
 		expectedResource.setEntities(entities);
     	
-		PagedRequest pagedRequest = new PagedRequest(offset, limit);
+		FunnyPictureResource resource = new FunnyPictureResource();
+		PagedRequest<FunnyPictureResource> pagedRequest = new PagedRequest<FunnyPictureResource>(resource, offset, limit);
 		
 		// When
     	String expectedResponse = getJson(expectedResource, false);

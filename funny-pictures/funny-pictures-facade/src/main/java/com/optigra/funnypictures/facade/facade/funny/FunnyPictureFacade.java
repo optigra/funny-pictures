@@ -18,7 +18,7 @@ public interface FunnyPictureFacade {
 	 *            request with offset and limit
 	 * @return Paged result with funny picture resource
 	 */
-	PagedResultResource<FunnyPictureResource> getFunnies(PagedRequest pagedRequest);
+	PagedResultResource<FunnyPictureResource> getFunnies(PagedRequest<FunnyPictureResource> pagedRequest);
 
 	/**
 	 * Method create funny picture.
@@ -45,7 +45,7 @@ public interface FunnyPictureFacade {
 	 * @param pagedRequest Paged request.
 	 * @return Paged result of funnies.
 	 */
-	PagedResultResource<FunnyPictureResource> getFunniesForPicture(Long id, PagedRequest pagedRequest);
+	PagedResultResource<FunnyPictureResource> getFunniesForPicture(Long id, PagedRequest<FunnyPictureResource> pagedRequest);
 	
 	/**
 	 * Delete funny picture by id.
