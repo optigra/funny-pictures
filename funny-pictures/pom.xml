@@ -4,7 +4,7 @@
 
 	<groupId>funny-pictures</groupId>
 	<artifactId>funny-pictures</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>funny-pictures</name>
