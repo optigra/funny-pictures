@@ -5,22 +5,22 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt);
     grunt
         .initConfig({
-            yeoman: {
+            app: {
                 source: 'src/main/sourceapp',
                 dist: 'src/main/webapp'
             },
             watch: {
                 sass: {
-                    files: ['<%= yeoman.source %>/scss/**/*.{scss,sass}'],
+                    files: ['<%= app.source %>/scss/**/*.{scss,sass}'],
                     tasks: ['sass:server', 'autoprefixer:dist']
                 },
                 scripts: {
-                    files: ['<%= yeoman.source %>/js/**/*.{js}'],
+                    files: ['<%= app.source %>/js/**/*.{js}'],
                     tasks: ['uglify:dist']
                 }
             },
             clean: {
-                dist: ['.tmp', '<%= yeoman.dist %>/css', '<%= yeoman.dist %>/js']
+                dist: ['.tmp', '<%= app.dist %>/css', '<%= app.dist %>/js']
 
             },
             copy: {
@@ -49,7 +49,7 @@ module.exports = function(grunt) {
                     },
                     files: [{
                         expand: true,
-                        cwd: '<%= yeoman.source %>/scss',
+                        cwd: '<%= app.source %>/scss',
                         src: '**/*.{scss,sass}',
                         dest: '.tmp/css',
                         ext: '.css'
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
                     },
                     files: [{
                         expand: true,
-                        cwd: '<%= yeoman.source %>/scss',
+                        cwd: '<%= app.source %>/scss',
                         src: '**/*.{scss,sass}',
                         dest: '.tmp/css',
                         ext: '.css'
@@ -77,7 +77,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: '.tmp/css',
                         src: '**/*.css',
-                        dest: '<%= yeoman.dist %>/css'
+                        dest: '<%= app.dist %>/css'
                     }]
                 }
             },
@@ -88,7 +88,7 @@ module.exports = function(grunt) {
                         beautify: true
                     },
                     files: {
-                        '<%= yeoman.dist %>/js/scripts.js': [
+                        '<%= app.dist %>/js/scripts.js': [
                             'bower_components/jquery/dist/jquery.js',
 
                             'bower_components/masonry/dist/masonry.pkgd.js',
@@ -102,16 +102,16 @@ module.exports = function(grunt) {
                             'bower_components/angular-aria/angular-aria.js',
                             'bower_components/angular-material/angular-material.js',
                             'bower_components/angular-masonry/angular-masonry.js',
-                            '<%= yeoman.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
+                            '<%= app.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
                         ],
 
-                        '<%= yeoman.dist %>/js/app.js': [
-                            '<%= yeoman.source %>/js/app.js',
-                            '<%= yeoman.source %>/js/properties/development.js'
+                        '<%= app.dist %>/js/app.js': [
+                            '<%= app.source %>/js/app.js',
+                            '<%= app.source %>/js/properties/development.js'
                         ],
 
-                        '<%= yeoman.dist %>/js/controllers.js': [
-                            '<%= yeoman.source %>/js/controllers.js'
+                        '<%= app.dist %>/js/controllers.js': [
+                            '<%= app.source %>/js/controllers.js'
                         ]
                     }
                 },
@@ -122,7 +122,7 @@ module.exports = function(grunt) {
                         report: 'min'
                     },
                     files: {
-                        '<%= yeoman.dist %>/js/scripts.js': [
+                        '<%= app.dist %>/js/scripts.js': [
                             'bower_components/jquery/dist/jquery.js',
 
                             'bower_components/masonry/dist/masonry.pkgd.js',
@@ -136,18 +136,18 @@ module.exports = function(grunt) {
                             'bower_components/angular-aria/angular-aria.js',
                             'bower_components/angular-material/angular-material.js',
                             'bower_components/angular-masonry/angular-masonry.js',
-                            '<%= yeoman.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
+                            '<%= app.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
                         ],
-                        '<%= yeoman.dist %>/js/app.js': [
-                            '<%= yeoman.source %>/js/app.js',
-                            '<%= yeoman.source %>/js/properties/production.js'
+                        '<%= app.dist %>/js/app.js': [
+                            '<%= app.source %>/js/app.js',
+                            '<%= app.source %>/js/properties/production.js'
                         ],
-                        '<%= yeoman.dist %>/js/controllers.js': [
-                            '<%= yeoman.source %>/js/controllers.js'
+                        '<%= app.dist %>/js/controllers.js': [
+                            '<%= app.source %>/js/controllers.js'
                         ]
                     }
                 }
-            },
+            }
         });
 
 

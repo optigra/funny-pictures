@@ -193,7 +193,6 @@ funnyControllers.controller('PreviewFunnyController', [
                 }
             }).success(function(data, status) {
                 $scope.funniesByTemplate = data.entities;
-                console.log(data.entities);
                 $scope.totalItems = data.count;
             }).error(function(error) {
                 $mdToast.show(
@@ -222,8 +221,8 @@ funnyControllers.controller('PreviewFunnyController', [
             });
         };
 
-        $scope.shareSocial = function (baseUrl, width, height) {
-            var url =  baseUrl + $scope.currentLocation;
+        $scope.shareSocial = function(baseUrl, width, height) {
+            var url = baseUrl + $scope.currentLocation;
             event.preventDefault();
             $window.open(url, "_blank", "width=" + width + ",height=" + height);
         };
@@ -245,11 +244,19 @@ funnyControllers.controller('CreatePictureController', [
     function($scope, $location, $window, $mdToast, FileUpload, SharedProperties,
         Pictures) {
         $scope.pictureTitle = "";
+        $scope.pictureUrl = "";
         $scope.uploadFile = function() {
             var uploadUrl = SharedProperties.getApiUrl() + "/content";
             var file = $scope.myFile;
-            if (file) {
-                FileUpload.uploadFileToUrl(file, uploadUrl).then(
+            var urlToFile = $scope.pictureUrl;
+            if (file || urlToFile) {
+                var promiseFile = {};
+                if (file) {
+                    promiseFile = FileUpload.uploadFileToUrl(file, uploadUrl);
+                } else if (urlToFile) {
+                    promiseFile = FileUpload.uploadFileUrlToUrl(urlToFile, uploadUrl);
+                }
+                promiseFile.then(
                     function(data) {
                         var pictureObject = {
                             name: $scope.pictureTitle,
@@ -273,7 +280,8 @@ funnyControllers.controller('CreatePictureController', [
                                 );
                             }
                         );
-                    });
+                    }
+                );
             } else {
                 $mdToast.show(
                     $mdToast.simple()

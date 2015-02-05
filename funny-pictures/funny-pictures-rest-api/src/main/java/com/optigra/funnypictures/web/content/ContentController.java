@@ -2,6 +2,8 @@ package com.optigra.funnypictures.web.content;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +35,7 @@ public class ContentController extends BaseController {
 
 	@Resource(name = "contentFacade")
 	private ContentFacade contentFacade;
+	
 
 	/**
 	 * Method for getting file by its contentPath.
@@ -62,12 +65,42 @@ public class ContentController extends BaseController {
 	 * @throws Exception All exception handling is being done in {@link BaseController.handleException} 
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST, headers = { "content=file" })
 	public ContentResource postContent(@RequestParam("content") final MultipartFile file) throws Exception {
 
 		InputStream istream = file.getInputStream();
 
 		MimeType mimeType = MimeType.fromType(file.getContentType());
+
+		ContentResource contentResource = new ContentResource();
+		contentResource.setContentStream(istream);
+		contentResource.setMimeType(mimeType);
+
+		return contentFacade.storeContent(contentResource);
+	}
+
+	/**
+	 * Method for storing file content from given URL.
+	 * @param url appropriate file url
+	 * @return ContentResource(all information about stored content)
+	 * @throws Exception All exception handling is being done in {@link BaseController.handleException} 
+	 */
+	@ResponseStatus(HttpStatus.CREATED)
+	@RequestMapping(method = RequestMethod.POST, headers = { "content=url" })
+	public ContentResource createContentFromUrl(@RequestParam("url") final String url) throws Exception {
+		URL urlToUrl = new URL(url);
+		urlToUrl.openConnection();
+	    HttpURLConnection connection = (HttpURLConnection) urlToUrl.openConnection();
+	    connection.setRequestMethod("HEAD");
+	    connection.connect();
+	    String contentType = connection.getContentType();
+	    if (!contentType.startsWith("image")) {
+	        throw new Exception("Requested url is not an image!");
+	    }
+		
+		InputStream istream = urlToUrl.openStream();
+
+		MimeType mimeType = MimeType.fromType(contentType);
 
 		ContentResource contentResource = new ContentResource();
 		contentResource.setContentStream(istream);

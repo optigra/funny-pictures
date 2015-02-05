@@ -55,7 +55,22 @@ funnyPicturesApp.service('FileUpload', ['$http', function($http) {
         var request = $http.post(uploadUrl, fd, {
             transformRequest: angular.identity,
             headers: {
+                'content': 'file',
                 'Content-Type': undefined
+            }
+        });
+        return (request.then(handleSuccess, handleError));
+    };
+
+    this.uploadFileUrlToUrl = function(urlToFile, uploadUrl) {
+        var request = $http({
+            url: uploadUrl,
+            method: "POST",
+            headers: {
+                'content': 'url'
+            },
+            params: {
+                url: urlToFile
             }
         });
         return (request.then(handleSuccess, handleError));
@@ -130,12 +145,12 @@ funnyPicturesApp.directive('fileModel', ['$parse', function($parse) {
     };
 }]);
 
-funnyPicturesApp.run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+funnyPicturesApp.run(['$route', '$rootScope', '$location', function($route, $rootScope, $location) {
     var original = $location.path;
-    $location.path = function (path, reload) {
+    $location.path = function(path, reload) {
         if (reload === false) {
             var lastRoute = $route.current;
-            var un = $rootScope.$on('$locationChangeSuccess', function () {
+            var un = $rootScope.$on('$locationChangeSuccess', function() {
                 $route.current = lastRoute;
                 un();
             });

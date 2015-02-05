@@ -8,14 +8,19 @@
                         <label>Template title</label>
                         <input ng-model="pictureTitle" name="pictureTitle" required>
                     </md-input-container>
+                    <md-input-container flex>
+                        <label>Image url</label>
+                        <input type="url" ng-pattern="/\.jpg|\.jpeg|\.png|\.gif$/" ng-disabled="myFile" ng-model="pictureUrl" name="pictureUrl" ng-required="!myFile">
+                    </md-input-container>
+                    <span class="text-center or-divider">or</span>
                     <div layout layout="column">
                         <md-input-container layout="row" layout-align="center end">
-                            <md-button class="md-raised md-button" ng-click="callUpload()">Open image</md-button>
-                            <input id="upload" type="file" file-model="myFile" accept="image/*" style="display: none;" required>
+                            <md-button class="md-raised md-button" ng-disabled="pictureUrl" ng-click="callUpload()">Open image</md-button>
+                            <input id="upload" type="file" file-model="myFile" accept="image/*" style="display: none;" ng-required="!pictureUrl">
                         </md-input-container>
                         <md-input-container flex>
                             <label>File name</label>
-                            <input name="fileName" class="form-control" ng-model="myFile.name" readonly disabled required>
+                            <input name="fileName" class="form-control" ng-model="myFile.name" readonly disabled ng-required="!pictureUrl">
                         </md-input-container>
                     </div>
                     <div layout="row" layout-align="end center">
@@ -26,6 +31,6 @@
         </md-card>
     </div>
     <div class="image-preview-wrapper" flex="50">
-        <img id="image-preview" class="hidden" src alt="{{myFile.name}}" title="{{myFile.name}}" />
+        <img id="image-preview" ng-class="{hidden: !pictureUrl && !myFile}" ng-src="{{pictureUrl}}" alt="{{myFile.name}}" title="{{myFile.name}}" />
     </div>
 </md-content>
