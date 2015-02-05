@@ -319,7 +319,7 @@
 			</activation>
 		</profile>
 		<profile>
-			<id>dump</id>
+			<id>migrations</id>
 			<modules>
 				<module>funny-pictures-migrations</module>
 			</modules>

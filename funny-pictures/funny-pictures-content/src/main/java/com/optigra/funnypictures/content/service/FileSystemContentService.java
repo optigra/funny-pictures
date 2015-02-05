@@ -63,7 +63,9 @@ public class FileSystemContentService implements ContentService {
 		LOG.info("Save content: {}", content);
 
 		try {
-			File file = new File(getFullfilePath(content.getPath()));
+			String path = getFullfilePath(content.getPath());
+			LOG.info("Storing file in: {}", path);
+			File file = new File(path);
 			if (file.createNewFile()) {
 				IOUtils.copy(content.getContentStream(), new FileOutputStream(file));
 			}

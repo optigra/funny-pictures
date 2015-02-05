@@ -1,6 +1,6 @@
 funnyPicturesApp.service('SharedProperties', function () {
     var generatedFunny = { };
-    var apiUrl = "http://drawmeme.com/api/";
+    var apiUrl = "http://drawmeme.com/api";
     return {
         getApiUrl: function () {
             return apiUrl;
