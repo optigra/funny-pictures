@@ -15,7 +15,7 @@
 		<developerConnection>scm:git:git@${vcs.release.alias}:michael/funny-pictires.git</developerConnection>
 		<url>scm:git:ssh://git@${vcs.release.alias}/michael/funny-pictires.git</url>
 		<tag>HEAD</tag>
-  </scm>
+  	</scm>
 	<distributionManagement>
 		<repository>
 			<id>maven-repository</id>
