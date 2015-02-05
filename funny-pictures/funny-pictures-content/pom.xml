@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>funny-pictures</groupId>
 			<artifactId>funny-pictures-domain</artifactId>
-			<version>0.0.8-SNAPSHOT</version>
+			<version>${version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
