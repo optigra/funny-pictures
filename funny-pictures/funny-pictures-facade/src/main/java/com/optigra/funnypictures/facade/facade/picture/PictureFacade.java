@@ -18,7 +18,7 @@ public interface PictureFacade {
 	 *            request with offset and limit
 	 * @return Paged result with picture resource
 	 */
-	PagedResultResource<PictureResource> getPictures(PagedRequest pagedRequest);
+	PagedResultResource<PictureResource> getPictures(PagedRequest<PictureResource> pagedRequest);
 
 	/**
 	 * Method for creating picture.

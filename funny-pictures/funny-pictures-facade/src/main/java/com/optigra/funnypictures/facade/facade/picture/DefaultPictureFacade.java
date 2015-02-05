@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,7 @@ import com.optigra.funnypictures.service.thumbnail.ThumbnailGeneratorService;
 public class DefaultPictureFacade implements PictureFacade {
 
 	@Resource(name = "pagedRequestConverter")
-	private Converter<PagedRequest, PagedSearch<Picture>> pagedRequestConverter;
+	private Converter<PagedRequest<PictureResource>, PagedSearch<Picture>> pagedRequestConverter;
 
 	@Resource(name = "pagedSearchConverter")
 	private Converter<PagedResult<?>, PagedResultResource<? extends ApiResource>> pagedResultConverter;
@@ -64,14 +65,18 @@ public class DefaultPictureFacade implements PictureFacade {
 	@Resource(name = "contentService")
 	private ContentService contentService;
 
+	@Value("${funnies.missing.generate.thumbnails}")
+	private Boolean generateMissingFunnyThumbnails;
+	
 	@Override
-	public PagedResultResource<PictureResource> getPictures(final PagedRequest pagedRequest) {
+	public PagedResultResource<PictureResource> getPictures(final PagedRequest<PictureResource> pagedRequest) {
 		// Convert PagedRequest to PagedSearch
 		PagedSearch<Picture> pagedSearch = pagedRequestConverter.convert(pagedRequest);
 
 		// Retrieve result pictureService.getPictures(pagedSearch)
 		PagedResult<Picture> pagedResult = pictureService.getPictures(pagedSearch);
-
+		generateMissingFunnies(pagedResult.getEntities());
+		
 		// Convert List<Picture> to List<PictureResource>
 		List<PictureResource> resources = pictureConverter.convertAll(pagedResult.getEntities());
 
@@ -85,11 +90,39 @@ public class DefaultPictureFacade implements PictureFacade {
 		return pagedResultResource;
 	}
 
+	/**
+	 * Method for generating Missing Funnies.
+	 * @param funnies
+	 */
+	private void generateMissingFunnies(final List<Picture> pictures) {
+	
+		if (generateMissingFunnyThumbnails) {
+			
+			for (Picture picture : pictures) {
+				
+				if (picture.getThumbnails().isEmpty()) {
+					generateThumbnails(picture);
+				}
+			}
+			
+		}
+		
+	}
+	
 	@Override
 	public PictureResource createPicture(final PictureResource pictureResource) {
 
 		Picture picture = pictureResourceConverter.convert(pictureResource);
 		pictureService.createPicture(picture);
+		
+		List<PictureThumbnail> pictureThumbnails = generateThumbnails(picture);
+		
+		picture.setThumbnails(pictureThumbnails);
+		
+		return pictureConverter.convert(picture);
+	}
+
+	private List<PictureThumbnail> generateThumbnails(final Picture picture) {
 		
 		Content content = contentService.getContentByPath(picture.getUrl());
 		List<ThumbnailContent> thumbnails = thumbnailGeneratorService.generateThumbnails(content);
@@ -103,10 +136,7 @@ public class DefaultPictureFacade implements PictureFacade {
 			pictureThumbnailService.createPictureThumbnail(pictureThumbnail);
 			pictureThumbnails.add(pictureThumbnail);
 		}
-		
-		picture.setThumbnails(pictureThumbnails);
-		
-		return pictureConverter.convert(picture);
+		return pictureThumbnails;
 	}
 
 	/**
@@ -159,6 +189,10 @@ public class DefaultPictureFacade implements PictureFacade {
 	public void deletePicture(final Long id) {
 		Picture picture = pictureService.getPicture(id);
 		pictureService.deletePicture(picture);
+	}
+
+	public void setGenerateMissingFunnyThumbnails(final Boolean generateMissingFunnyThumbnails) {
+		this.generateMissingFunnyThumbnails = generateMissingFunnyThumbnails;
 	}
 
 }
