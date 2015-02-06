@@ -13,6 +13,7 @@
 	    "angular-bootstrap": "0.12.0",
 	    "angular-material": "0.7.0",
 	    "angular-masonry": "0.11.0",
+	    "angular-translate": "2.5.2",
 	    "masonry": "3.2.2"
 	},
 	  "resolutions": {

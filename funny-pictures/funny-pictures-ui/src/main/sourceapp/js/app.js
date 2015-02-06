@@ -1,7 +1,7 @@
 /**
  * Created by rostyslav on 9/29/14.
  */
-var funnyPicturesApp = angular.module('mainModule', ['ngResource', 'ui.bootstrap', 'ngRoute', 'funnyControllers', 'ngMaterial', 'wu.masonry']);
+var funnyPicturesApp = angular.module('mainModule', ['ngResource', 'ui.bootstrap', 'ngRoute', 'funnyControllers', 'ngMaterial', 'wu.masonry' , 'pascalprecht.translate']);
 
 funnyPicturesApp.factory('Pictures', function($resource, SharedProperties) {
     return $resource(SharedProperties.getApiUrl() + '/pictures/:id', {}, {

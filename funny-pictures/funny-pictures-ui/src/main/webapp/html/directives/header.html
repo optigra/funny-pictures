@@ -5,17 +5,22 @@
         </div>
         <md-tabs flex>
             <md-tab id="tab1" aria-controls="tab1-content" ng-click="go('/home')" md-active="isActive('/home')">
-                Home
+                {{'HOME_HEADER' |translate}}
             </md-tab>
-            <md-tab id="tab2" aria-controls="tab2-content" ng-click="go('/createTemplate')" md-active="isActive('/createTemplate')">
-                Create template
+            <md-tab id="tab2" aria-controls="tab2-content" ng-click="go('/createTemplate')"
+                    md-active="isActive('/createTemplate')">
+                {{'CREATE_TEMPLATE_HEADER' |translate}}
             </md-tab>
             <md-tab id="tab3" aria-controls="tab3-content" ng-click="go('/funnies')" md-active="isActive('/funnies')">
-                Funny pictures
+                {{'FUNNY_PICTURES_HEADER' |translate}}
             </md-tab>
             <md-tab id="tab3" aria-controls="tab3-content" ng-click="go('/contact')" md-active="isActive('/contact')">
-                Contact us
+                {{'CONTACT_US_HEADER' |translate}}
             </md-tab>
+            <div layout="column">
+                <a ng-click="changeLanguage('uk')" >UA</a>
+                <a ng-click="changeLanguage('en_US')" >EN</a>
+            </div>
         </md-tabs>
     </div>
 </md-toolbar>

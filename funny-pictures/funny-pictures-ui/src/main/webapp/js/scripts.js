@@ -14863,7 +14863,508 @@ function() {
             }
         };
     });
-}(), angular.module("ui.bootstrap", [ "ui.bootstrap.tpls", "ui.bootstrap.pagination" ]), 
+}(), angular.module("pascalprecht.translate", [ "ng" ]).run([ "$translate", function($translate) {
+    var key = $translate.storageKey(), storage = $translate.storage(), fallbackFromIncorrectStorageValue = function() {
+        var preferred = $translate.preferredLanguage();
+        angular.isString(preferred) ? $translate.use(preferred) : storage.put(key, $translate.use());
+    };
+    storage ? storage.get(key) ? $translate.use(storage.get(key))["catch"](fallbackFromIncorrectStorageValue) : fallbackFromIncorrectStorageValue() : angular.isString($translate.preferredLanguage()) && $translate.use($translate.preferredLanguage());
+} ]), angular.module("pascalprecht.translate").provider("$translate", [ "$STORAGE_KEY", function($STORAGE_KEY) {
+    var $preferredLanguage, $languageKeyAliases, $fallbackLanguage, $fallbackWasString, $uses, $nextLang, $storageFactory, $storagePrefix, $missingTranslationHandlerFactory, $interpolationFactory, $loaderFactory, $loaderOptions, $notFoundIndicatorLeft, $notFoundIndicatorRight, loaderCache, $translationTable = {}, $availableLanguageKeys = [], $storageKey = $STORAGE_KEY, $interpolatorFactories = [], $interpolationSanitizationStrategy = !1, $cloakClassName = "translate-cloak", $postCompilingEnabled = !1, NESTED_OBJECT_DELIMITER = ".", version = "2.5.2", getFirstBrowserLanguage = function() {
+        var i, language, nav = window.navigator, browserLanguagePropertyKeys = [ "language", "browserLanguage", "systemLanguage", "userLanguage" ];
+        if (angular.isArray(nav.languages)) for (i = 0; i < nav.languages.length; i++) if (language = nav.languages[i], 
+        language && language.length) return language;
+        for (i = 0; i < browserLanguagePropertyKeys.length; i++) if (language = nav[browserLanguagePropertyKeys[i]], 
+        language && language.length) return language;
+        return null;
+    };
+    getFirstBrowserLanguage.displayName = "angular-translate/service: getFirstBrowserLanguage";
+    var getLocale = function() {
+        return (getFirstBrowserLanguage() || "").split("-").join("_");
+    };
+    getLocale.displayName = "angular-translate/service: getLocale";
+    var indexOf = function(array, searchElement) {
+        for (var i = 0, len = array.length; len > i; i++) if (array[i] === searchElement) return i;
+        return -1;
+    }, trim = function() {
+        return this.replace(/^\s+|\s+$/g, "");
+    }, negotiateLocale = function(preferred) {
+        for (var avail = [], locale = angular.lowercase(preferred), i = 0, n = $availableLanguageKeys.length; n > i; i++) avail.push(angular.lowercase($availableLanguageKeys[i]));
+        if (indexOf(avail, locale) > -1) return preferred;
+        if ($languageKeyAliases) {
+            var alias;
+            for (var langKeyAlias in $languageKeyAliases) {
+                var hasWildcardKey = !1, hasExactKey = Object.prototype.hasOwnProperty.call($languageKeyAliases, langKeyAlias) && angular.lowercase(langKeyAlias) === angular.lowercase(preferred);
+                if ("*" === langKeyAlias.slice(-1) && (hasWildcardKey = langKeyAlias.slice(0, -1) === preferred.slice(0, langKeyAlias.length - 1)), 
+                (hasExactKey || hasWildcardKey) && (alias = $languageKeyAliases[langKeyAlias], indexOf(avail, angular.lowercase(alias)) > -1)) return alias;
+            }
+        }
+        var parts = preferred.split("_");
+        return parts.length > 1 && indexOf(avail, angular.lowercase(parts[0])) > -1 ? parts[0] : preferred;
+    }, translations = function(langKey, translationTable) {
+        if (!langKey && !translationTable) return $translationTable;
+        if (langKey && !translationTable) {
+            if (angular.isString(langKey)) return $translationTable[langKey];
+        } else angular.isObject($translationTable[langKey]) || ($translationTable[langKey] = {}), 
+        angular.extend($translationTable[langKey], flatObject(translationTable));
+        return this;
+    };
+    this.translations = translations, this.cloakClassName = function(name) {
+        return name ? ($cloakClassName = name, this) : $cloakClassName;
+    };
+    var flatObject = function(data, path, result, prevKey) {
+        var key, keyWithPath, keyWithShortPath, val;
+        path || (path = []), result || (result = {});
+        for (key in data) Object.prototype.hasOwnProperty.call(data, key) && (val = data[key], 
+        angular.isObject(val) ? flatObject(val, path.concat(key), result, key) : (keyWithPath = path.length ? "" + path.join(NESTED_OBJECT_DELIMITER) + NESTED_OBJECT_DELIMITER + key : key, 
+        path.length && key === prevKey && (keyWithShortPath = "" + path.join(NESTED_OBJECT_DELIMITER), 
+        result[keyWithShortPath] = "@:" + keyWithPath), result[keyWithPath] = val));
+        return result;
+    };
+    this.addInterpolation = function(factory) {
+        return $interpolatorFactories.push(factory), this;
+    }, this.useMessageFormatInterpolation = function() {
+        return this.useInterpolation("$translateMessageFormatInterpolation");
+    }, this.useInterpolation = function(factory) {
+        return $interpolationFactory = factory, this;
+    }, this.useSanitizeValueStrategy = function(value) {
+        return $interpolationSanitizationStrategy = value, this;
+    }, this.preferredLanguage = function(langKey) {
+        return setupPreferredLanguage(langKey), this;
+    };
+    var setupPreferredLanguage = function(langKey) {
+        return langKey && ($preferredLanguage = langKey), $preferredLanguage;
+    };
+    this.translationNotFoundIndicator = function(indicator) {
+        return this.translationNotFoundIndicatorLeft(indicator), this.translationNotFoundIndicatorRight(indicator), 
+        this;
+    }, this.translationNotFoundIndicatorLeft = function(indicator) {
+        return indicator ? ($notFoundIndicatorLeft = indicator, this) : $notFoundIndicatorLeft;
+    }, this.translationNotFoundIndicatorRight = function(indicator) {
+        return indicator ? ($notFoundIndicatorRight = indicator, this) : $notFoundIndicatorRight;
+    }, this.fallbackLanguage = function(langKey) {
+        return fallbackStack(langKey), this;
+    };
+    var fallbackStack = function(langKey) {
+        return langKey ? (angular.isString(langKey) ? ($fallbackWasString = !0, $fallbackLanguage = [ langKey ]) : angular.isArray(langKey) && ($fallbackWasString = !1, 
+        $fallbackLanguage = langKey), angular.isString($preferredLanguage) && indexOf($fallbackLanguage, $preferredLanguage) < 0 && $fallbackLanguage.push($preferredLanguage), 
+        this) : $fallbackWasString ? $fallbackLanguage[0] : $fallbackLanguage;
+    };
+    this.use = function(langKey) {
+        if (langKey) {
+            if (!$translationTable[langKey] && !$loaderFactory) throw new Error("$translateProvider couldn't find translationTable for langKey: '" + langKey + "'");
+            return $uses = langKey, this;
+        }
+        return $uses;
+    };
+    var storageKey = function(key) {
+        return key ? void ($storageKey = key) : $storagePrefix ? $storagePrefix + $storageKey : $storageKey;
+    };
+    this.storageKey = storageKey, this.useUrlLoader = function(url, options) {
+        return this.useLoader("$translateUrlLoader", angular.extend({
+            url: url
+        }, options));
+    }, this.useStaticFilesLoader = function(options) {
+        return this.useLoader("$translateStaticFilesLoader", options);
+    }, this.useLoader = function(loaderFactory, options) {
+        return $loaderFactory = loaderFactory, $loaderOptions = options || {}, this;
+    }, this.useLocalStorage = function() {
+        return this.useStorage("$translateLocalStorage");
+    }, this.useCookieStorage = function() {
+        return this.useStorage("$translateCookieStorage");
+    }, this.useStorage = function(storageFactory) {
+        return $storageFactory = storageFactory, this;
+    }, this.storagePrefix = function(prefix) {
+        return prefix ? ($storagePrefix = prefix, this) : prefix;
+    }, this.useMissingTranslationHandlerLog = function() {
+        return this.useMissingTranslationHandler("$translateMissingTranslationHandlerLog");
+    }, this.useMissingTranslationHandler = function(factory) {
+        return $missingTranslationHandlerFactory = factory, this;
+    }, this.usePostCompiling = function(value) {
+        return $postCompilingEnabled = !!value, this;
+    }, this.determinePreferredLanguage = function(fn) {
+        var locale = fn && angular.isFunction(fn) ? fn() : getLocale();
+        return $preferredLanguage = $availableLanguageKeys.length ? negotiateLocale(locale) : locale, 
+        this;
+    }, this.registerAvailableLanguageKeys = function(languageKeys, aliases) {
+        return languageKeys ? ($availableLanguageKeys = languageKeys, aliases && ($languageKeyAliases = aliases), 
+        this) : $availableLanguageKeys;
+    }, this.useLoaderCache = function(cache) {
+        return cache === !1 ? loaderCache = void 0 : cache === !0 ? loaderCache = !0 : "undefined" == typeof cache ? loaderCache = "$translationCache" : cache && (loaderCache = cache), 
+        this;
+    }, this.$get = [ "$log", "$injector", "$rootScope", "$q", function($log, $injector, $rootScope, $q) {
+        var Storage, fallbackIndex, startFallbackIteration, defaultInterpolator = $injector.get($interpolationFactory || "$translateDefaultInterpolation"), pendingLoader = !1, interpolatorHashMap = {}, langPromises = {}, $translate = function(translationId, interpolateParams, interpolationId) {
+            if (angular.isArray(translationId)) {
+                var translateAll = function(translationIds) {
+                    for (var results = {}, promises = [], translate = function(translationId) {
+                        var deferred = $q.defer(), regardless = function(value) {
+                            results[translationId] = value, deferred.resolve([ translationId, value ]);
+                        };
+                        return $translate(translationId, interpolateParams, interpolationId).then(regardless, regardless), 
+                        deferred.promise;
+                    }, i = 0, c = translationIds.length; c > i; i++) promises.push(translate(translationIds[i]));
+                    return $q.all(promises).then(function() {
+                        return results;
+                    });
+                };
+                return translateAll(translationId);
+            }
+            var deferred = $q.defer();
+            translationId && (translationId = trim.apply(translationId));
+            var promiseToWaitFor = function() {
+                var promise = $preferredLanguage ? langPromises[$preferredLanguage] : langPromises[$uses];
+                if (fallbackIndex = 0, $storageFactory && !promise) {
+                    var langKey = Storage.get($storageKey);
+                    if (promise = langPromises[langKey], $fallbackLanguage && $fallbackLanguage.length) {
+                        var index = indexOf($fallbackLanguage, langKey);
+                        fallbackIndex = 0 === index ? 1 : 0, indexOf($fallbackLanguage, $preferredLanguage) < 0 && $fallbackLanguage.push($preferredLanguage);
+                    }
+                }
+                return promise;
+            }();
+            return promiseToWaitFor ? promiseToWaitFor.then(function() {
+                determineTranslation(translationId, interpolateParams, interpolationId).then(deferred.resolve, deferred.reject);
+            }, deferred.reject) : determineTranslation(translationId, interpolateParams, interpolationId).then(deferred.resolve, deferred.reject), 
+            deferred.promise;
+        }, applyNotFoundIndicators = function(translationId) {
+            return $notFoundIndicatorLeft && (translationId = [ $notFoundIndicatorLeft, translationId ].join(" ")), 
+            $notFoundIndicatorRight && (translationId = [ translationId, $notFoundIndicatorRight ].join(" ")), 
+            translationId;
+        }, useLanguage = function(key) {
+            $uses = key, $rootScope.$emit("$translateChangeSuccess", {
+                language: key
+            }), $storageFactory && Storage.put($translate.storageKey(), $uses), defaultInterpolator.setLocale($uses), 
+            angular.forEach(interpolatorHashMap, function(interpolator, id) {
+                interpolatorHashMap[id].setLocale($uses);
+            }), $rootScope.$emit("$translateChangeEnd", {
+                language: key
+            });
+        }, loadAsync = function(key) {
+            if (!key) throw "No language key specified for loading.";
+            var deferred = $q.defer();
+            $rootScope.$emit("$translateLoadingStart", {
+                language: key
+            }), pendingLoader = !0;
+            var cache = loaderCache;
+            "string" == typeof cache && (cache = $injector.get(cache));
+            var loaderOptions = angular.extend({}, $loaderOptions, {
+                key: key,
+                $http: angular.extend({}, {
+                    cache: cache
+                }, $loaderOptions.$http)
+            });
+            return $injector.get($loaderFactory)(loaderOptions).then(function(data) {
+                var translationTable = {};
+                $rootScope.$emit("$translateLoadingSuccess", {
+                    language: key
+                }), angular.isArray(data) ? angular.forEach(data, function(table) {
+                    angular.extend(translationTable, flatObject(table));
+                }) : angular.extend(translationTable, flatObject(data)), pendingLoader = !1, deferred.resolve({
+                    key: key,
+                    table: translationTable
+                }), $rootScope.$emit("$translateLoadingEnd", {
+                    language: key
+                });
+            }, function(key) {
+                $rootScope.$emit("$translateLoadingError", {
+                    language: key
+                }), deferred.reject(key), $rootScope.$emit("$translateLoadingEnd", {
+                    language: key
+                });
+            }), deferred.promise;
+        };
+        if ($storageFactory && (Storage = $injector.get($storageFactory), !Storage.get || !Storage.put)) throw new Error("Couldn't use storage '" + $storageFactory + "', missing get() or put() method!");
+        angular.isFunction(defaultInterpolator.useSanitizeValueStrategy) && defaultInterpolator.useSanitizeValueStrategy($interpolationSanitizationStrategy), 
+        $interpolatorFactories.length && angular.forEach($interpolatorFactories, function(interpolatorFactory) {
+            var interpolator = $injector.get(interpolatorFactory);
+            interpolator.setLocale($preferredLanguage || $uses), angular.isFunction(interpolator.useSanitizeValueStrategy) && interpolator.useSanitizeValueStrategy($interpolationSanitizationStrategy), 
+            interpolatorHashMap[interpolator.getInterpolationIdentifier()] = interpolator;
+        });
+        var getTranslationTable = function(langKey) {
+            var deferred = $q.defer();
+            return Object.prototype.hasOwnProperty.call($translationTable, langKey) ? deferred.resolve($translationTable[langKey]) : langPromises[langKey] ? langPromises[langKey].then(function(data) {
+                translations(data.key, data.table), deferred.resolve(data.table);
+            }, deferred.reject) : deferred.reject(), deferred.promise;
+        }, getFallbackTranslation = function(langKey, translationId, interpolateParams, Interpolator) {
+            var deferred = $q.defer();
+            return getTranslationTable(langKey).then(function(translationTable) {
+                Object.prototype.hasOwnProperty.call(translationTable, translationId) ? (Interpolator.setLocale(langKey), 
+                deferred.resolve(Interpolator.interpolate(translationTable[translationId], interpolateParams)), 
+                Interpolator.setLocale($uses)) : deferred.reject();
+            }, deferred.reject), deferred.promise;
+        }, getFallbackTranslationInstant = function(langKey, translationId, interpolateParams, Interpolator) {
+            var result, translationTable = $translationTable[langKey];
+            return translationTable && Object.prototype.hasOwnProperty.call(translationTable, translationId) && (Interpolator.setLocale(langKey), 
+            result = Interpolator.interpolate(translationTable[translationId], interpolateParams), 
+            Interpolator.setLocale($uses)), result;
+        }, translateByHandler = function(translationId) {
+            if ($missingTranslationHandlerFactory) {
+                var resultString = $injector.get($missingTranslationHandlerFactory)(translationId, $uses);
+                return void 0 !== resultString ? resultString : translationId;
+            }
+            return translationId;
+        }, resolveForFallbackLanguage = function(fallbackLanguageIndex, translationId, interpolateParams, Interpolator) {
+            var deferred = $q.defer();
+            if (fallbackLanguageIndex < $fallbackLanguage.length) {
+                var langKey = $fallbackLanguage[fallbackLanguageIndex];
+                getFallbackTranslation(langKey, translationId, interpolateParams, Interpolator).then(deferred.resolve, function() {
+                    resolveForFallbackLanguage(fallbackLanguageIndex + 1, translationId, interpolateParams, Interpolator).then(deferred.resolve);
+                });
+            } else deferred.resolve(translateByHandler(translationId));
+            return deferred.promise;
+        }, resolveForFallbackLanguageInstant = function(fallbackLanguageIndex, translationId, interpolateParams, Interpolator) {
+            var result;
+            if (fallbackLanguageIndex < $fallbackLanguage.length) {
+                var langKey = $fallbackLanguage[fallbackLanguageIndex];
+                result = getFallbackTranslationInstant(langKey, translationId, interpolateParams, Interpolator), 
+                result || (result = resolveForFallbackLanguageInstant(fallbackLanguageIndex + 1, translationId, interpolateParams, Interpolator));
+            }
+            return result;
+        }, fallbackTranslation = function(translationId, interpolateParams, Interpolator) {
+            return resolveForFallbackLanguage(startFallbackIteration > 0 ? startFallbackIteration : fallbackIndex, translationId, interpolateParams, Interpolator);
+        }, fallbackTranslationInstant = function(translationId, interpolateParams, Interpolator) {
+            return resolveForFallbackLanguageInstant(startFallbackIteration > 0 ? startFallbackIteration : fallbackIndex, translationId, interpolateParams, Interpolator);
+        }, determineTranslation = function(translationId, interpolateParams, interpolationId) {
+            var deferred = $q.defer(), table = $uses ? $translationTable[$uses] : $translationTable, Interpolator = interpolationId ? interpolatorHashMap[interpolationId] : defaultInterpolator;
+            if (table && Object.prototype.hasOwnProperty.call(table, translationId)) {
+                var translation = table[translationId];
+                "@:" === translation.substr(0, 2) ? $translate(translation.substr(2), interpolateParams, interpolationId).then(deferred.resolve, deferred.reject) : deferred.resolve(Interpolator.interpolate(translation, interpolateParams));
+            } else {
+                var missingTranslationHandlerTranslation;
+                $missingTranslationHandlerFactory && !pendingLoader && (missingTranslationHandlerTranslation = translateByHandler(translationId)), 
+                $uses && $fallbackLanguage && $fallbackLanguage.length ? fallbackTranslation(translationId, interpolateParams, Interpolator).then(function(translation) {
+                    deferred.resolve(translation);
+                }, function(_translationId) {
+                    deferred.reject(applyNotFoundIndicators(_translationId));
+                }) : $missingTranslationHandlerFactory && !pendingLoader && missingTranslationHandlerTranslation ? deferred.resolve(missingTranslationHandlerTranslation) : deferred.reject(applyNotFoundIndicators(translationId));
+            }
+            return deferred.promise;
+        }, determineTranslationInstant = function(translationId, interpolateParams, interpolationId) {
+            var result, table = $uses ? $translationTable[$uses] : $translationTable, Interpolator = interpolationId ? interpolatorHashMap[interpolationId] : defaultInterpolator;
+            if (table && Object.prototype.hasOwnProperty.call(table, translationId)) {
+                var translation = table[translationId];
+                result = "@:" === translation.substr(0, 2) ? determineTranslationInstant(translation.substr(2), interpolateParams, interpolationId) : Interpolator.interpolate(translation, interpolateParams);
+            } else {
+                var missingTranslationHandlerTranslation;
+                $missingTranslationHandlerFactory && !pendingLoader && (missingTranslationHandlerTranslation = translateByHandler(translationId)), 
+                $uses && $fallbackLanguage && $fallbackLanguage.length ? (fallbackIndex = 0, result = fallbackTranslationInstant(translationId, interpolateParams, Interpolator)) : result = $missingTranslationHandlerFactory && !pendingLoader && missingTranslationHandlerTranslation ? missingTranslationHandlerTranslation : applyNotFoundIndicators(translationId);
+            }
+            return result;
+        };
+        if ($translate.preferredLanguage = function(langKey) {
+            return langKey && setupPreferredLanguage(langKey), $preferredLanguage;
+        }, $translate.cloakClassName = function() {
+            return $cloakClassName;
+        }, $translate.fallbackLanguage = function(langKey) {
+            if (void 0 !== langKey && null !== langKey) {
+                if (fallbackStack(langKey), $loaderFactory && $fallbackLanguage && $fallbackLanguage.length) for (var i = 0, len = $fallbackLanguage.length; len > i; i++) langPromises[$fallbackLanguage[i]] || (langPromises[$fallbackLanguage[i]] = loadAsync($fallbackLanguage[i]));
+                $translate.use($translate.use());
+            }
+            return $fallbackWasString ? $fallbackLanguage[0] : $fallbackLanguage;
+        }, $translate.useFallbackLanguage = function(langKey) {
+            if (void 0 !== langKey && null !== langKey) if (langKey) {
+                var langKeyPosition = indexOf($fallbackLanguage, langKey);
+                langKeyPosition > -1 && (startFallbackIteration = langKeyPosition);
+            } else startFallbackIteration = 0;
+        }, $translate.proposedLanguage = function() {
+            return $nextLang;
+        }, $translate.storage = function() {
+            return Storage;
+        }, $translate.use = function(key) {
+            if (!key) return $uses;
+            var deferred = $q.defer();
+            $rootScope.$emit("$translateChangeStart", {
+                language: key
+            });
+            var aliasedKey = negotiateLocale(key);
+            return aliasedKey && (key = aliasedKey), $translationTable[key] || !$loaderFactory || langPromises[key] ? (deferred.resolve(key), 
+            useLanguage(key)) : ($nextLang = key, langPromises[key] = loadAsync(key).then(function(translation) {
+                return translations(translation.key, translation.table), deferred.resolve(translation.key), 
+                useLanguage(translation.key), $nextLang === key && ($nextLang = void 0), translation;
+            }, function(key) {
+                $nextLang === key && ($nextLang = void 0), $rootScope.$emit("$translateChangeError", {
+                    language: key
+                }), deferred.reject(key), $rootScope.$emit("$translateChangeEnd", {
+                    language: key
+                });
+            })), deferred.promise;
+        }, $translate.storageKey = function() {
+            return storageKey();
+        }, $translate.isPostCompilingEnabled = function() {
+            return $postCompilingEnabled;
+        }, $translate.refresh = function(langKey) {
+            function resolve() {
+                deferred.resolve(), $rootScope.$emit("$translateRefreshEnd", {
+                    language: langKey
+                });
+            }
+            function reject() {
+                deferred.reject(), $rootScope.$emit("$translateRefreshEnd", {
+                    language: langKey
+                });
+            }
+            if (!$loaderFactory) throw new Error("Couldn't refresh translation table, no loader registered!");
+            var deferred = $q.defer();
+            if ($rootScope.$emit("$translateRefreshStart", {
+                language: langKey
+            }), langKey) $translationTable[langKey] ? loadAsync(langKey).then(function(data) {
+                translations(data.key, data.table), langKey === $uses && useLanguage($uses), resolve();
+            }, reject) : reject(); else {
+                var tables = [], loadingKeys = {};
+                if ($fallbackLanguage && $fallbackLanguage.length) for (var i = 0, len = $fallbackLanguage.length; len > i; i++) tables.push(loadAsync($fallbackLanguage[i])), 
+                loadingKeys[$fallbackLanguage[i]] = !0;
+                $uses && !loadingKeys[$uses] && tables.push(loadAsync($uses)), $q.all(tables).then(function(tableData) {
+                    angular.forEach(tableData, function(data) {
+                        $translationTable[data.key] && delete $translationTable[data.key], translations(data.key, data.table);
+                    }), $uses && useLanguage($uses), resolve();
+                });
+            }
+            return deferred.promise;
+        }, $translate.instant = function(translationId, interpolateParams, interpolationId) {
+            if (null === translationId || angular.isUndefined(translationId)) return translationId;
+            if (angular.isArray(translationId)) {
+                for (var results = {}, i = 0, c = translationId.length; c > i; i++) results[translationId[i]] = $translate.instant(translationId[i], interpolateParams, interpolationId);
+                return results;
+            }
+            if (angular.isString(translationId) && translationId.length < 1) return translationId;
+            translationId && (translationId = trim.apply(translationId));
+            var result, possibleLangKeys = [];
+            $preferredLanguage && possibleLangKeys.push($preferredLanguage), $uses && possibleLangKeys.push($uses), 
+            $fallbackLanguage && $fallbackLanguage.length && (possibleLangKeys = possibleLangKeys.concat($fallbackLanguage));
+            for (var j = 0, d = possibleLangKeys.length; d > j; j++) {
+                var possibleLangKey = possibleLangKeys[j];
+                if ($translationTable[possibleLangKey] && "undefined" != typeof $translationTable[possibleLangKey][translationId] && (result = determineTranslationInstant(translationId, interpolateParams, interpolationId)), 
+                "undefined" != typeof result) break;
+            }
+            return result || "" === result || (result = defaultInterpolator.interpolate(translationId, interpolateParams), 
+            $missingTranslationHandlerFactory && !pendingLoader && (result = translateByHandler(translationId))), 
+            result;
+        }, $translate.versionInfo = function() {
+            return version;
+        }, $translate.loaderCache = function() {
+            return loaderCache;
+        }, $loaderFactory && (angular.equals($translationTable, {}) && $translate.use($translate.use()), 
+        $fallbackLanguage && $fallbackLanguage.length)) for (var processAsyncResult = function(translation) {
+            return translations(translation.key, translation.table), $rootScope.$emit("$translateChangeEnd", {
+                language: translation.key
+            }), translation;
+        }, i = 0, len = $fallbackLanguage.length; len > i; i++) langPromises[$fallbackLanguage[i]] = loadAsync($fallbackLanguage[i]).then(processAsyncResult);
+        return $translate;
+    } ];
+} ]), angular.module("pascalprecht.translate").factory("$translateDefaultInterpolation", [ "$interpolate", function($interpolate) {
+    var $locale, $translateInterpolator = {}, $identifier = "default", $sanitizeValueStrategy = null, sanitizeValueStrategies = {
+        escaped: function(params) {
+            var result = {};
+            for (var key in params) Object.prototype.hasOwnProperty.call(params, key) && (result[key] = angular.element("<div></div>").text(params[key]).html());
+            return result;
+        }
+    }, sanitizeParams = function(params) {
+        var result;
+        return result = angular.isFunction(sanitizeValueStrategies[$sanitizeValueStrategy]) ? sanitizeValueStrategies[$sanitizeValueStrategy](params) : params;
+    };
+    return $translateInterpolator.setLocale = function(locale) {
+        $locale = locale;
+    }, $translateInterpolator.getInterpolationIdentifier = function() {
+        return $identifier;
+    }, $translateInterpolator.useSanitizeValueStrategy = function(value) {
+        return $sanitizeValueStrategy = value, this;
+    }, $translateInterpolator.interpolate = function(string, interpolateParams) {
+        return $sanitizeValueStrategy && (interpolateParams = sanitizeParams(interpolateParams)), 
+        $interpolate(string)(interpolateParams || {});
+    }, $translateInterpolator;
+} ]), angular.module("pascalprecht.translate").constant("$STORAGE_KEY", "NG_TRANSLATE_LANG_KEY"), 
+angular.module("pascalprecht.translate").directive("translate", [ "$translate", "$q", "$interpolate", "$compile", "$parse", "$rootScope", function($translate, $q, $interpolate, $compile, $parse, $rootScope) {
+    return {
+        restrict: "AE",
+        scope: !0,
+        compile: function(tElement, tAttr) {
+            var translateValuesExist = tAttr.translateValues ? tAttr.translateValues : void 0, translateInterpolation = tAttr.translateInterpolation ? tAttr.translateInterpolation : void 0, translateValueExist = tElement[0].outerHTML.match(/translate-value-+/i), interpolateRegExp = "^(.*)(" + $interpolate.startSymbol() + ".*" + $interpolate.endSymbol() + ")(.*)", watcherRegExp = "^(.*)" + $interpolate.startSymbol() + "(.*)" + $interpolate.endSymbol() + "(.*)";
+            return function(scope, iElement, iAttr) {
+                scope.interpolateParams = {}, scope.preText = "", scope.postText = "";
+                var translationIds = {}, observeElementTranslation = function(translationId) {
+                    if (angular.equals(translationId, "") || !angular.isDefined(translationId)) {
+                        var interpolateMatches = iElement.text().match(interpolateRegExp);
+                        angular.isArray(interpolateMatches) ? (scope.preText = interpolateMatches[1], scope.postText = interpolateMatches[3], 
+                        translationIds.translate = $interpolate(interpolateMatches[2])(scope.$parent), watcherMatches = iElement.text().match(watcherRegExp), 
+                        angular.isArray(watcherMatches) && watcherMatches[2] && watcherMatches[2].length && scope.$watch(watcherMatches[2], function(newValue) {
+                            translationIds.translate = newValue, updateTranslations();
+                        })) : translationIds.translate = iElement.text().replace(/^\s+|\s+$/g, "");
+                    } else translationIds.translate = translationId;
+                    updateTranslations();
+                }, observeAttributeTranslation = function(translateAttr) {
+                    iAttr.$observe(translateAttr, function(translationId) {
+                        translationIds[translateAttr] = translationId, updateTranslations();
+                    });
+                };
+                iAttr.$observe("translate", function(translationId) {
+                    observeElementTranslation(translationId);
+                });
+                for (var translateAttr in iAttr) iAttr.hasOwnProperty(translateAttr) && "translateAttr" === translateAttr.substr(0, 13) && observeAttributeTranslation(translateAttr);
+                if (iAttr.$observe("translateDefault", function(value) {
+                    scope.defaultText = value;
+                }), translateValuesExist && iAttr.$observe("translateValues", function(interpolateParams) {
+                    interpolateParams && scope.$parent.$watch(function() {
+                        angular.extend(scope.interpolateParams, $parse(interpolateParams)(scope.$parent));
+                    });
+                }), translateValueExist) {
+                    var observeValueAttribute = function(attrName) {
+                        iAttr.$observe(attrName, function(value) {
+                            var attributeName = angular.lowercase(attrName.substr(14, 1)) + attrName.substr(15);
+                            scope.interpolateParams[attributeName] = value;
+                        });
+                    };
+                    for (var attr in iAttr) Object.prototype.hasOwnProperty.call(iAttr, attr) && "translateValue" === attr.substr(0, 14) && "translateValues" !== attr && observeValueAttribute(attr);
+                }
+                var updateTranslations = function() {
+                    for (var key in translationIds) translationIds.hasOwnProperty(key) && translationIds[key] && updateTranslation(key, translationIds[key], scope, scope.interpolateParams);
+                }, updateTranslation = function(translateAttr, translationId, scope, interpolateParams) {
+                    $translate(translationId, interpolateParams, translateInterpolation).then(function(translation) {
+                        applyTranslation(translation, scope, !0, translateAttr);
+                    }, function(translationId) {
+                        applyTranslation(translationId, scope, !1, translateAttr);
+                    });
+                }, applyTranslation = function(value, scope, successful, translateAttr) {
+                    if ("translate" === translateAttr) {
+                        successful || "undefined" == typeof scope.defaultText || (value = scope.defaultText), 
+                        iElement.html(scope.preText + value + scope.postText);
+                        var globallyEnabled = $translate.isPostCompilingEnabled(), locallyDefined = "undefined" != typeof tAttr.translateCompile, locallyEnabled = locallyDefined && "false" !== tAttr.translateCompile;
+                        (globallyEnabled && !locallyDefined || locallyEnabled) && $compile(iElement.contents())(scope);
+                    } else {
+                        successful || "undefined" == typeof scope.defaultText || (value = scope.defaultText);
+                        var attributeName = iAttr.$attr[translateAttr].substr(15);
+                        iElement.attr(attributeName, value);
+                    }
+                };
+                scope.$watch("interpolateParams", updateTranslations, !0);
+                var unbind = $rootScope.$on("$translateChangeSuccess", updateTranslations);
+                iElement.text().length && observeElementTranslation(""), updateTranslations(), scope.$on("$destroy", unbind);
+            };
+        }
+    };
+} ]), angular.module("pascalprecht.translate").directive("translateCloak", [ "$rootScope", "$translate", function($rootScope, $translate) {
+    return {
+        compile: function(tElement) {
+            var applyCloak = function() {
+                tElement.addClass($translate.cloakClassName());
+            }, removeCloak = function() {
+                tElement.removeClass($translate.cloakClassName());
+            }, removeListener = $rootScope.$on("$translateChangeEnd", function() {
+                removeCloak(), removeListener(), removeListener = null;
+            });
+            return applyCloak(), function(scope, iElement, iAttr) {
+                iAttr.translateCloak && iAttr.translateCloak.length && iAttr.$observe("translateCloak", function(translationId) {
+                    $translate(translationId).then(removeCloak, applyCloak);
+                });
+            };
+        }
+    };
+} ]), angular.module("pascalprecht.translate").filter("translate", [ "$parse", "$translate", function($parse, $translate) {
+    var translateFilter = function(translationId, interpolateParams, interpolation) {
+        return angular.isObject(interpolateParams) || (interpolateParams = $parse(interpolateParams)(this)), 
+        $translate.instant(translationId, interpolateParams, interpolation);
+    };
+    return translateFilter.$stateful = !0, translateFilter;
+} ]), angular.module("ui.bootstrap", [ "ui.bootstrap.tpls", "ui.bootstrap.pagination" ]), 
 angular.module("ui.bootstrap.tpls", [ "template/pagination/pager.html", "template/pagination/pagination.html" ]), 
 angular.module("ui.bootstrap.pagination", []).controller("PaginationController", [ "$scope", "$attrs", "$parse", function($scope, $attrs, $parse) {
     var self = this, ngModelCtrl = {

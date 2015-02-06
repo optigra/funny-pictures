@@ -10,7 +10,7 @@
             <md-card-content>
                 <div class="action-toolbar" layout="row" layout-align="space-between center">
                     <div>
-                        <span>Share:</span>
+                        <span>{{'SHARE_LABEL' | translate}}</span>
                         <ul class="social-share">
                             <li>
                                 <a class="social-link flaticon-twitter" href="#" ng-click="shareSocial('https://twitter.com/home?status=',600,250)"></a>
@@ -23,7 +23,7 @@
                             </li>
                         </ul>
                     </div>
-                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{funnyPicture.url}}" download="{{funnyPicture.name}}">Download</md-button>
+                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{funnyPicture.url}}" download="{{funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
                 </div>
             </md-card-content>
         </md-card>

@@ -6,21 +6,21 @@
             <md-card-content>
                 <form name="funnyPictureText" ng-hide="loaded">
                     <md-input-container flex>
-                        <label>Header text</label>
+                        <label>{{'HEADER_TEXT_LABEL' | translate}}</label>
                         <input ng-model="headerText" name="headerText" required>
                     </md-input-container>
                     <md-input-container flex>
-                        <label>Footer text</label>
+                        <label>{{'FOOTER_TEXT_LABEL' | translate}}</label>
                         <input ng-model="footerText" name="footerText" required>
                     </md-input-container>
                     <div layout="row" layout-align="end center">
-                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="createFunnyPicture()" ng-disabled="isButtonDisabled()">Create a picture</md-button>
+                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="createFunnyPicture()" ng-disabled="isButtonDisabled()">{{'CREATE_FUNNY_BUTTON' | translate}}</md-button>
                     </div>
                 </form>
                 <div class="action-toolbar" layout="row" layout-align="end center" ng-show="loaded">
-                    <md-button class="md-button" target="_self" ng-href="{{funnyPicture.url}}" download="{{funnyPicture.name}}">Download</md-button>
-                    <md-button class="md-warn" ng-click="cancel()">Cancel</md-button>
-                    <md-button type="submit" class="md-raised md-primary" ng-click="createNew()">Create new</md-button>
+                    <md-button class="md-button" target="_self" ng-href="{{funnyPicture.url}}" download="{{funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
+                    <md-button class="md-warn" ng-click="cancel()">{{'CANCEL_BUTTON' | translate}}</md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="createNew()">{{'CREATE_NEW_BUTTON' | translate}}</md-button>
                 </div>
             </md-card-content>
         </md-card>

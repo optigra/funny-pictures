@@ -102,6 +102,7 @@ module.exports = function(grunt) {
                             'bower_components/angular-aria/angular-aria.js',
                             'bower_components/angular-material/angular-material.js',
                             'bower_components/angular-masonry/angular-masonry.js',
+                            'bower_components/angular-translate/angular-translate.js',
                             '<%= app.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
                         ],
 
