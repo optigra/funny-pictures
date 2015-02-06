@@ -66,7 +66,7 @@ public class BaseThumbnailGeneratorTest {
 		
 		// Then
 		verify(convertCommand).run(convertOperationCaptor.capture(), anyVararg());
-		String expectedConvertCommand = "?img? -thumbnail 100x100> -gravity center ?img? ";
+		String expectedConvertCommand = "?img? -thumbnail 100 -gravity center ?img? ";
 		assertEquals(expectedConvertCommand, convertOperationCaptor.getAllValues().get(0).toString());
 	}
 
