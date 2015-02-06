@@ -16,6 +16,7 @@ import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.thumbnail.PictureThumbnailService;
+import com.optigra.funnypictures.view.thumbnail.RandomPictureThumbnailView;
 
 /**
  * Default implementation of ThumbnailFacade.
@@ -28,7 +29,7 @@ import com.optigra.funnypictures.service.thumbnail.PictureThumbnailService;
 public class DefaultPictureThumbnailFacade implements PictureThumbnailFacade {
 
 	@Resource(name = "pagedRequestConverter")
-	private Converter<PagedRequest, PagedSearch<PictureThumbnail>> pagedRequestConverter;
+	private Converter<PagedRequest, PagedSearch<?>> pagedRequestConverter;
 
 	@Resource(name = "pagedSearchConverter")
 	private Converter<PagedResult<?>, PagedResultResource<? extends ApiResource>> pagedResultConverter;
@@ -38,7 +39,10 @@ public class DefaultPictureThumbnailFacade implements PictureThumbnailFacade {
 
 	@Resource(name = "pictureThumbnailResourceConverter")
 	private Converter<PictureThumbnailResource, PictureThumbnail> pictureThumbnailResourceConverter;
-	
+
+	@Resource(name = "randomPictureThumbnailConverter")
+	private Converter<RandomPictureThumbnailView, PictureThumbnailResource> randomPictureThumbnailConverter;
+
 	@Resource(name = "pictureThumbnailService")
 	private PictureThumbnailService pictureThumbnailService;
 
@@ -46,15 +50,16 @@ public class DefaultPictureThumbnailFacade implements PictureThumbnailFacade {
 	public PagedResultResource<PictureThumbnailResource> getPicturesThumbnails(
 			final PagedRequest<PictureThumbnailResource> pagedRequest) {
 		// Convert PagedRequest to PagedSearch
-		PagedSearch<PictureThumbnail> pagedSearch = pagedRequestConverter
+		PagedSearch<PictureThumbnail> pagedSearch = (PagedSearch<PictureThumbnail>) pagedRequestConverter
 				.convert(pagedRequest);
-		pagedSearch.setEntity(pictureThumbnailResourceConverter.convert(pagedRequest.getResource()));
+		pagedSearch.setEntity(pictureThumbnailResourceConverter
+				.convert(pagedRequest.getResource()));
 
-		// Retrieve result pictureService.getPictures(pagedSearch)
+		// Retrieve result pictureService.getPicturesThumbnails(pagedSearch)
 		PagedResult<PictureThumbnail> pagedResult = pictureThumbnailService
 				.getPictureThumbnails(pagedSearch);
 
-		// Convert List<Picture> to List<PictureResource>
+		// Convert List<PictureThumbnails> to List<PictureThumbnailResource>
 		List<PictureThumbnailResource> resources = pictureThumbnailConverter
 				.convertAll(pagedResult.getEntities());
 
@@ -66,6 +71,31 @@ public class DefaultPictureThumbnailFacade implements PictureThumbnailFacade {
 		// Convert PagedResult to PagedResultResource
 		pagedResultConverter.convert(pagedResult, pagedResultResource);
 
+		return pagedResultResource;
+	}
+
+	@Override
+	public PagedResultResource<PictureThumbnailResource> getRandomPicturesThumbnails(
+			PagedRequest<RandomPictureThumbnailView> pagedRequest) {
+		// Convert PagedRequest to PagedSearch
+		PagedSearch<RandomPictureThumbnailView> pagedSearch = (PagedSearch<RandomPictureThumbnailView>) pagedRequestConverter
+				.convert(pagedRequest);
+
+		// Retrieve result pictureService.getPicturesThumbnails(pagedSearch)
+		PagedResult<RandomPictureThumbnailView> pagedResult = pictureThumbnailService
+				.getRandomPictureThumbnails(pagedSearch);
+
+		// Convert List<RandomPictureThumbnailView> to List<PictureThumbnailResource>
+		List<PictureThumbnailResource> resources = randomPictureThumbnailConverter
+				.convertAll(pagedResult.getEntities());
+
+		// Create pagedResultResource
+		PagedResultResource<PictureThumbnailResource> pagedResultResource = new PagedResultResource<>(
+				"/picturesthumb");
+		pagedResultResource.setEntities(resources);
+
+		// Convert PagedResult to PagedResultResource
+		pagedResultConverter.convert(pagedResult, pagedResultResource);
 		return pagedResultResource;
 	}
 

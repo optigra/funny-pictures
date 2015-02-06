@@ -32,6 +32,9 @@ public class Queries {
 	private static final String FIND_FUNNY_PICTURE_THUMBNAILS_BY_PIC_QUERY_NAME = "FunnyPictureThumbnails.findThumbnailsByPicture";
 	private static final String FIND_FUNNY_PICTURE_THUMBNAILS_BY_PIC_QUERY = "SELECT t FROM FunnyPictureThumbnail t "
 			+ "WHERE t.funnyPicture.picture = :picture AND t.thumbnailType = :type  ORDER BY t.id DESC";
+	
+	public static final String GET_RANDOM_PICTURE_THUMBNAILS_QUERY_NAME = "RandomPictureThumbnailView.findThumbnails";
+	public static final String GET_RANDOM_PICTURE_THUMBNAILS_QUERY = "SELECT t FROM RandomPictureThumbnailView t ORDER BY t.id DESC";
 
 	public static final Queries FIND_PICTURES = new Queries(FIND_PICTURES_QUERY_NAME, FIND_PICTURES_QUERY);
 	public static final Queries FIND_FUNNY_PICTURES = new Queries(FIND_FUNNY_PICTURES_QUERY_NAME, FIND_FUNNY_PICTURES_QUERY);
@@ -41,6 +44,7 @@ public class Queries {
 	public static final Queries GET_FUNNY_PICTURE_THUMBNAILS = new Queries(GET_FUNNY_PICTURE_THUMBNAILS_QUERY_NAME, GET_FUNNY_PICTURE_THUMBNAILS_QUERY);
 	public static final Queries FIND_FUNNY_PICTURE_THUMBNAILS_BY_PICTURE = new Queries(FIND_FUNNY_PICTURE_THUMBNAILS_BY_PIC_QUERY_NAME, 
 			FIND_FUNNY_PICTURE_THUMBNAILS_BY_PIC_QUERY);
+	public static final Queries GET_RANDOM_PICTURE_THUMBNAILS = new Queries(GET_RANDOM_PICTURE_THUMBNAILS_QUERY_NAME, GET_RANDOM_PICTURE_THUMBNAILS_QUERY);
 	
 	
 

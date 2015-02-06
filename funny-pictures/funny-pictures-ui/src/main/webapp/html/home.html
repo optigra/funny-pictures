@@ -1,7 +1,7 @@
 <div layout="row">
 	<div class="gallery-wrapper" flex="80">
 	    <div masonry="{ 'isFitWidth': true }" class="masonry">
-	        <div class="masonry-brick md-whiteframe-z1" ng-repeat="pictureThumbnail in pictureThumbnails">
+	        <div class="masonry-brick" ng-repeat="pictureThumbnail in pictureThumbnails">
 	            <a ng-click="createFunnyPicture(pictureThumbnail.pictureId)">
 	                <img ng-src="{{pictureThumbnail.url}}" alt="">
 	            </a>

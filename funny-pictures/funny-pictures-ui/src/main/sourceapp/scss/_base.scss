@@ -11,11 +11,13 @@ $sub-text-color: #999999;
 $link-lighten-amount: 20%;
 
 // Animations
-$transition-duration: 0.2s;
+$transition-duration: 0.15s;
 $transition-duration-long: 0.4s;
 $transition-animation: ease-in-out;
+$all-animation: all $transition-duration $transition-animation;
 $color-animation: color $transition-duration $transition-animation;
 $opacity-animation: opacity $transition-duration $transition-animation;
+$transform-animation: transform $transition-duration-long $transition-animation;
 $box-shadow-animation: box-shadow $transition-duration-long $transition-animation;
 
 @import "modules/utility";

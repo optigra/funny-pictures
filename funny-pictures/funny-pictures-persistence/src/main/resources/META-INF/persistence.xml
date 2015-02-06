@@ -9,6 +9,7 @@
         <class>com.optigra.funnypictures.model.thumbnail.PictureThumbnail</class>
         <class>com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail</class>
         <class>com.optigra.funnypictures.model.comment.FunnyPictureComment</class>
+        <class>com.optigra.funnypictures.view.thumbnail.RandomPictureThumbnailView</class>
         
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>

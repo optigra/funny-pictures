@@ -50,3 +50,12 @@ md-input-container {
         transform: translate(-50%, -50%);
     }
 }
+.header {
+    .lang {
+        font-size: .7em;
+        cursor: pointer;
+    }
+    .divider {
+        margin: 0 5px;
+    }
+}

@@ -112,7 +112,8 @@ module.exports = function(grunt) {
                         ],
 
                         '<%= app.dist %>/js/controllers.js': [
-                            '<%= app.source %>/js/controllers.js'
+                            '<%= app.source %>/js/controllers.js',
+                            '<%= app.source %>/js/i18n.js'
                         ]
                     }
                 },

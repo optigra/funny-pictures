@@ -8,9 +8,11 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.optigra.funnypictures.dao.thumbnail.PictureThumbnailDao;
+import com.optigra.funnypictures.dao.thumbnail.RandomPictureThumbnailDao;
 import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
+import com.optigra.funnypictures.view.thumbnail.RandomPictureThumbnailView;
 
 /**
  * Picture Thumbnail Service.
@@ -22,6 +24,9 @@ public class DefaultPictureThumbnailService implements PictureThumbnailService {
 
 	@Resource(name = "pictureThumbnailDao")
 	private PictureThumbnailDao pictureThumbnailDao;
+	
+	@Resource(name = "randomPictureThumbnailDao")
+	private RandomPictureThumbnailDao randomPictureThumbnailDao;
 	
 	@Override
 	public void createPictureThumbnail(final PictureThumbnail pictureThumbnail) {
@@ -39,8 +44,16 @@ public class DefaultPictureThumbnailService implements PictureThumbnailService {
 	}
 
 	@Override
+	public PagedResult<RandomPictureThumbnailView> getRandomPictureThumbnails(
+			PagedSearch<RandomPictureThumbnailView> pagedSearch) {
+		Map<String, Object> params = new HashMap<>();
+		
+		pagedSearch.setParameters(params);
+		return randomPictureThumbnailDao.getRandomThumbnails(pagedSearch);
+	}
+
+	@Override
 	public PictureThumbnail getPictureThumbnail(final Long id) {
 		return pictureThumbnailDao.findById(id);
 	}
-
 }

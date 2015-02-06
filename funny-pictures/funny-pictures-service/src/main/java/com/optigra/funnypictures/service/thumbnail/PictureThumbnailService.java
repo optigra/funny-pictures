@@ -3,6 +3,7 @@ package com.optigra.funnypictures.service.thumbnail;
 import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
+import com.optigra.funnypictures.view.thumbnail.RandomPictureThumbnailView;
 
 /**
  * Interface that declares most of operations for Picture Thumbnail.
@@ -30,5 +31,12 @@ public interface PictureThumbnailService {
 	 * @return a section of the result list
 	 */
 	PagedResult<PictureThumbnail> getPictureThumbnails(PagedSearch<PictureThumbnail> pagedSearch);
+	
+	/**
+	 * Retrieves a paged list of picture thumbnails of random type.
+	 * @param pagedSearch search conditions that should specify results offset and limit.
+	 * @return a section of the result list
+	 */
+	PagedResult<RandomPictureThumbnailView> getRandomPictureThumbnails(PagedSearch<RandomPictureThumbnailView> pagedSearch);
 
 }

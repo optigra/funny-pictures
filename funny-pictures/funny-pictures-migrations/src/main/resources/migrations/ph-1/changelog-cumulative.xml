@@ -179,4 +179,33 @@
 			<column name="author" type="varchar(255)" />
 		</createTable>
 	</changeSet>
+	
+	<changeSet id="createRandomPictureThumbnail" author="Oleh Zasadnyy">
+		<createView viewName="v_random_picture_thumbnail">
+			 SELECT DISTINCT s.id,
+			    s.picture_id,
+			    s.update_date,
+			    s.create_date,
+			    s.url,
+			    s.type
+			   FROM ( SELECT DISTINCT ON (picture_thumbnail.picture_id) picture_thumbnail.id,
+			            picture_thumbnail.picture_id,
+			            picture_thumbnail.update_date,
+			            picture_thumbnail.create_date,
+			            picture_thumbnail.url,
+			            picture_thumbnail.type
+			           FROM picture_thumbnail
+			          ORDER BY picture_thumbnail.picture_id, random()) s
+			  ORDER BY s.picture_id;		
+		</createView>
+	</changeSet>
+	
+	<changeSet id="createRandomPictureThumbnailSM" author="Oleh Zasadnyy">
+		<createView viewName="v_random_picture_thumbnail_sm">
+			 	SELECT  pt.id, pt.picture_id, pt.update_date, pt.create_date, pt.url, pt.type
+				FROM picture_thumbnail pt
+				JOIN (SELECT *, trunc(random() * 2) AS random_value FROM (SELECT DISTINCT picture_id FROM picture_thumbnail) dd) ran 
+				  ON ran.picture_id = pt.picture_id AND pt.type = CASE ran.random_value WHEN 0 THEN 'SMALL' WHEN 1 THEN 'MEDIUM' end		
+		</createView>
+	</changeSet>
 </databaseChangeLog>

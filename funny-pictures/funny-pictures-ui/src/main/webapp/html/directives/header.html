@@ -1,14 +1,14 @@
-<md-toolbar class="md-whiteframe-z1">
+<md-toolbar class="md-whiteframe-z1 header">
     <div class="md-toolbar-tools" layout="column" layout-align="center" ng-controller="HeaderController">
         <div class="logo" flex="20" layout="row" layout-align="center center">
             <a class="navbar-brand" href="#home">Funny pictures</a>
         </div>
+
         <md-tabs flex>
             <md-tab id="tab1" aria-controls="tab1-content" ng-click="go('/home')" md-active="isActive('/home')">
                 {{'HOME_HEADER' |translate}}
             </md-tab>
-            <md-tab id="tab2" aria-controls="tab2-content" ng-click="go('/createTemplate')"
-                    md-active="isActive('/createTemplate')">
+            <md-tab id="tab2" aria-controls="tab2-content" ng-click="go('/createTemplate')" md-active="isActive('/createTemplate')">
                 {{'CREATE_TEMPLATE_HEADER' |translate}}
             </md-tab>
             <md-tab id="tab3" aria-controls="tab3-content" ng-click="go('/funnies')" md-active="isActive('/funnies')">
@@ -17,10 +17,12 @@
             <md-tab id="tab3" aria-controls="tab3-content" ng-click="go('/contact')" md-active="isActive('/contact')">
                 {{'CONTACT_US_HEADER' |translate}}
             </md-tab>
-            <div layout="column">
-                <a ng-click="changeLanguage('uk')" >UA</a>
-                <a ng-click="changeLanguage('en_US')" >EN</a>
-            </div>
         </md-tabs>
+
+        <div layout="row" layout-align="center center" flex="10">
+            <span class="lang" ng-click="changeLanguage('uk')">UA</span> 
+            <span class="divider">|</span>
+            <span class="lang" ng-click="changeLanguage('en_US')">EN</span>
+        </div>
     </div>
 </md-toolbar>

@@ -19,5 +19,5 @@ public interface PictureThumbnailDao extends Dao<PictureThumbnail, Long> {
 	 * @return a list of picture thumbnails.
 	 */
 	PagedResult<PictureThumbnail> getThumbnails(PagedSearch<PictureThumbnail> pagedSearch);
-
+	
 }

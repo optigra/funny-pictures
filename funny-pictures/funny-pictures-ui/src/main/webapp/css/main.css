@@ -7018,7 +7018,7 @@ md-tooltip[width-32="8"].md-show .md-background {
 
 a {
   color: #2196F3;
-  transition: color 0.2s ease-in-out; }
+  transition: color 0.15s ease-in-out; }
   a:hover, a:active, a:focus {
     color: #82c4f8; }
 
@@ -7062,6 +7062,12 @@ md-input-container label {
         -ms-transform: translate(-50%, -50%);
             transform: translate(-50%, -50%); }
 
+.header .lang {
+  font-size: 0.7em;
+  cursor: pointer; }
+.header .divider {
+  margin: 0 5px; }
+
 .flow-img {
   overflow: hidden;
   width: 100%;
@@ -7072,7 +7078,7 @@ md-input-container label {
 
 .hidden {
   opacity: 0;
-  transition: opacity 0.2s ease-in-out; }
+  transition: opacity 0.15s ease-in-out; }
 
 .visible {
   opacity: 1; }
@@ -7089,14 +7095,21 @@ md-input-container label {
   margin: 0 auto; }
 
 .masonry-brick {
-  margin: 0.6em;
+  margin: 0.35em;
   display: none;
   box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
-  transition: opacity 0.2s ease-in-out, box-shadow 0.4s ease-in-out;
+  transition: box-shadow 0.4s ease-in-out;
   cursor: pointer; }
   .masonry-brick:hover {
-    opacity: 0.8;
     box-shadow: 0px 8px 17px rgba(0, 0, 0, 0.2); }
+    .masonry-brick:hover img {
+      -webkit-transform: scale(1.02);
+          -ms-transform: scale(1.02);
+              transform: scale(1.02); }
+  .masonry-brick img {
+    min-width: 256px;
+    transition: -webkit-transform 0.4s ease-in-out;
+    transition: transform 0.4s ease-in-out; }
   .masonry-brick.loaded {
     display: block; }
 
