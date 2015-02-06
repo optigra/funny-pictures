@@ -122,6 +122,11 @@ public class DefaultPictureFacade implements PictureFacade {
 		return pictureConverter.convert(picture);
 	}
 
+	/**
+	 * Method for generating thumbnails.
+	 * @param picture
+	 * @return collection of thumbnails.
+	 */
 	private List<PictureThumbnail> generateThumbnails(final Picture picture) {
 		
 		Content content = contentService.getContentByPath(picture.getUrl());
