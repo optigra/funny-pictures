@@ -125,14 +125,22 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		IMOperation op = new IMOperation();
 		
 		op.addImage();
+		op.openOperation();
 		op.size(width, height);
 		op.fill("white");
 		op.stroke("black");
-		op.strokewidth(height / 40 + 1);
+		op.strokewidth(height / 80 + 1);
 		op.background("none");
 		op.gravity("Center");
 		op.font("Impact-Regular");
 		op.addImage("caption:" + caption);
+		op.openOperation();
+		op.p_clone();
+		op.shadow(100, 10.0, 0, 0);
+		op.closeOperation();
+		op.p_swap();
+		op.layers("merge");
+		op.closeOperation();
 		op.gravity(gravity);
 		op.composite();
 		op.addImage();

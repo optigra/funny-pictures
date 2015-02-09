@@ -78,8 +78,12 @@ public class BaseAdviceMemeGeneratorTest {
 		
 		String expectedConvertCommand = "?img? ?img? ";
 		
-		String expectedConvertTopCommand = "?img? -size 400x80 -fill white -stroke black -strokewidth 3 -background none -gravity Center -font Impact-Regular caption:Top caption -gravity North -composite ?img? ";
-		String expectedConvertBottomCommand = "?img? -size 400x80 -fill white -stroke black -strokewidth 3 -background none -gravity Center -font Impact-Regular caption:Bottom caption -gravity South -composite ?img? ";
+		String expectedConvertTopCommand = "?img? ( -size 400x80 -fill white -stroke black -strokewidth 2 " +
+				"-background none -gravity Center -font Impact-Regular caption:Top caption ( +clone -shadow 100x10.0+0+0 ) " + 
+				"+swap -layers merge ) -gravity North -composite ?img? ";
+		String expectedConvertBottomCommand = "?img? ( -size 400x80 -fill white -stroke black -strokewidth 2 " + 
+				"-background none -gravity Center -font Impact-Regular caption:Bottom caption ( +clone -shadow 100x10.0+0+0 ) " + 
+				"+swap -layers merge ) -gravity South -composite ?img? ";
 		
 		assertEquals(expectedConvertCommand, convertOperationCaptor.getAllValues().get(0).toString());
 		assertEquals(expectedConvertTopCommand, convertOperationCaptor.getAllValues().get(1).toString());
