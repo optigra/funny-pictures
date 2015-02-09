@@ -50,7 +50,7 @@ public class PictureThumbnailController extends BaseController {
 	public PagedResultResource<PictureThumbnailResource> getPicturesThumbnails(@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
 			@RequestParam(value = "limit", defaultValue = "20") final Integer limit,
 			@RequestParam(value = "thumbnailType", defaultValue = "MEDIUM") final String thumbnailType) {
-		if(ThumbnailType.RANDOM.name().equals(thumbnailType)) {
+		if (ThumbnailType.RANDOM.name().equals(thumbnailType)) {
 			PagedRequest pagedRequest = new PagedRequest(offset, limit);
 			return pictureThumbnailFacade.getRandomPicturesThumbnails(pagedRequest);
 		} else {
