@@ -21,7 +21,7 @@ public class RandomPictureThumbnailView extends ThumbnailView {
 		return pictureId;
 	}
 
-	public void setPictureId(Long pictureId) {
+	public void setPictureId(final Long pictureId) {
 		this.pictureId = pictureId;
 	}
 	

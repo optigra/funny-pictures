@@ -3,50 +3,50 @@
  */
 var funnyPicturesApp = angular.module('mainModule', ['ngResource', 'ui.bootstrap', 'ngRoute', 'funnyControllers', 'ngMaterial', 'wu.masonry', 'pascalprecht.translate']);
 
-funnyPicturesApp.factory('Pictures', function($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/pictures/:id', {}, {
+funnyPicturesApp.factory('Pictures', ['$resource', 'apiUrl', function($resource, apiUrl) {
+    return $resource(apiUrl + '/pictures/:id', {}, {
         'query': {
             method: 'GET',
             isArray: false
         }
     });
-});
+}]);
 
-funnyPicturesApp.factory('PicturesThumbnails', function($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/picturesthumb/:id', {}, {
+funnyPicturesApp.factory('PicturesThumbnails', ['$resource', 'apiUrl', function($resource, apiUrl) {
+    return $resource(apiUrl + '/picturesthumb/:id', {}, {
         'query': {
             method: 'GET',
             isArray: false
         }
     });
-});
+}]);
 
-funnyPicturesApp.factory('Funnies', function($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/funnies/:id', {}, {
+funnyPicturesApp.factory('Funnies', ['$resource', 'apiUrl', function($resource, apiUrl) {
+    return $resource(apiUrl + '/funnies/:id', {}, {
         'query': {
             method: 'GET',
             isArray: false
         }
     });
-});
+}]);
 
-funnyPicturesApp.factory('FunnyPicturesThumbnails', function($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/funniesthumb/:id', {}, {
+funnyPicturesApp.factory('FunnyPicturesThumbnails', ['$resource', 'apiUrl', function($resource, apiUrl) {
+    return $resource(apiUrl + '/funniesthumb/:id', {}, {
         'query': {
             method: 'GET',
             isArray: false
         }
     });
-});
+}]);
 
-funnyPicturesApp.factory('Feedback', function($resource, SharedProperties) {
-    return $resource(SharedProperties.getApiUrl() + '/feedbacks/:id', {}, {
+funnyPicturesApp.factory('Feedback', ['$resource', 'apiUrl', function($resource, apiUrl) {
+    return $resource(apiUrl + '/feedbacks/:id', {}, {
         'query': {
             method: 'GET',
             isArray: false
         }
     });
-});
+}]);
 
 funnyPicturesApp.service('FileUpload', ['$http', function($http) {
     this.uploadFileToUrl = function(file, uploadUrl) {
@@ -172,5 +172,37 @@ funnyPicturesApp.directive('footer', function() {
         restrict: 'E',
         templateUrl: "html/directives/footer.html"
 
+    };
+});
+
+funnyPicturesApp.directive('tilesGallery', ['$timeout', function($timeout) {
+    return {
+        restrict: 'A',
+        link: function($scope, element, attrs) {
+            $scope.$on('imageLoaded', function() {
+                console.log('test');
+                $timeout(function() { // You might need this timeout to be sure its run after DOM render.
+                    $("#final-tg").finalTilesGallery({
+                        minTileWidth: 180,
+                        margin: 15,
+                        gridCellSize: 30
+                    });
+                }, 0, false);
+            })
+        }
+    };
+}]);
+
+funnyPicturesApp.directive('onLastRepeat', function() {
+    return function(scope, element, attrs) {
+        if (scope.$last) setTimeout(function() {
+            scope.$emit('onRepeatLast', element, attrs);
+            // console.log('last');
+            // $("#final-tg").finalTilesGallery({
+            //     minTileWidth: 180,
+            //     margin: 15,
+            //     gridCellSize: 30
+            // });
+        }, 1);
     };
 });

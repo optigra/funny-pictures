@@ -119,7 +119,7 @@ module.exports = function(grunt) {
                 },
                 dist: {
                     options: {
-                        mangle: false,
+                        compress: true,
                         preserveComments: false,
                         report: 'min'
                     },
@@ -138,14 +138,16 @@ module.exports = function(grunt) {
                             'bower_components/angular-aria/angular-aria.js',
                             'bower_components/angular-material/angular-material.js',
                             'bower_components/angular-masonry/angular-masonry.js',
+                            'bower_components/angular-translate/angular-translate.js',
                             '<%= app.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
                         ],
                         '<%= app.dist %>/js/app.js': [
                             '<%= app.source %>/js/app.js',
-                            '<%= app.source %>/js/properties/production.js'
+                            '<%= app.source %>/js/properties/development.js'
                         ],
                         '<%= app.dist %>/js/controllers.js': [
-                            '<%= app.source %>/js/controllers.js'
+                            '<%= app.source %>/js/controllers.js',
+                            '<%= app.source %>/js/i18n.js'
                         ]
                     }
                 }
@@ -154,7 +156,7 @@ module.exports = function(grunt) {
 
 
     grunt.registerTask('serve', ['clean', 'copy:css', 'sass:server',
-        'autoprefixer', 'uglify:server'
+        'autoprefixer', 'uglify:dist'
     ]);
     grunt.registerTask('build', ['clean', 'copy:css', 'sass:dist',
         'autoprefixer', 'uglify:dist'

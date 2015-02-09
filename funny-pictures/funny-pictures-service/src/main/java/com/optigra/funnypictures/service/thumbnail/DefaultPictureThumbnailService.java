@@ -45,7 +45,7 @@ public class DefaultPictureThumbnailService implements PictureThumbnailService {
 
 	@Override
 	public PagedResult<RandomPictureThumbnailView> getRandomPictureThumbnails(
-			PagedSearch<RandomPictureThumbnailView> pagedSearch) {
+			final PagedSearch<RandomPictureThumbnailView> pagedSearch) {
 		Map<String, Object> params = new HashMap<>();
 		
 		pagedSearch.setParameters(params);

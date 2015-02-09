@@ -14,7 +14,7 @@ import com.optigra.funnypictures.view.thumbnail.RandomPictureThumbnailView;
  *
  */
 @Repository("randomPictureThumbnailDao")
-public class DefaultRandomPictureThumbnailDao extends AbstractDao<RandomPictureThumbnailView, Long> implements RandomPictureThumbnailDao{
+public class DefaultRandomPictureThumbnailDao extends AbstractDao<RandomPictureThumbnailView, Long> implements RandomPictureThumbnailDao {
 
 
 	@Override

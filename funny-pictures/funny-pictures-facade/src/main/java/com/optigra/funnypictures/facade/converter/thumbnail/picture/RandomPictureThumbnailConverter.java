@@ -19,8 +19,8 @@ public class RandomPictureThumbnailConverter extends AbstractConverter<RandomPic
 	private String contentRootUrl;
 	
 	@Override
-	public PictureThumbnailResource convert(RandomPictureThumbnailView source,
-			PictureThumbnailResource target) {
+	public PictureThumbnailResource convert(final RandomPictureThumbnailView source,
+			final PictureThumbnailResource target) {
 		
 		target.setId(source.getId());
 		target.setPictureId(source.getPictureId());
@@ -31,7 +31,7 @@ public class RandomPictureThumbnailConverter extends AbstractConverter<RandomPic
 	}
 
 	@Override
-	public PictureThumbnailResource convert(RandomPictureThumbnailView source) {
+	public PictureThumbnailResource convert(final RandomPictureThumbnailView source) {
 		return convert(source, new PictureThumbnailResource());
 	}
 	

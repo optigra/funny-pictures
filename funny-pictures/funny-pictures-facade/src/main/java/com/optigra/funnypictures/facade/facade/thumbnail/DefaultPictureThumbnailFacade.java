@@ -76,7 +76,7 @@ public class DefaultPictureThumbnailFacade implements PictureThumbnailFacade {
 
 	@Override
 	public PagedResultResource<PictureThumbnailResource> getRandomPicturesThumbnails(
-			PagedRequest<RandomPictureThumbnailView> pagedRequest) {
+			final PagedRequest<RandomPictureThumbnailView> pagedRequest) {
 		// Convert PagedRequest to PagedSearch
 		PagedSearch<RandomPictureThumbnailView> pagedSearch = (PagedSearch<RandomPictureThumbnailView>) pagedRequestConverter
 				.convert(pagedRequest);

@@ -49,9 +49,10 @@ public class PictureThumbnailController extends BaseController {
 	@RequestMapping(method = RequestMethod.GET)
 	public PagedResultResource<PictureThumbnailResource> getPicturesThumbnails(@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
 			@RequestParam(value = "limit", defaultValue = "20") final Integer limit,
-			@RequestParam(value = "thumbnailType", defaultValue = "RANDOM") final String thumbnailType) {
-		if("RANDOM".equals(thumbnailType)) {
-			return getRandomPicturesThumbnails(offset, limit);
+			@RequestParam(value = "thumbnailType", defaultValue = "MEDIUM") final String thumbnailType) {
+		if(ThumbnailType.RANDOM.name().equals(thumbnailType)) {
+			PagedRequest pagedRequest = new PagedRequest(offset, limit);
+			return pictureThumbnailFacade.getRandomPicturesThumbnails(pagedRequest);
 		} else {
 			LOG.info("Get pictures thumbnails: offset [{}] limit [{}] thumbnailType [{}]", offset, limit, thumbnailType);
 			PictureThumbnailResource resource = new PictureThumbnailResource();
@@ -59,23 +60,6 @@ public class PictureThumbnailController extends BaseController {
 			PagedRequest pagedRequest = new PagedRequest(resource, offset, limit);
 			return pictureThumbnailFacade.getPicturesThumbnails(pagedRequest);
 		}
-	}
-	
-	/**
-	 * Controller method for getting paged result of pictures thumbnails of random type. Requested
-	 * method GET.
-	 * 
-	 * @param offset
-	 *            starting position of paged result
-	 * @param limit
-	 *            count of entities in result
-	 * @return PagedResultResource with limit count of entities.
-	 */
-	public PagedResultResource<PictureThumbnailResource> getRandomPicturesThumbnails(@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
-			@RequestParam(value = "limit", defaultValue = "20") final Integer limit) {
-		LOG.info("Get pictures thumbnails: offset [{}] limit [{}] ", offset, limit);
-		PagedRequest pagedRequest = new PagedRequest(offset, limit);
-		return pictureThumbnailFacade.getRandomPicturesThumbnails(pagedRequest);
 	}
 	
 	/**
