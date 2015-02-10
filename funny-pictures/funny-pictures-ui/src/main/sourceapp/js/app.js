@@ -89,8 +89,12 @@ funnyPicturesApp.service('FileUpload', ['$http', function($http) {
 funnyPicturesApp.config(["$routeProvider", function($routeProvider) {
     $routeProvider
         .when("/home", {
-            templateUrl: "html/home.html",
-            controller: 'HomeController'
+            templateUrl: "html/funnies.html",
+            controller: 'FunniesController'
+        })
+        .when("/templates", {
+            templateUrl: "html/templates.html",
+            controller: 'TemplatesController'
         })
         .when("/createTemplate", {
             templateUrl: "html/createPicture.html",
@@ -103,10 +107,6 @@ funnyPicturesApp.config(["$routeProvider", function($routeProvider) {
         .when("/preview/:funnyPictureId", {
             templateUrl: "html/funnyPicturePreview.html",
             controller: 'PreviewFunnyController'
-        })
-        .when("/funnies", {
-            templateUrl: "html/funnies.html",
-            controller: 'FunniesController'
         })
         .when("/contact", {
             templateUrl: "html/contact.html",
@@ -172,37 +172,5 @@ funnyPicturesApp.directive('footer', function() {
         restrict: 'E',
         templateUrl: "html/directives/footer.html"
 
-    };
-});
-
-funnyPicturesApp.directive('tilesGallery', ['$timeout', function($timeout) {
-    return {
-        restrict: 'A',
-        link: function($scope, element, attrs) {
-            $scope.$on('imageLoaded', function() {
-                console.log('test');
-                $timeout(function() { // You might need this timeout to be sure its run after DOM render.
-                    $("#final-tg").finalTilesGallery({
-                        minTileWidth: 180,
-                        margin: 15,
-                        gridCellSize: 30
-                    });
-                }, 0, false);
-            })
-        }
-    };
-}]);
-
-funnyPicturesApp.directive('onLastRepeat', function() {
-    return function(scope, element, attrs) {
-        if (scope.$last) setTimeout(function() {
-            scope.$emit('onRepeatLast', element, attrs);
-            // console.log('last');
-            // $("#final-tg").finalTilesGallery({
-            //     minTileWidth: 180,
-            //     margin: 15,
-            //     gridCellSize: 30
-            // });
-        }, 1);
     };
 });

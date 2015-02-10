@@ -5,24 +5,24 @@
         </div>
 
         <md-tabs flex>
-            <md-tab id="tab1" aria-controls="tab1-content" ng-click="go('/home')" md-active="isActive('/home')">
+            <md-tab id="tab1" aria-controls="tab3-content" ng-click="go('/home')" md-active="isActive('/home')">
                 {{'HOME_HEADER' |translate}}
             </md-tab>
-            <md-tab id="tab2" aria-controls="tab2-content" ng-click="go('/createTemplate')" md-active="isActive('/createTemplate')">
+            <md-tab id="tab2" aria-controls="tab1-content" ng-click="go('/templates')" md-active="isActive('/templates')">
+                {{'TEMPLATES_HEADER' |translate}}
+            </md-tab>
+            <md-tab id="tab3" aria-controls="tab2-content" ng-click="go('/createTemplate')" md-active="isActive('/createTemplate')">
                 {{'CREATE_TEMPLATE_HEADER' |translate}}
             </md-tab>
-            <md-tab id="tab3" aria-controls="tab3-content" ng-click="go('/funnies')" md-active="isActive('/funnies')">
-                {{'FUNNY_PICTURES_HEADER' |translate}}
-            </md-tab>
-            <md-tab id="tab3" aria-controls="tab3-content" ng-click="go('/contact')" md-active="isActive('/contact')">
+            <md-tab id="tab4" aria-controls="tab3-content" ng-click="go('/contact')" md-active="isActive('/contact')">
                 {{'CONTACT_US_HEADER' |translate}}
             </md-tab>
         </md-tabs>
 
         <div layout="row" layout-align="center center" flex="10">
-            <span class="lang" ng-click="changeLanguage('uk')">UA</span> 
-            <span class="divider">|</span>
-            <span class="lang" ng-click="changeLanguage('en_US')">EN</span>
+            <span class="lang" ng-class="{current: getCurrentLanguage() == 'uk'}" ng-click="getCurrentLanguage() != 'uk' && changeLanguage('uk')">UA</span> 
+            <span class="divider">|{{ use() }}</span>
+            <span class="lang" ng-class="{current: getCurrentLanguage() == 'en_US'}" ng-click="getCurrentLanguage() != 'en_US' && changeLanguage('en_US')">EN</span>
         </div>
     </div>
 </md-toolbar>

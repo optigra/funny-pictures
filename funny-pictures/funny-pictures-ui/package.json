@@ -1,20 +1,19 @@
 {
   "name": "funny-pictures",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Description for funny-pictures",
   "dependencies": {
   },
   "devDependencies": {
     "bower": "~1.3.12",
     "grunt": "~0.4.5",
-    "grunt-autoprefixer": "~2.2.0",
     "grunt-cli": "~0.1.13",
+    "grunt-autoprefixer": "~2.2.0",
     "grunt-contrib-copy": "~0.7.0",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-uglify": "~0.7.0",
-    "grunt-contrib-watch": "~0.6.1",
     "grunt-sass": "~0.17.0",
-    "jit-grunt": "~0.9.0",
+    "jit-grunt": "~0.9.1",
     "time-grunt": "~1.0.0"
   },
   "engines": {

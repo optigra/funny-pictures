@@ -9,19 +9,8 @@ module.exports = function(grunt) {
                 source: 'src/main/sourceapp',
                 dist: 'src/main/webapp'
             },
-            watch: {
-                sass: {
-                    files: ['<%= app.source %>/scss/**/*.{scss,sass}'],
-                    tasks: ['sass:server', 'autoprefixer:dist']
-                },
-                scripts: {
-                    files: ['<%= app.source %>/js/**/*.{js}'],
-                    tasks: ['uglify:dist']
-                }
-            },
             clean: {
                 dist: ['.tmp', '<%= app.dist %>/css', '<%= app.dist %>/js']
-
             },
             copy: {
                 css: {
@@ -108,10 +97,7 @@ module.exports = function(grunt) {
 
                         '<%= app.dist %>/js/app.js': [
                             '<%= app.source %>/js/app.js',
-                            '<%= app.source %>/js/properties/development.js'
-                        ],
-
-                        '<%= app.dist %>/js/controllers.js': [
+                            '<%= app.source %>/js/properties/development.js',
                             '<%= app.source %>/js/controllers.js',
                             '<%= app.source %>/js/i18n.js'
                         ]
@@ -141,11 +127,10 @@ module.exports = function(grunt) {
                             'bower_components/angular-translate/angular-translate.js',
                             '<%= app.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
                         ],
+                        
                         '<%= app.dist %>/js/app.js': [
                             '<%= app.source %>/js/app.js',
-                            '<%= app.source %>/js/properties/development.js'
-                        ],
-                        '<%= app.dist %>/js/controllers.js': [
+                            '<%= app.source %>/js/properties/production.js',
                             '<%= app.source %>/js/controllers.js',
                             '<%= app.source %>/js/i18n.js'
                         ]
@@ -156,7 +141,7 @@ module.exports = function(grunt) {
 
 
     grunt.registerTask('serve', ['clean', 'copy:css', 'sass:server',
-        'autoprefixer', 'uglify:dist'
+        'autoprefixer', 'uglify:server'
     ]);
     grunt.registerTask('build', ['clean', 'copy:css', 'sass:dist',
         'autoprefixer', 'uglify:dist'

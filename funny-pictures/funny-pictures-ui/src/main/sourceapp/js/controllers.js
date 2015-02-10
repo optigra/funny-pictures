@@ -3,7 +3,7 @@
  */
 var funnyControllers = angular.module('funnyControllers', ['pascalprecht.translate']);
 
-funnyControllers.controller('HomeController', [
+funnyControllers.controller('TemplatesController', [
     '$scope',
     '$location',
     '$mdToast',
@@ -77,6 +77,9 @@ funnyControllers.controller('HeaderController', ['$scope', '$location', '$transl
         };
         $scope.changeLanguage = function(langKey) {
             $translate.use(langKey);
+        };
+        $scope.getCurrentLanguage = function() {
+            return $translate.use();
         };
         $scope.go = function(path) {
             $location.path(path);

@@ -17,7 +17,7 @@ $transition-animation: ease-in-out;
 $all-animation: all $transition-duration $transition-animation;
 $color-animation: color $transition-duration $transition-animation;
 $opacity-animation: opacity $transition-duration $transition-animation;
-$transform-animation: transform $transition-duration-long $transition-animation;
+$transform-animation: transform $transition-duration $transition-animation;
 $box-shadow-animation: box-shadow $transition-duration-long $transition-animation;
 
 @import "modules/utility";

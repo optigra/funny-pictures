@@ -23,9 +23,9 @@ funnyControllers.config(['$translateProvider', function ($translateProvider) {
         CREATE_FUNNY_BUTTON: "Create picture",
         CANCEL_BUTTON: "Cancel",
         CREATE_NEW_BUTTON: "Create new",
-        HOME_HEADER: "Templates",
+        HOME_HEADER: "Home",
+        TEMPLATES_HEADER: "Templates",
         CREATE_TEMPLATE_HEADER: "Create template",
-        FUNNY_PICTURES_HEADER: "Funny pictures",
         CONTACT_US_HEADER: "Contact us"
 
     });
@@ -54,9 +54,9 @@ funnyControllers.config(['$translateProvider', function ($translateProvider) {
         CREATE_FUNNY_BUTTON: "Створити мем",
         CANCEL_BUTTON: "Відмінити",
         CREATE_NEW_BUTTON: "Створити новий мем",
-        HOME_HEADER: "Шаблони",
+        HOME_HEADER: "Головна",
+        TEMPLATES_HEADER: "Шаблони",
         CREATE_TEMPLATE_HEADER: "Створити шаблон",
-        FUNNY_PICTURES_HEADER: "Картинки",
         CONTACT_US_HEADER: "Контакти"
     });
 

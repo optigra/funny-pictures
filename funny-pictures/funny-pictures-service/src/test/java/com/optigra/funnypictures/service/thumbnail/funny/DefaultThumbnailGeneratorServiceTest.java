@@ -65,8 +65,8 @@ public class DefaultThumbnailGeneratorServiceTest {
 		List<ThumbnailContent> thumbnails = unit.generateThumbnails(generatorServiceInputContent);
 		
 		// Then
-		verify(contentService, times(4)).getContentByPath(originalFilePath);
-		verify(thumbnailGenerator, times(4)).generate(any(ThumbnailContext.class));
+		verify(contentService, times(3)).getContentByPath(originalFilePath);
+		verify(thumbnailGenerator, times(3)).generate(any(ThumbnailContext.class));
 		// TODO ad assertion about results list
 	}
 

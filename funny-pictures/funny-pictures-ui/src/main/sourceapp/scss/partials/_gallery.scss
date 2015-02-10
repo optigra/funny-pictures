@@ -15,15 +15,19 @@
     cursor: pointer;
     &:hover {
         box-shadow: 0px 8px 17px rgba(0, 0, 0, 0.2);
-        img {
-            transform: scale(1.02);
-        }
-    }
-    img {
-        min-width: 256px;
-        transition: $transform-animation;
     }
     &.loaded {
         display: block;
+    }
+    img {
+        min-width: 256px;
+    }
+}
+.brick-inside {
+    display: block;
+    transition: $transform-animation;
+    background: #ffffff;
+    &:hover {
+        transform: scale(1.02);
     }
 }

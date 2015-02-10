@@ -28,7 +28,7 @@
     <div class="image-preview-wrapper" flex="50">
         <div masonry>
             <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyByTemplate in funniesByTemplate">
-                <a ng-href="#/preview/{{funnyByTemplate.funnyPictureId}}">
+                <a class="brick-inside" ng-href="#/preview/{{funnyByTemplate.funnyPictureId}}">
                     <img ng-src="{{funnyByTemplate.url}}" alt="">
                 </a>
             </div>

@@ -33,8 +33,10 @@ public class DefaultThumbnailGeneratorService implements
 	
 	@Override
 	public List<ThumbnailContent> generateThumbnails(final Content content) {
+		ThumbnailType[] thumbnailTypes = new ThumbnailType[]{ThumbnailType.SMALL, 
+				ThumbnailType.MEDIUM, ThumbnailType.BIG};
 		List<ThumbnailContent> thumbnails = new ArrayList<ThumbnailContent>();
-		for (ThumbnailType thumbnailType : ThumbnailType.values()) {
+		for (ThumbnailType thumbnailType : thumbnailTypes) {
 			Content generatorInputContent = contentService.getContentByPath(content.getPath());
 			ThumbnailContent thumbnail = generateThumbnail(generatorInputContent, thumbnailType);
 			thumbnails.add(thumbnail);
