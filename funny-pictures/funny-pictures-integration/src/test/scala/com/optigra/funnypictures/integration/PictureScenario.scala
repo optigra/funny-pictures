@@ -10,9 +10,7 @@ class PictureScenario extends Simulation {
     .baseURL("http://localhost:8080/funny-pictures-rest-api/api")
     .acceptHeader("application/json")
 
-  val pictureDetails = Array(Map("name" -> "name1", "url" -> "url1"),
-                   		     Map("name" -> "name2", "url" -> "url2"),
-                             Map("name" -> "name3", "url" -> "url3"))
+  val pictureDetails = Array(Map("name" -> "name1", "url" -> "/414f8a8d-d856-4010-b33d-96b58e419233.png"))
                        .queue
     
   val scn = scenario("Manage Pictures")

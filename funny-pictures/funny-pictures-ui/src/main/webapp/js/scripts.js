@@ -1,25 +1,29 @@
-function mdMediaFactory($mdConstant, $rootScope, $window) {
+function mdMediaFactory($mdConstant, $mdUtil, $rootScope, $window) {
     function $mdMedia(query) {
-        var validated = queries[query];
-        angular.isUndefined(validated) && (validated = queries[query] = validate(query));
-        var result = results[validated];
+        var validated = queriesCache.get(query);
+        angular.isUndefined(validated) && (validated = queriesCache.put(query, validate(query)));
+        var result = resultsCache.get(validated);
         return angular.isUndefined(result) && (result = add(validated)), result;
     }
     function validate(query) {
         return $mdConstant.MEDIA[query] || ("(" !== query.charAt(0) ? "(" + query + ")" : query);
     }
     function add(query) {
-        var result = $window.matchMedia(query);
-        return result.addListener(onQueryChange), results[result.media] = !!result.matches;
+        return resultsCache.put(query, !!$window.matchMedia(query).matches);
     }
-    function onQueryChange() {
-        var query = this;
-        $rootScope.$evalAsync(function() {
-            results[query.media] = !!query.matches;
-        });
+    function updateAll() {
+        var keys = resultsCache.keys(), len = keys.length;
+        if (len) {
+            for (var i = 0; len > i; i++) add(keys[i]);
+            $rootScope.$evalAsync();
+        }
     }
-    var queries = {}, results = {};
-    return $mdMedia;
+    var queriesCache = $mdUtil.cacheFactory("$mdMedia:queries", {
+        capacity: 15
+    }), resultsCache = $mdUtil.cacheFactory("$mdMedia:results", {
+        capacity: 15
+    });
+    return angular.element($window).on("resize", updateAll), $mdMedia;
 }
 
 !function(global, factory) {
@@ -4785,7 +4789,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             for (message = prefix + template.replace(/\{\d+\}/g, function(match) {
                 var index = +match.slice(1, -1);
                 return index + 2 < templateArgs.length ? toDebugString(templateArgs[index + 2]) : match;
-            }), message = message + "\nhttp://errors.angularjs.org/1.3.13/" + (module ? module + "/" : "") + code, 
+            }), message = message + "\nhttp://errors.angularjs.org/1.3.10/" + (module ? module + "/" : "") + code, 
             i = 2; i < arguments.length; i++) message = message + (2 == i ? "?" : "&") + "p" + (i - 2) + "=" + encodeURIComponent(toDebugString(arguments[i]));
             return new ErrorConstructor(message);
         };
@@ -5086,11 +5090,11 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
         }, NG_ENABLE_DEBUG_INFO = /^NG_ENABLE_DEBUG_INFO!/, NG_DEFER_BOOTSTRAP = /^NG_DEFER_BOOTSTRAP!/;
         return window && NG_ENABLE_DEBUG_INFO.test(window.name) && (config.debugInfoEnabled = !0, 
         window.name = window.name.replace(NG_ENABLE_DEBUG_INFO, "")), window && !NG_DEFER_BOOTSTRAP.test(window.name) ? doBootstrap() : (window.name = window.name.replace(NG_DEFER_BOOTSTRAP, ""), 
-        angular.resumeBootstrap = function(extraModules) {
-            return forEach(extraModules, function(module) {
+        void (angular.resumeBootstrap = function(extraModules) {
+            forEach(extraModules, function(module) {
                 modules.push(module);
             }), doBootstrap();
-        }, void (isFunction(angular.resumeDeferredBootstrap) && angular.resumeDeferredBootstrap()));
+        }));
     }
     function reloadWithDebugInfo() {
         window.name = "NG_ENABLE_DEBUG_INFO!" + window.name, window.location.reload();
@@ -5622,7 +5626,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             }
             function invoke(fn, self, locals, serviceName) {
                 "string" == typeof locals && (serviceName = locals, locals = null);
-                var length, i, key, args = [], $inject = createInjector.$$annotate(fn, strictDi, serviceName);
+                var length, i, key, args = [], $inject = annotate(fn, strictDi, serviceName);
                 for (i = 0, length = $inject.length; length > i; i++) {
                     if (key = $inject[i], "string" != typeof key) throw $injectorMinErr("itkn", "Incorrect injection token! Expected service name as string, got {0}", key);
                     args.push(locals && locals.hasOwnProperty(key) ? locals[key] : getService(key, serviceName));
@@ -5637,7 +5641,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
                 invoke: invoke,
                 instantiate: instantiate,
                 get: getService,
-                annotate: createInjector.$$annotate,
+                annotate: annotate,
                 has: function(name) {
                     return providerCache.hasOwnProperty(name + providerSuffix) || cache.hasOwnProperty(name);
                 }
@@ -6235,7 +6239,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
                 });
             }
             function compileTemplateUrl(directives, $compileNode, tAttrs, $rootElement, childTranscludeFn, preLinkFns, postLinkFns, previousCompileContext) {
-                var afterTemplateNodeLinkFn, afterTemplateChildLinkFn, linkQueue = [], beforeTemplateCompileNode = $compileNode[0], origAsyncDirective = directives.shift(), derivedSyncDirective = inherit(origAsyncDirective, {
+                var afterTemplateNodeLinkFn, afterTemplateChildLinkFn, linkQueue = [], beforeTemplateCompileNode = $compileNode[0], origAsyncDirective = directives.shift(), derivedSyncDirective = extend({}, origAsyncDirective, {
                     templateUrl: null,
                     transclude: null,
                     replace: null,
@@ -6475,12 +6479,9 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             }
             return function(expression, locals, later, ident) {
                 var instance, match, constructor, identifier;
-                if (later = later === !0, ident && isString(ident) && (identifier = ident), isString(expression)) {
-                    if (match = expression.match(CNTRL_REG), !match) throw $controllerMinErr("ctrlfmt", "Badly formed controller string '{0}'. Must match `__name__ as __id__` or `__name__`.", expression);
-                    constructor = match[1], identifier = identifier || match[3], expression = controllers.hasOwnProperty(constructor) ? controllers[constructor] : getter(locals.$scope, constructor, !0) || (globals ? getter($window, constructor, !0) : undefined), 
-                    assertArgFn(expression, constructor, !0);
-                }
-                if (later) {
+                if (later = later === !0, ident && isString(ident) && (identifier = ident), isString(expression) && (match = expression.match(CNTRL_REG), 
+                constructor = match[1], identifier = identifier || match[3], expression = controllers.hasOwnProperty(constructor) ? controllers[constructor] : getter(locals.$scope, constructor, !0) || (globals ? getter($window, constructor, !0) : undefined), 
+                assertArgFn(expression, constructor, !0)), later) {
                     var controllerPrototype = (isArray(expression) ? expression[expression.length - 1] : expression).prototype;
                     return instance = Object.create(controllerPrototype || null), identifier && addIdentifier(locals, identifier, instance, constructor || expression.name), 
                     extend(function() {
@@ -7041,14 +7042,14 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             $location.$$state = $browser.state();
             var IGNORE_URI_REGEXP = /^\s*(javascript|mailto):/i;
             $rootElement.on("click", function(event) {
-                if (html5Mode.rewriteLinks && !event.ctrlKey && !event.metaKey && !event.shiftKey && 2 != event.which && 2 != event.button) {
+                if (html5Mode.rewriteLinks && !event.ctrlKey && !event.metaKey && 2 != event.which) {
                     for (var elm = jqLite(event.target); "a" !== nodeName_(elm[0]); ) if (elm[0] === $rootElement[0] || !(elm = elm.parent())[0]) return;
                     var absHref = elm.prop("href"), relHref = elm.attr("href") || elm.attr("xlink:href");
                     isObject(absHref) && "[object SVGAnimatedString]" === absHref.toString() && (absHref = urlResolve(absHref.animVal).href), 
                     IGNORE_URI_REGEXP.test(absHref) || !absHref || elm.attr("target") || event.isDefaultPrevented() || $location.$$parseLinkUrl(absHref, relHref) && (event.preventDefault(), 
                     $location.absUrl() != $browser.url() && ($rootScope.$apply(), $window.angular["ff-684208-preventDefault"] = !0));
                 }
-            }), trimEmptyHash($location.absUrl()) != trimEmptyHash(initialUrl) && $browser.url($location.absUrl(), !0);
+            }), $location.absUrl() != initialUrl && $browser.url($location.absUrl(), !0);
             var initializing = !0;
             return $browser.onUrlChange(function(newUrl, newState) {
                 $rootScope.$evalAsync(function() {
@@ -8685,11 +8686,11 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
         }
         return csp.isActive_ = active;
     }, ngAttrPrefixes = [ "ng-", "data-ng-", "ng:", "x-ng-" ], SNAKE_CASE_REGEXP = /[A-Z]/g, bindJQueryFired = !1, NODE_TYPE_ELEMENT = 1, NODE_TYPE_TEXT = 3, NODE_TYPE_COMMENT = 8, NODE_TYPE_DOCUMENT = 9, NODE_TYPE_DOCUMENT_FRAGMENT = 11, version = {
-        full: "1.3.13",
+        full: "1.3.10",
         major: 1,
         minor: 3,
-        dot: 13,
-        codeName: "meticulous-riffleshuffle"
+        dot: 10,
+        codeName: "heliotropic-sundial"
     };
     JQLite.expando = "ng339";
     var jqCache = JQLite.cache = {}, jqId = 1, addEventListenerFn = function(element, type, fn) {
@@ -9082,7 +9083,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
         } ];
     } ], $compileMinErr = minErr("$compile");
     $CompileProvider.$inject = [ "$provide", "$$sanitizeUriProvider" ];
-    var PREFIX_REGEXP = /^((?:x|data)[\:\-_])/i, $controllerMinErr = minErr("$controller"), APPLICATION_JSON = "application/json", CONTENT_TYPE_APPLICATION_JSON = {
+    var PREFIX_REGEXP = /^((?:x|data)[\:\-_])/i, APPLICATION_JSON = "application/json", CONTENT_TYPE_APPLICATION_JSON = {
         "Content-Type": APPLICATION_JSON + ";charset=utf-8"
     }, JSON_START = /^\[|^\{(?!\{)/, JSON_ENDS = {
         "[": /]$/,
@@ -9522,7 +9523,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
                 if (args) for (var i = argsFn.length; i--; ) args[i] = ensureSafeObject(argsFn[i](scope, locals), expressionText);
                 ensureSafeObject(context, expressionText), ensureSafeFunction(fn, expressionText);
                 var v = fn.apply ? fn.apply(context, args) : fn(args[0], args[1], args[2], args[3], args[4]);
-                return args && (args.length = 0), ensureSafeObject(v, expressionText);
+                return ensureSafeObject(v, expressionText);
             };
         },
         arrayDeclaration: function() {
@@ -9600,12 +9601,10 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
         restrict: "E",
         compile: function(element, attr) {
             return attr.href || attr.xlinkHref || attr.name ? void 0 : function(scope, element) {
-                if ("a" === element[0].nodeName.toLowerCase()) {
-                    var href = "[object SVGAnimatedString]" === toString.call(element.prop("href")) ? "xlink:href" : "href";
-                    element.on("click", function(event) {
-                        element.attr(href) || event.preventDefault();
-                    });
-                }
+                var href = "[object SVGAnimatedString]" === toString.call(element.prop("href")) ? "xlink:href" : "href";
+                element.on("click", function(event) {
+                    element.attr(href) || event.preventDefault();
+                });
             };
         }
     }), ngAttributeAliasDirectives = {};
@@ -10588,7 +10587,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
                         var intVal = int(value);
                         maxlength = isNaN(intVal) ? -1 : intVal, ctrl.$validate();
                     }), ctrl.$validators.maxlength = function(modelValue, viewValue) {
-                        return 0 > maxlength || ctrl.$isEmpty(viewValue) || viewValue.length <= maxlength;
+                        return 0 > maxlength || ctrl.$isEmpty(modelValue) || viewValue.length <= maxlength;
                     };
                 }
             }
@@ -10873,8 +10872,11 @@ function(window, angular, undefined) {
                 },
                 updateParams: function(newParams) {
                     if (!this.current || !this.current.$$route) throw $routeMinErr("norout", "Tried updating route when with no current route");
-                    newParams = angular.extend({}, this.current.params, newParams), $location.path(interpolate(this.current.$$route.originalPath, newParams)), 
-                    $location.search(newParams);
+                    var searchParams = {}, self = this;
+                    angular.forEach(Object.keys(newParams), function(key) {
+                        self.current.pathParams[key] || (searchParams[key] = newParams[key]);
+                    }), newParams = angular.extend({}, this.current.params, newParams), $location.path(interpolate(this.current.$$route.originalPath, newParams)), 
+                    $location.search(angular.extend({}, $location.search(), searchParams));
                 }
             };
             return $rootScope.$on("$locationChangeStart", prepareRoute), $rootScope.$on("$locationChangeSuccess", commitRoute), 
@@ -11684,11 +11686,8 @@ function(window, angular, undefined) {
             compile: function(elem, attr) {
                 var fn = $parse(attr.ngClick, null, !0);
                 return function(scope, elem, attr) {
-                    function isNodeOneOf(elem, nodeTypeArray) {
-                        return -1 !== nodeTypeArray.indexOf(elem[0].nodeName) ? !0 : void 0;
-                    }
                     $aria.config("tabindex") && !elem.attr("tabindex") && elem.attr("tabindex", 0), 
-                    $aria.config("bindKeypress") && !attr.ngKeypress && isNodeOneOf(elem, [ "DIV", "LI" ]) && elem.on("keypress", function(event) {
+                    $aria.config("bindKeypress") && !attr.ngKeypress && elem.on("keypress", function(event) {
                         function callback() {
                             fn(scope, {
                                 $event: event
@@ -11704,24 +11703,28 @@ function(window, angular, undefined) {
             $aria.config("tabindex") && !elem.attr("tabindex") && elem.attr("tabindex", 0);
         };
     } ]);
-}(window, window.angular), angular.module("ngMaterial", [ "ng", "ngAnimate", "ngAria", "material.core", "material.core.theming.palette", "material.core.theming", "material.components.backdrop", "material.components.bottomSheet", "material.components.button", "material.components.card", "material.components.checkbox", "material.components.content", "material.components.dialog", "material.components.divider", "material.components.icon", "material.components.input", "material.components.list", "material.components.progressCircular", "material.components.progressLinear", "material.components.radioButton", "material.components.sidenav", "material.components.slider", "material.components.sticky", "material.components.subheader", "material.components.swipe", "material.components.switch", "material.components.tabs", "material.components.textField", "material.components.toast", "material.components.toolbar", "material.components.tooltip", "material.components.whiteframe" ]), 
+}(window, window.angular), angular.module("ngMaterial", [ "ng", "ngAnimate", "ngAria", "material.core", "material.core.theming.palette", "material.core.theming", "material.components.backdrop", "material.components.bottomSheet", "material.components.button", "material.components.checkbox", "material.components.card", "material.components.content", "material.components.dialog", "material.components.divider", "material.components.icon", "material.components.input", "material.components.list", "material.components.progressCircular", "material.components.progressLinear", "material.components.radioButton", "material.components.sidenav", "material.components.slider", "material.components.sticky", "material.components.subheader", "material.components.swipe", "material.components.switch", "material.components.tabs", "material.components.textField", "material.components.toast", "material.components.toolbar", "material.components.whiteframe", "material.components.tooltip" ]), 
 function() {
     "use strict";
+    function MdCoreInitialize() {
+        if ("undefined" == typeof Hammer) throw new Error("ngMaterial requires HammerJS to be preloaded.");
+        Hammer.defaults.cssProps.userSelect = "";
+    }
     function MdCoreConfigure($provide, $mdThemingProvider) {
-        $provide.decorator("$$rAF", [ "$delegate", rAFDecorator ]), $mdThemingProvider.theme("default").primaryPalette("indigo").accentPalette("pink").warnPalette("red").backgroundPalette("grey");
+        function rAFDecorator($$rAF) {
+            return $$rAF.debounce = function(cb) {
+                var queueArgs, alreadyQueued, queueCb, context;
+                return function() {
+                    queueArgs = arguments, context = this, queueCb = cb, alreadyQueued || (alreadyQueued = !0, 
+                    $$rAF(function() {
+                        queueCb.apply(context, queueArgs), alreadyQueued = !1;
+                    }));
+                };
+            }, $$rAF;
+        }
+        $provide.decorator("$$rAF", [ "$delegate", "$rootScope", rAFDecorator ]), $mdThemingProvider.theme("default").primaryColor("blue").accentColor("green").warnColor("red").backgroundColor("grey");
     }
-    function rAFDecorator($delegate) {
-        return $delegate.throttle = function(cb) {
-            var queueArgs, alreadyQueued, queueCb, context;
-            return function() {
-                queueArgs = arguments, context = this, queueCb = cb, alreadyQueued || (alreadyQueued = !0, 
-                $delegate(function() {
-                    queueCb.apply(context, queueArgs), alreadyQueued = !1;
-                }));
-            };
-        }, $delegate;
-    }
-    angular.module("material.core", [ "material.core.theming" ]).config(MdCoreConfigure), 
+    angular.module("material.core", [ "material.core.theming" ]).run(MdCoreInitialize).config(MdCoreConfigure), 
     MdCoreConfigure.$inject = [ "$provide", "$mdThemingProvider" ];
 }(), function() {
     "use strict";
@@ -11844,14 +11847,71 @@ function() {
             return $delegate.iterator = Iterator, $delegate;
         } ]);
     } ]);
-}(), angular.module("material.core").factory("$mdMedia", mdMediaFactory), mdMediaFactory.$inject = [ "$mdConstant", "$rootScope", "$window" ], 
+}(), angular.module("material.core").factory("$mdMedia", mdMediaFactory), mdMediaFactory.$inject = [ "$mdConstant", "$mdUtil", "$rootScope", "$window" ], 
 function() {
     "use strict";
     var nextUniqueId = [ "0", "0", "0" ];
-    angular.module("material.core").factory("$mdUtil", [ "$document", "$timeout", function($document, $timeout) {
+    angular.module("material.core").factory("$mdUtil", [ "$cacheFactory", "$document", "$timeout", function($cacheFactory, $document, $timeout) {
+        function attachDragBehavior(scope, element) {
+            function cleanup() {
+                cleanup.called || (cleanup.called = !0, element.off(START_EVENTS, startDrag), $document.off(MOVE_EVENTS, doDrag).off(END_EVENTS, endDrag), 
+                drag = pointerIsDown = !1);
+            }
+            function startDrag(ev) {
+                var eventType = ev.type.charAt(0), now = Util.now();
+                previousDrag && previousDrag.pointerType !== eventType && now - previousDrag.endTime < 400 || pointerIsDown || (pointerIsDown = !0, 
+                drag = {
+                    pointerType: eventType,
+                    startX: getPosition(ev),
+                    startTime: now
+                }, element.one("$md.dragstart", function(ev) {
+                    ev.defaultPrevented && (drag = null);
+                }), element.triggerHandler("$md.dragstart", drag));
+            }
+            function doDrag(ev) {
+                drag && isProperEventType(ev, drag) && (("t" === drag.pointerType || "p" === drag.pointerType) && ev.preventDefault(), 
+                updateDragState(ev), element.triggerHandler("$md.drag", drag));
+            }
+            function endDrag(ev) {
+                pointerIsDown = !1, drag && isProperEventType(ev, drag) && (drag.endTime = Util.now(), 
+                updateDragState(ev), element.triggerHandler("$md.dragend", drag), previousDrag = drag, 
+                drag = null);
+            }
+            function updateDragState(ev) {
+                var x = getPosition(ev);
+                drag.distance = drag.startX - x, drag.direction = drag.distance > 0 ? "left" : drag.distance < 0 ? "right" : "", 
+                drag.duration = drag.startTime - Util.now(), drag.velocity = Math.abs(drag.duration) / drag.time;
+            }
+            function getPosition(ev) {
+                ev = ev.originalEvent || ev;
+                var point = ev.touches && ev.touches[0] || ev.changedTouches && ev.changedTouches[0] || ev;
+                return point.pageX;
+            }
+            function isProperEventType(ev, drag) {
+                return drag && ev && (ev.type || "").charAt(0) === drag.pointerType;
+            }
+            var drag, previousDrag, pointerIsDown, START_EVENTS = "mousedown touchstart pointerdown", MOVE_EVENTS = "mousemove touchmove pointermove", END_EVENTS = "mouseup mouseleave touchend touchcancel pointerup pointercancel";
+            return element.on(START_EVENTS, startDrag), $document.on(MOVE_EVENTS, doDrag).on(END_EVENTS, endDrag), 
+            scope.$on("$destroy", cleanup), cleanup;
+        }
+        function cacheFactory(id, options) {
+            var cache = $cacheFactory(id, options), keys = {};
+            return cache._put = cache.put, cache.put = function(k, v) {
+                return keys[k] = !0, cache._put(k, v);
+            }, cache._remove = cache.remove, cache.remove = function(k) {
+                return delete keys[k], cache._remove(k);
+            }, cache._removeAll = cache.removeAll, cache.removeAll = function() {
+                return keys = {}, cache._removeAll();
+            }, cache._destroy = cache.destroy, cache.destroy = function() {
+                return keys = {}, cache._destroy();
+            }, cache.keys = function() {
+                return Object.keys(keys);
+            }, cache;
+        }
         var Util;
         return Util = {
             now: window.performance ? angular.bind(window.performance, window.performance.now) : Date.now,
+            attachDragBehavior: attachDragBehavior,
             elementRect: function(element, offsetParent) {
                 var node = element[0];
                 offsetParent = offsetParent || node.offsetParent || document.body, offsetParent = offsetParent[0] || offsetParent;
@@ -11865,14 +11925,10 @@ function() {
             },
             fakeNgModel: function() {
                 return {
-                    $fake: !0,
                     $setViewValue: function(value) {
                         this.$viewValue = value, this.$render(value), this.$viewChangeListeners.forEach(function(cb) {
                             cb();
                         });
-                    },
-                    $isEmpty: function(value) {
-                        return 0 === ("" + value).length;
                     },
                     $parsers: [],
                     $formatters: [],
@@ -11880,6 +11936,7 @@ function() {
                     $render: angular.noop
                 };
             },
+            cacheFactory: cacheFactory,
             debounce: function(func, wait, scope, invokeApply) {
                 var timer;
                 return function() {
@@ -11998,204 +12055,6 @@ function() {
         };
     }
     angular.module("material.core").service("$mdCompiler", mdCompilerService), mdCompilerService.$inject = [ "$q", "$http", "$injector", "$compile", "$controller", "$templateCache" ];
-}(), function() {
-    "use strict";
-    function runHandlers(handlerEvent, event) {
-        var handler;
-        for (var handlerName in HANDLERS) handler = HANDLERS[handlerName], "start" === handlerEvent && handler.cancel(), 
-        handler[handlerEvent](event, pointer);
-    }
-    function gestureStart(ev) {
-        if (!pointer) {
-            var now = +Date.now();
-            lastPointer && !typesMatch(ev, lastPointer) && now - lastPointer.endTime < 1500 || (pointer = makeStartPointer(ev), 
-            runHandlers("start", ev));
-        }
-    }
-    function gestureMove(ev) {
-        pointer && typesMatch(ev, pointer) && (updatePointerState(ev, pointer), runHandlers("move", ev));
-    }
-    function gestureEnd(ev) {
-        pointer && typesMatch(ev, pointer) && (updatePointerState(ev, pointer), pointer.endTime = +Date.now(), 
-        runHandlers("end", ev), lastPointer = pointer, pointer = null);
-    }
-    function typesMatch(ev, pointer) {
-        return ev && pointer && ev.type.charAt(0) === pointer.type;
-    }
-    function getEventPoint(ev) {
-        return ev = ev.originalEvent || ev, ev.touches && ev.touches[0] || ev.changedTouches && ev.changedTouches[0] || ev;
-    }
-    function updatePointerState(ev, pointer) {
-        var point = getEventPoint(ev), x = pointer.x = point.pageX, y = pointer.y = point.pageY;
-        pointer.distanceX = x - pointer.startX, pointer.distanceY = y - pointer.startY, 
-        pointer.distance = Math.sqrt(pointer.distanceX * pointer.distanceX + pointer.distanceY * pointer.distanceY), 
-        pointer.directionX = pointer.distanceX > 0 ? "right" : pointer.distanceX < 0 ? "left" : "", 
-        pointer.directionY = pointer.distanceY > 0 ? "up" : pointer.distanceY < 0 ? "down" : "", 
-        pointer.duration = +Date.now() - pointer.startTime, pointer.velocityX = pointer.distanceX / pointer.duration, 
-        pointer.velocityY = pointer.distanceY / pointer.duration;
-    }
-    function makeStartPointer(ev) {
-        var point = getEventPoint(ev), startPointer = {
-            startTime: +Date.now(),
-            target: ev.target,
-            type: ev.type.charAt(0)
-        };
-        return startPointer.startX = startPointer.x = point.pageX, startPointer.startY = startPointer.y = point.pageY, 
-        startPointer;
-    }
-    var HANDLERS, START_EVENTS = "mousedown touchstart pointerdown", MOVE_EVENTS = "mousemove touchmove pointermove", END_EVENTS = "mouseup mouseleave touchend touchcancel pointerup pointercancel";
-    document.contains || (document.contains = function(node) {
-        return document.body.contains(node);
-    });
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera, isIos = userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) || userAgent.match(/iPod/i), isAndroid = userAgent.match(/Android/i), shouldHijackClicks = isIos || isAndroid;
-    shouldHijackClicks && document.addEventListener("click", function(ev) {
-        var isKeyClick = 0 === ev.clientX && 0 === ev.clientY;
-        isKeyClick || ev.$material || (ev.preventDefault(), ev.stopPropagation());
-    }, !0), angular.element(document).on(START_EVENTS, gestureStart).on(MOVE_EVENTS, gestureMove).on(END_EVENTS, gestureEnd).on("$$mdGestureReset", function() {
-        lastPointer = pointer = null;
-    });
-    var pointer, lastPointer;
-    angular.module("material.core").run([ "$mdGesture", function() {} ]).factory("$mdGesture", [ "$$MdGestureHandler", "$$rAF", "$timeout", function($$MdGestureHandler, $$rAF, $timeout) {
-        function addHandler(name, definition) {
-            var handler = new $$MdGestureHandler(name);
-            return angular.extend(handler, definition), HANDLERS[name] = handler, self;
-        }
-        function register(element, handlerName, options) {
-            var handler = HANDLERS[handlerName.replace(/^\$md./, "")];
-            if (!handler) throw new Error("Failed to register element with handler " + handlerName + ". Available handlers: " + Object.keys(HANDLERS).join(", "));
-            return handler.registerElement(element, options);
-        }
-        HANDLERS = {}, shouldHijackClicks && addHandler("click", {
-            options: {
-                maxDistance: 6
-            },
-            onEnd: function(ev, pointer) {
-                pointer.distance < this.state.options.maxDistance && this.dispatchEvent(ev, "click", null, ev);
-            }
-        }), addHandler("press", {
-            onStart: function(ev) {
-                this.dispatchEvent(ev, "$md.pressdown");
-            },
-            onEnd: function(ev) {
-                this.dispatchEvent(ev, "$md.pressup");
-            }
-        }), addHandler("hold", {
-            options: {
-                maxDistance: 6,
-                delay: 500
-            },
-            onCancel: function() {
-                $timeout.cancel(this.state.timeout);
-            },
-            onStart: function(ev, pointer) {
-                return this.state.registeredParent ? (this.state.pos = {
-                    x: pointer.x,
-                    y: pointer.y
-                }, void (this.state.timeout = $timeout(angular.bind(this, function() {
-                    this.dispatchEvent(ev, "$md.hold"), this.cancel();
-                }), this.state.options.delay, !1))) : this.cancel();
-            },
-            onMove: function(ev, pointer) {
-                ev.preventDefault();
-                var dx = this.state.pos.x - pointer.x, dy = this.state.pos.y - pointer.y;
-                Math.sqrt(dx * dx + dy * dy) > this.options.maxDistance && this.cancel();
-            },
-            onEnd: function() {
-                this.onCancel();
-            }
-        }), addHandler("drag", {
-            options: {
-                minDistance: 6,
-                horizontal: !0
-            },
-            onStart: function() {
-                this.state.registeredParent || this.cancel();
-            },
-            onMove: function(ev, pointer) {
-                var shouldStartDrag, shouldCancel;
-                ev.preventDefault(), this.state.dragPointer ? this.dispatchDragMove(ev) : (this.state.options.horizontal ? (shouldStartDrag = Math.abs(pointer.distanceX) > this.state.options.minDistance, 
-                shouldCancel = Math.abs(pointer.distanceY) > 1.5 * this.state.options.minDistance) : (shouldStartDrag = Math.abs(pointer.distanceY) > this.state.options.minDistance, 
-                shouldCancel = Math.abs(pointer.distanceX) > 1.5 * this.state.options.minDistance), 
-                shouldStartDrag ? (this.state.dragPointer = makeStartPointer(ev), updatePointerState(ev, this.state.dragPointer), 
-                this.dispatchEvent(ev, "$md.dragstart", this.state.dragPointer)) : shouldCancel && this.cancel());
-            },
-            dispatchDragMove: $$rAF.throttle(function(ev) {
-                this.state.isRunning && (updatePointerState(ev, this.state.dragPointer), this.dispatchEvent(ev, "$md.drag", this.state.dragPointer));
-            }),
-            onEnd: function(ev) {
-                this.state.dragPointer && (updatePointerState(ev, this.state.dragPointer), this.dispatchEvent(ev, "$md.dragend", this.state.dragPointer));
-            }
-        }), addHandler("swipe", {
-            options: {
-                minVelocity: .65,
-                minDistance: 10
-            },
-            onEnd: function(ev, pointer) {
-                if (Math.abs(pointer.velocityX) > this.state.options.minVelocity && Math.abs(pointer.distanceX) > this.state.options.minDistance) {
-                    var eventType = "left" == pointer.directionX ? "$md.swipeleft" : "$md.swiperight";
-                    this.dispatchEvent(ev, eventType);
-                }
-            }
-        });
-        var self;
-        return self = {
-            handler: addHandler,
-            register: register
-        };
-    } ]).factory("$$MdGestureHandler", [ "$$rAF", function() {
-        function GestureHandler(name) {
-            this.name = name, this.state = {};
-        }
-        function dispatchEvent(srcEvent, eventType, eventPointer, ev) {
-            eventPointer = eventPointer || pointer;
-            var eventObj;
-            "click" === eventType ? (eventObj = document.createEvent("MouseEvents"), eventObj.initMouseEvent("click", !0, !0, window, ev.detail, ev.screenX, ev.screenY, ev.clientX, ev.clientY, ev.ctrlKey, ev.altKey, ev.shiftKey, ev.metaKey, ev.button, ev.relatedTarget || null)) : (eventObj = document.createEvent("CustomEvent"), 
-            eventObj.initCustomEvent(eventType, !0, !0, {})), eventObj.$material = !0, eventObj.pointer = eventPointer, 
-            eventObj.srcEvent = srcEvent, eventPointer.target.dispatchEvent(eventObj);
-        }
-        GestureHandler.prototype = {
-            onStart: angular.noop,
-            onMove: angular.noop,
-            onEnd: angular.noop,
-            onCancel: angular.noop,
-            options: {},
-            dispatchEvent: dispatchEvent,
-            start: function(ev, pointer) {
-                if (!this.state.isRunning) {
-                    var parentTarget = this.getNearestParent(ev.target), parentTargetOptions = parentTarget && parentTarget.$mdGesture[this.name] || {};
-                    this.state = {
-                        isRunning: !0,
-                        options: angular.extend({}, this.options, parentTargetOptions),
-                        registeredParent: parentTarget
-                    }, this.onStart(ev, pointer);
-                }
-            },
-            move: function(ev, pointer) {
-                this.state.isRunning && this.onMove(ev, pointer);
-            },
-            end: function(ev, pointer) {
-                this.state.isRunning && (this.onEnd(ev, pointer), this.state.isRunning = !1);
-            },
-            cancel: function(ev, pointer) {
-                this.onCancel(ev, pointer), this.state = {};
-            },
-            getNearestParent: function(node) {
-                for (var current = node; current; ) {
-                    if ((current.$mdGesture || {})[this.name]) return current;
-                    current = current.parentNode;
-                }
-            },
-            registerElement: function(element, options) {
-                function onDestroy() {
-                    delete element[0].$mdGesture[self.name], element.off("$destroy", onDestroy);
-                }
-                var self = this;
-                return element[0].$mdGesture = element[0].$mdGesture || {}, element[0].$mdGesture[this.name] = options || {}, 
-                element.on("$destroy", onDestroy), onDestroy;
-            }
-        };
-        return GestureHandler;
-    } ]);
 }(), function() {
     "use strict";
     function InterimElementProvider() {
@@ -12408,8 +12267,7 @@ function() {
         function attachCheckboxBehavior(scope, element, options) {
             return attach(scope, element, angular.extend({
                 center: !0,
-                dimBackground: !1,
-                fitRipple: !0
+                dimBackground: !1
             }, options));
         }
         function attachTabBehavior(scope, element, options) {
@@ -12420,11 +12278,6 @@ function() {
             }, options));
         }
         function attach(scope, element, options) {
-            function getRippleContainer() {
-                var container = element.data("$mdRippleContainer");
-                return container ? container : (container = angular.element('<div class="md-ripple-container">'), 
-                element.append(container), element.data("$mdRippleContainer", container), container);
-            }
             function parseColor(color) {
                 function hexToRGBA(color) {
                     var hex = "#" === color.charAt(0) ? color.substr(1) : color, dig = hex.length / 3, red = hex.substr(0, dig), grn = hex.substr(dig, dig), blu = hex.substr(2 * dig);
@@ -12436,7 +12289,7 @@ function() {
                 if (color) return 0 === color.indexOf("rgba") ? color.replace(/\d?\.?\d*\s*\)\s*$/, "0.1)") : 0 === color.indexOf("rgb") ? rgbToRGBA(color) : 0 === color.indexOf("#") ? hexToRGBA(color) : void 0;
             }
             function removeElement(elem, wait) {
-                ripples.splice(ripples.indexOf(elem), 1), 0 === ripples.length && getRippleContainer().css({
+                ripples.splice(ripples.indexOf(elem), 1), 0 === ripples.length && rippleContainer && rippleContainer.css({
                     backgroundColor: ""
                 }), $timeout(function() {
                     elem.remove();
@@ -12464,8 +12317,7 @@ function() {
                     return options.isMenuItem ? size = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) : options.outline ? (rect = node.getBoundingClientRect(), 
                     left -= rect.left, top -= rect.top, width = Math.max(left, width - left), height = Math.max(top, height - top), 
                     size = 2 * Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))) : (multiplier = options.isFAB ? 1.1 : .8, 
-                    size = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) * multiplier, options.fitRipple && (size = Math.min(height, width, size))), 
-                    size;
+                    size = Math.max(width, height) * multiplier), size;
                 }
                 function getRippleCss(size, left, top) {
                     function rgbaToRGB(color) {
@@ -12482,6 +12334,11 @@ function() {
                     css.left = Math.round((left - rect.left) / container.prop("offsetWidth") * 100) + "%", 
                     css.top = Math.round((top - rect.top) / container.prop("offsetHeight") * 100) + "%"), 
                     css;
+                }
+                function getRippleContainer() {
+                    if (rippleContainer) return rippleContainer;
+                    var container = angular.element('<div class="md-ripple-container"></div>');
+                    return rippleContainer = container, element.append(container), container;
                 }
                 color = parseColor(element.attr("md-ink-ripple")) || parseColor($window.getComputedStyle(options.colorElement[0]).color || "rgb(0, 0, 0)");
                 var container = getRippleContainer(), size = getRippleSize(left, top), css = getRippleCss(size, left, top), elem = getRippleElement(css), index = ripples.indexOf(elem), state = states[index] || {};
@@ -12500,27 +12357,20 @@ function() {
                     }, options.outline ? 450 : 225, !1);
                 }, 0, !1), elem;
             }
-            function onPressDown(ev) {
-                if (isRippleAllowed()) {
-                    {
-                        createRipple(ev.pointer.x, ev.pointer.y);
+            function onInput(ev) {
+                function isRippleAllowed() {
+                    function isDisabled(elem) {
+                        return elem && elem.hasAttribute && elem.hasAttribute("disabled");
                     }
-                    isHeld = !0;
+                    var parent = node.parentNode, grandparent = parent && parent.parentNode, ancestor = grandparent && grandparent.parentNode;
+                    return !(isDisabled(node) || isDisabled(parent) || isDisabled(grandparent) || isDisabled(ancestor));
                 }
-            }
-            function onPressUp() {
-                isHeld = !1;
-                var ripple = ripples[ripples.length - 1];
-                $timeout(function() {
+                var ripple, index;
+                ev.eventType === Hammer.INPUT_START && ev.isFirst && isRippleAllowed() ? (ripple = createRipple(ev.center.x, ev.center.y), 
+                isHeld = !0) : ev.eventType === Hammer.INPUT_END && ev.isFinal && (isHeld = !1, 
+                index = ripples.length - 1, ripple = ripples[index], $timeout(function() {
                     updateElement(ripple);
-                }, 0, !1);
-            }
-            function isRippleAllowed() {
-                function isDisabled(elem) {
-                    return elem && elem.hasAttribute && elem.hasAttribute("disabled");
-                }
-                var parent = node.parentNode, grandparent = parent && parent.parentNode, ancestor = grandparent && grandparent.parentNode;
-                return !(isDisabled(node) || isDisabled(parent) || isDisabled(grandparent) || isDisabled(ancestor));
+                }, 0, !1));
             }
             if (element.controller("mdNoInk")) return angular.noop;
             options = angular.extend({
@@ -12533,25 +12383,16 @@ function() {
                 dimBackground: !1,
                 outline: !1,
                 isFAB: !1,
-                isMenuItem: !1,
-                fitRipple: !1
+                isMenuItem: !1
             }, options);
-            var rippleSize, controller = element.controller("mdInkRipple") || {}, counter = 0, ripples = [], states = [], isActiveExpr = element.attr("md-highlight"), isActive = !1, isHeld = !1, node = element[0], rippleSizeSetting = element.attr("md-ripple-size"), color = parseColor(element.attr("md-ink-ripple")) || parseColor($window.getComputedStyle(options.colorElement[0]).color || "rgb(0, 0, 0)");
-            switch (rippleSizeSetting) {
-              case "full":
-                options.isFAB = !0;
-                break;
-
-              case "partial":
-                options.isFAB = !1;
-            }
-            return options.mousedown && element.on("$md.pressdown", onPressDown).on("$md.pressup", onPressUp), 
+            var rippleContainer, rippleSize, controller = element.controller("mdInkRipple") || {}, counter = 0, ripples = [], states = [], isActiveExpr = element.attr("md-highlight"), isActive = !1, isHeld = !1, node = element[0], hammertime = new Hammer(node), color = parseColor(element.attr("md-ink-ripple")) || parseColor($window.getComputedStyle(options.colorElement[0]).color || "rgb(0, 0, 0)");
+            return scope._onInput = onInput, options.mousedown && hammertime.on("hammer.input", onInput), 
             controller.createRipple = createRipple, isActiveExpr && scope.$watch(isActiveExpr, function(newValue) {
                 isActive = newValue, isActive && !ripples.length && $timeout(function() {
                     createRipple(0, 0);
                 }, 0, !1), angular.forEach(ripples, updateElement);
             }), function() {
-                element.off("$md.pressdown", onPressDown).off("$md.pressup", onPressUp), getRippleContainer().remove();
+                hammertime.destroy(), rippleContainer && rippleContainer.remove();
             };
         }
         return {
@@ -12589,8 +12430,7 @@ function() {
             A400: "#ff1744",
             A700: "#d50000",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200 300 400 A100",
-            contrastStrongLightColors: "500 600 700 A200 A400 A700"
+            contrastDarkColors: "50 100 200 300 400 A100"
         },
         pink: {
             "50": "#fce4ec",
@@ -12608,8 +12448,7 @@ function() {
             A400: "#f50057",
             A700: "#c51162",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200 300 400 A100",
-            contrastStrongLightColors: "500 600 A200 A400 A700"
+            contrastDarkColors: "50 100 200 300 400 A100"
         },
         purple: {
             "50": "#f3e5f5",
@@ -12627,8 +12466,7 @@ function() {
             A400: "#d500f9",
             A700: "#aa00ff",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200 A100",
-            contrastStrongLightColors: "300 400 A200 A400 A700"
+            contrastDarkColors: "50 100 200 A100"
         },
         "deep-purple": {
             "50": "#ede7f6",
@@ -12646,8 +12484,7 @@ function() {
             A400: "#651fff",
             A700: "#6200ea",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200 A100",
-            contrastStrongLightColors: "300 400 A200"
+            contrastDarkColors: "50 100 200 A100"
         },
         indigo: {
             "50": "#e8eaf6",
@@ -12665,8 +12502,7 @@ function() {
             A400: "#3d5afe",
             A700: "#304ffe",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200 A100",
-            contrastStrongLightColors: "300 400 A200 A400"
+            contrastDarkColors: "50 100 200 A100"
         },
         blue: {
             "50": "#e3f2fd",
@@ -12684,8 +12520,7 @@ function() {
             A400: "#2979ff",
             A700: "#2962ff",
             contrastDefaultColor: "light",
-            contrastDarkColors: "100 200 300 400 A100",
-            contrastStrongLightColors: "500 600 700 A200 A400 A700"
+            contrastDarkColors: "100 200 300 400 A100"
         },
         "light-blue": {
             "50": "#e1f5fe",
@@ -12703,8 +12538,7 @@ function() {
             A400: "#00b0ff",
             A700: "#0091ea",
             contrastDefaultColor: "dark",
-            contrastLightColors: "500 600 700 800 900 A700",
-            contrastStrongLightColors: "500 600 700 800 A700"
+            contrastLightColors: "500 600 700 800 900 A700"
         },
         cyan: {
             "50": "#e0f7fa",
@@ -12722,8 +12556,7 @@ function() {
             A400: "#00e5ff",
             A700: "#00b8d4",
             contrastDefaultColor: "dark",
-            contrastLightColors: "500 600 700 800 900",
-            contrastStrongLightColors: "500 600 700 800"
+            contrastLightColors: "500 600 700 800 900"
         },
         teal: {
             "50": "#e0f2f1",
@@ -12741,8 +12574,7 @@ function() {
             A400: "#1de9b6",
             A700: "#00bfa5",
             contrastDefaultColor: "dark",
-            contrastLightColors: "500 600 700 800 900",
-            contrastStrongLightColors: "500 600 700"
+            contrastLightColors: "500 600 700 800 900"
         },
         green: {
             "50": "#e8f5e9",
@@ -12760,8 +12592,7 @@ function() {
             A400: "#00e676",
             A700: "#00c853",
             contrastDefaultColor: "dark",
-            contrastLightColors: "500 600 700 800 900",
-            contrastStrongLightColors: "500 600 700"
+            contrastLightColors: "500 600 700 800 900"
         },
         "light-green": {
             "50": "#f1f8e9",
@@ -12779,8 +12610,7 @@ function() {
             A400: "#76ff03",
             A700: "#64dd17",
             contrastDefaultColor: "dark",
-            contrastLightColors: "800 900",
-            contrastStrongLightColors: "800 900"
+            contrastLightColors: "800 900"
         },
         lime: {
             "50": "#f9fbe7",
@@ -12798,8 +12628,7 @@ function() {
             A400: "#c6ff00",
             A700: "#aeea00",
             contrastDefaultColor: "dark",
-            contrastLightColors: "900",
-            contrastStrongLightColors: "900"
+            contrastLightColors: "900"
         },
         yellow: {
             "50": "#fffde7",
@@ -12851,8 +12680,7 @@ function() {
             A400: "#ff9100",
             A700: "#ff6d00",
             contrastDefaultColor: "dark",
-            contrastLightColors: "800 900",
-            contrastStrongLightColors: "800 900"
+            contrastLightColors: "800 900"
         },
         "deep-orange": {
             "50": "#fbe9e7",
@@ -12870,8 +12698,7 @@ function() {
             A400: "#ff3d00",
             A700: "#dd2c00",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200 300 400 A100 A200",
-            contrastStrongLightColors: "500 600 700 800 900 A400 A700"
+            contrastDarkColors: "50 100 200 300 400 A100 A200"
         },
         brown: {
             "50": "#efebe9",
@@ -12889,8 +12716,7 @@ function() {
             A400: "#8d6e63",
             A700: "#5d4037",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200",
-            contrastStrongLightColors: "300 400"
+            contrastDarkColors: "50 100 200"
         },
         grey: {
             "0": "#ffffff",
@@ -12928,8 +12754,7 @@ function() {
             A400: "#78909c",
             A700: "#455a64",
             contrastDefaultColor: "light",
-            contrastDarkColors: "50 100 200 300",
-            contrastStrongLightColors: "400 500"
+            contrastDarkColors: "50 100 200 300"
         }
     });
 }(), function() {
@@ -12973,7 +12798,7 @@ function() {
             var self = this;
             self.name = name, self.colors = {}, self.dark = setDark, setDark(!1), THEME_COLOR_TYPES.forEach(function(colorType) {
                 var defaultHues = (self.isDark ? DARK_DEFAULT_HUES : LIGHT_DEFAULT_HUES)[colorType];
-                self[colorType + "Palette"] = function(paletteName, hues) {
+                self[colorType + "Color"] = function(paletteName, hues) {
                     var color = self.colors[colorType] = {
                         name: paletteName,
                         hues: angular.extend({}, defaultHues, hues)
@@ -12985,24 +12810,16 @@ function() {
                     }).forEach(function(hueValue) {
                         if (-1 == VALID_HUE_VALUES.indexOf(hueValue)) throw new Error("Invalid hue value '%1' in theme %2's %3 color %4. Available hue values: %5".replace("%1", hueValue).replace("%2", self.name).replace("%3", colorType).replace("%4", paletteName).replace("%5", VALID_HUE_VALUES.join(", ")));
                     }), self;
-                }, self[colorType + "Color"] = function() {
-                    var args = Array.prototype.slice.call(arguments);
-                    return console.warn("$mdThemingProviderTheme." + colorType + "Color() has been depricated. Use $mdThemingProviderTheme." + colorType + "Palette() instead."), 
-                    self[colorType + "Palette"].apply(self, args);
                 };
             });
         }
-        function ThemingService($rootScope, $log) {
-            function registered(theme) {
-                return void 0 === theme || "" === theme ? !0 : void 0 !== THEMES[theme];
-            }
+        function ThemingService($rootScope) {
             function applyTheme(scope, el) {
                 void 0 === el && (el = scope, scope = void 0), void 0 === scope && (scope = $rootScope), 
                 applyTheme.inherit(el, el);
             }
             return applyTheme.inherit = function(el, parent) {
                 function changeTheme(theme) {
-                    registered(theme) || $log.warn("Attempted to use unregistered theme '" + theme + "'. Register it with $mdThemingProvider.theme().");
                     var oldTheme = el.data("$mdThemeName");
                     oldTheme && el.removeClass("md-" + oldTheme + "-theme"), el.addClass("md-" + theme + "-theme"), 
                     el.data("$mdThemeName", theme);
@@ -13017,11 +12834,11 @@ function() {
                     var theme = ctrl && ctrl.$mdTheme || defaultTheme;
                     changeTheme(theme);
                 }
-            }, applyTheme.registered = registered, applyTheme;
+            }, applyTheme;
         }
         PALETTES = {}, THEMES = {};
         var defaultTheme = "default", alwaysWatchTheme = !1;
-        return angular.extend(PALETTES, $mdColorPalette), ThemingService.$inject = [ "$rootScope", "$log" ], 
+        return angular.extend(PALETTES, $mdColorPalette), ThemingService.$inject = [ "$rootScope" ], 
         themingProvider = {
             definePalette: definePalette,
             extendPalette: extendPalette,
@@ -13041,14 +12858,13 @@ function() {
             _rgba: rgba
         };
     }
-    function ThemingDirective($mdTheming, $interpolate, $log) {
+    function ThemingDirective($interpolate) {
         return {
             priority: 100,
             link: {
                 pre: function(scope, el, attrs) {
                     var ctrl = {
                         $setTheme: function(theme) {
-                            $mdTheming.registered(theme) || $log.warn("attempted to use unregistered theme '" + theme + "'"), 
                             ctrl.$mdTheme = theme;
                         }
                     };
@@ -13077,13 +12893,12 @@ function() {
     }
     function generateThemes($injector) {
         function sanitizePalette(palette) {
-            var defaultContrast = palette.contrastDefaultColor, lightColors = palette.contrastLightColors || [], strongLightColors = palette.contrastStrongLightColors || [], darkColors = palette.contrastDarkColors || [];
-            "string" == typeof lightColors && (lightColors = lightColors.split(" ")), "string" == typeof strongLightColors && (strongLightColors = strongLightColors.split(" ")), 
-            "string" == typeof darkColors && (darkColors = darkColors.split(" ")), delete palette.contrastDefaultColor, 
-            delete palette.contrastLightColors, delete palette.contrastStrongLightColors, delete palette.contrastDarkColors, 
+            var defaultContrast = palette.contrastDefaultColor, lightColors = palette.contrastLightColors || [], darkColors = palette.contrastDarkColors || [];
+            "string" == typeof lightColors && (lightColors = lightColors.split(" ")), "string" == typeof darkColors && (darkColors = darkColors.split(" ")), 
+            delete palette.contrastDefaultColor, delete palette.contrastLightColors, delete palette.contrastDarkColors, 
             angular.forEach(palette, function(hueValue, hueName) {
                 function getContrastColor() {
-                    return "light" === defaultContrast ? darkColors.indexOf(hueName) > -1 ? DARK_CONTRAST_COLOR : strongLightColors.indexOf(hueName) > -1 ? STRONG_LIGHT_CONTRAST_COLOR : LIGHT_CONTRAST_COLOR : lightColors.indexOf(hueName) > -1 ? strongLightColors.indexOf(hueName) > -1 ? STRONG_LIGHT_CONTRAST_COLOR : LIGHT_CONTRAST_COLOR : DARK_CONTRAST_COLOR;
+                    return "light" === defaultContrast ? darkColors.indexOf(hueName) > -1 ? DARK_CONTRAST_COLOR : LIGHT_CONTRAST_COLOR : lightColors.indexOf(hueName) > -1 ? LIGHT_CONTRAST_COLOR : DARK_CONTRAST_COLOR;
                 }
                 if (!angular.isObject(hueValue)) {
                     var rgbValue = colorToRgbaArray(hueValue);
@@ -13115,7 +12930,7 @@ function() {
         if (angular.forEach(THEMES, function(theme) {
             THEME_COLOR_TYPES.forEach(function(colorType) {
                 styleString += parseRules(theme, colorType, rulesByType[colorType] + "");
-            }), theme.colors.primary.name == theme.colors.accent.name && console.warn("$mdThemingProvider: Using the same palette for primary andaccent. This violates the material design spec.");
+            });
         }), !generationIsDone) {
             var style = document.createElement("style");
             style.innerHTML = styleString;
@@ -13128,8 +12943,8 @@ function() {
     }
     function colorToRgbaArray(clr) {
         if (angular.isArray(clr) && 3 == clr.length) return clr;
-        if (/^rgb/.test(clr)) return clr.replace(/(^\s*rgba?\(|\)\s*$)/g, "").split(",").map(function(value, i) {
-            return 3 == i ? parseFloat(value, 10) : parseInt(value, 10);
+        if (/^rgb/.test(clr)) return clr.replace(/(^\s*rgba?\(|\)\s*$)/g, "").split(",").map(function(value) {
+            return parseInt(value, 10);
         });
         if ("#" == clr.charAt(0) && (clr = clr.substring(1)), /^([a-fA-F0-9]{3}){1,2}$/g.test(clr)) {
             var dig = clr.length / 3, red = clr.substr(0, dig), grn = clr.substr(dig, dig), blu = clr.substr(2 * dig);
@@ -13137,8 +12952,7 @@ function() {
         }
     }
     function rgba(rgbArray, opacity) {
-        return 4 == rgbArray.length && (rgbArray = angular.copy(rgbArray), opacity ? rgbArray.pop() : opacity = rgbArray.pop()), 
-        opacity && ("number" == typeof opacity || "string" == typeof opacity && opacity.length) ? "rgba(" + rgbArray.join(",") + "," + opacity + ")" : "rgb(" + rgbArray.join(",") + ")";
+        return 4 == rgbArray.length && (opacity = rgbArray.pop()), opacity && opacity.length ? "rgba(" + rgbArray.join(",") + "," + opacity + ")" : "rgb(" + rgbArray.join(",") + ")";
     }
     angular.module("material.core.theming", [ "material.core.theming.palette" ]).directive("mdTheme", ThemingDirective).directive("mdThemable", ThemableDirective).provider("$mdTheming", ThemingProvider).run(generateThemes);
     var PALETTES, THEMES, themingProvider, generationIsDone, DARK_FOREGROUND = {
@@ -13153,12 +12967,12 @@ function() {
         "2": "rgba(255,255,255,0.7)",
         "3": "rgba(255,255,255,0.3)",
         "4": "rgba(255,255,255,0.12)"
-    }, DARK_SHADOW = "1px 1px 0px rgba(0,0,0,0.4), -1px -1px 0px rgba(0,0,0,0.4)", LIGHT_SHADOW = "", DARK_CONTRAST_COLOR = colorToRgbaArray("rgba(0,0,0,0.87)"), LIGHT_CONTRAST_COLOR = colorToRgbaArray("rgba(255,255,255,0.87"), STRONG_LIGHT_CONTRAST_COLOR = colorToRgbaArray("rgb(255,255,255)"), THEME_COLOR_TYPES = [ "primary", "accent", "warn", "background" ], DEFAULT_COLOR_TYPE = "primary", LIGHT_DEFAULT_HUES = {
+    }, DARK_SHADOW = "1px 1px 0px rgba(0,0,0,0.4), -1px -1px 0px rgba(0,0,0,0.4)", LIGHT_SHADOW = "", DARK_CONTRAST_COLOR = colorToRgbaArray("rgba(0,0,0,0.87)"), LIGHT_CONTRAST_COLOR = colorToRgbaArray("rgb(255,255,255)"), THEME_COLOR_TYPES = [ "primary", "accent", "warn", "background" ], DEFAULT_COLOR_TYPE = "primary", LIGHT_DEFAULT_HUES = {
         accent: {
-            "default": "A200",
-            "hue-1": "A100",
+            "default": "A700",
+            "hue-1": "A200",
             "hue-2": "A400",
-            "hue-3": "A700"
+            "hue-3": "A100"
         }
     }, DARK_DEFAULT_HUES = {
         background: {
@@ -13179,7 +12993,7 @@ function() {
         DARK_DEFAULT_HUES[colorType] || (DARK_DEFAULT_HUES[colorType] = defaultDefaultHues);
     });
     var VALID_HUE_VALUES = [ "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "A100", "A200", "A400", "A700" ];
-    ThemingProvider.$inject = [ "$mdColorPalette" ], ThemingDirective.$inject = [ "$mdTheming", "$interpolate", "$log" ], 
+    ThemingProvider.$inject = [ "$mdColorPalette" ], ThemingDirective.$inject = [ "$interpolate" ], 
     ThemableDirective.$inject = [ "$mdTheming" ], generateThemes.$inject = [ "$injector" ];
 }(), function() {
     "use strict";
@@ -13196,16 +13010,15 @@ function() {
         };
     }
     function MdBottomSheetProvider($$interimElementProvider) {
-        function bottomSheetDefaults($animate, $mdConstant, $timeout, $$rAF, $compile, $mdTheming, $mdBottomSheet, $rootElement, $rootScope, $mdGesture) {
+        function bottomSheetDefaults($animate, $mdConstant, $timeout, $$rAF, $compile, $mdTheming, $mdBottomSheet, $rootElement) {
             function onShow(scope, element, options) {
                 backdrop = $compile('<md-backdrop class="md-opaque md-bottom-sheet-backdrop">')(scope), 
-                backdrop.on("click", function() {
+                backdrop.on("click touchstart", function() {
                     $timeout($mdBottomSheet.cancel);
                 }), $mdTheming.inherit(backdrop, options.parent), $animate.enter(backdrop, options.parent, null);
-                var bottomSheet = new BottomSheet(element, options.parent);
+                var bottomSheet = new BottomSheet(element);
                 return options.bottomSheet = bottomSheet, options.targetEvent && angular.element(options.targetEvent.target).blur(), 
-                $mdTheming.inherit(bottomSheet.element, options.parent), options.disableParentScroll && (options.lastOverflow = options.parent.css("overflow"), 
-                options.parent.css("overflow", "hidden")), $animate.enter(bottomSheet.element, options.parent).then(function() {
+                $mdTheming.inherit(bottomSheet.element, options.parent), $animate.enter(bottomSheet.element, options.parent).then(function() {
                     var focusable = angular.element(element[0].querySelector("button") || element[0].querySelector("a") || element[0].querySelector("[ng-click]"));
                     focusable.focus(), options.escapeToClose && (options.rootElementKeyupCallback = function(e) {
                         e.keyCode === $mdConstant.KEY_CODE.ESCAPE && $timeout($mdBottomSheet.cancel);
@@ -13215,32 +13028,44 @@ function() {
             function onRemove(scope, element, options) {
                 var bottomSheet = options.bottomSheet;
                 return $animate.leave(backdrop), $animate.leave(bottomSheet.element).then(function() {
-                    options.disableParentScroll && (options.parent.css("overflow", options.lastOverflow), 
-                    delete options.lastOverflow), bottomSheet.cleanup(), options.targetEvent && angular.element(options.targetEvent.target).focus();
+                    bottomSheet.cleanup(), options.targetEvent && angular.element(options.targetEvent.target).focus();
                 });
             }
-            function BottomSheet(element, parent) {
-                function onDragStart() {
-                    element.css($mdConstant.CSS.TRANSITION_DURATION, "0ms");
+            function BottomSheet(element) {
+                function onTouchStart(e) {
+                    e.preventDefault(), startTarget = e.target, startY = getY(e), transitionDelay = element.css($mdConstant.CSS.TRANSITION_DURATION), 
+                    element.css($mdConstant.CSS.TRANSITION_DURATION, "0s");
                 }
-                function onDrag(ev) {
-                    var transform = ev.pointer.distanceY;
-                    5 > transform && (transform = Math.max(-PADDING, transform / 2)), element.css($mdConstant.CSS.TRANSFORM, "translate3d(0," + (PADDING + transform) + "px,0)");
+                function onTouchEnd(e) {
+                    element.css($mdConstant.CSS.TRANSITION_DURATION, transitionDelay);
+                    var currentY = getY(e);
+                    Math.abs(currentY - startY) < 5 && e.target == startTarget ? angular.element(e.target).triggerHandler("click") : velocity > CLOSING_VELOCITY ? $timeout($mdBottomSheet.cancel) : setTransformY(void 0);
                 }
-                function onDragEnd(ev) {
-                    if (ev.pointer.distanceY > 0 && (ev.pointer.distanceY > 20 || Math.abs(ev.pointer.velocityY) > CLOSING_VELOCITY)) {
-                        var distanceRemaining = element.prop("offsetHeight") - ev.pointer.distanceY, transitionDuration = Math.min(distanceRemaining / ev.pointer.velocityY * .75, 500);
-                        element.css($mdConstant.CSS.TRANSITION_DURATION, transitionDuration + "ms"), $timeout($mdBottomSheet.cancel);
-                    } else element.css($mdConstant.CSS.TRANSITION_DURATION, ""), element.css($mdConstant.CSS.TRANSFORM, "");
+                function onTouchMove(e) {
+                    var currentY = getY(e), delta = currentY - startY;
+                    velocity = currentY - lastY, lastY = currentY, delta = adjustedDelta(delta), setTransformY(delta + MAX_OFFSET);
                 }
-                var deregister = $mdGesture.register(parent, "drag", {
-                    horizontal: !1
-                });
-                return parent.on("$md.dragstart", onDragStart).on("$md.drag", onDrag).on("$md.dragend", onDragEnd), 
+                function getY(e) {
+                    var touch = e.touches && e.touches.length ? e.touches[0] : e.changedTouches[0];
+                    return touch.clientY;
+                }
+                function setTransformY(amt) {
+                    null === amt || void 0 === amt ? element.css($mdConstant.CSS.TRANSFORM, "") : element.css($mdConstant.CSS.TRANSFORM, "translate3d(0, " + amt + "px, 0)");
+                }
+                function adjustedDelta(delta) {
+                    if (0 > delta && -MAX_OFFSET + WIGGLE_AMOUNT > delta) {
+                        delta = -delta;
+                        var base = MAX_OFFSET - WIGGLE_AMOUNT;
+                        delta = Math.max(-MAX_OFFSET, -Math.min(MAX_OFFSET - 5, base + WIGGLE_AMOUNT * (delta - base) / MAX_OFFSET) - delta / 50);
+                    }
+                    return delta;
+                }
+                var startY, lastY, velocity, transitionDelay, startTarget, MAX_OFFSET = 80, WIGGLE_AMOUNT = 20, CLOSING_VELOCITY = 10;
+                return element = element.eq(0), element.on("touchstart", onTouchStart).on("touchmove", onTouchMove).on("touchend", onTouchEnd), 
                 {
                     element: element,
                     cleanup: function() {
-                        deregister(), parent.off("$md.dragstart", onDragStart).off("$md.drag", onDrag).off("$md.dragend", onDragEnd);
+                        element.off("touchstart", onTouchStart).off("touchmove", onTouchMove).off("touchend", onTouchEnd);
                     }
                 };
             }
@@ -13250,14 +13075,11 @@ function() {
                 targetEvent: null,
                 onShow: onShow,
                 onRemove: onRemove,
-                escapeToClose: !0,
-                disableParentScroll: !0
+                escapeToClose: !0
             };
         }
-        var CLOSING_VELOCITY = .5, PADDING = 80;
-        return bottomSheetDefaults.$inject = [ "$animate", "$mdConstant", "$timeout", "$$rAF", "$compile", "$mdTheming", "$mdBottomSheet", "$rootElement", "$rootScope", "$mdGesture" ], 
+        return bottomSheetDefaults.$inject = [ "$animate", "$mdConstant", "$timeout", "$$rAF", "$compile", "$mdTheming", "$mdBottomSheet", "$rootElement" ], 
         $$interimElementProvider("$mdBottomSheet").setDefaults({
-            methods: [ "disableParentScroll", "escapeToClose", "targetEvent" ],
             options: bottomSheetDefaults
         });
     }
@@ -13292,18 +13114,6 @@ function() {
     MdButtonDirective.$inject = [ "$mdInkRipple", "$mdTheming", "$mdAria" ];
 }(), function() {
     "use strict";
-    function mdCardDirective($mdTheming) {
-        return {
-            restrict: "E",
-            link: function($scope, $element) {
-                $mdTheming($element);
-            }
-        };
-    }
-    angular.module("material.components.card", [ "material.core" ]).directive("mdCard", mdCardDirective), 
-    mdCardDirective.$inject = [ "$mdTheming" ];
-}(), function() {
-    "use strict";
     function MdCheckboxDirective(inputDirective, $mdInkRipple, $mdAria, $mdConstant, $mdTheming, $mdUtil) {
         function compile(tElement, tAttrs) {
             return tAttrs.type = "checkbox", tAttrs.tabIndex = 0, tElement.attr("role", tAttrs.type), 
@@ -13321,10 +13131,10 @@ function() {
                 }
                 ngModelCtrl = ngModelCtrl || $mdUtil.fakeNgModel();
                 var checked = !1;
-                $mdTheming(element), $mdAria.expectWithText(element, "aria-label"), inputDirective.link.pre(scope, {
+                $mdTheming(element), $mdAria.expectWithText(tElement, "aria-label"), inputDirective.link.pre(scope, {
                     on: angular.noop,
                     0: {}
-                }, attr, [ ngModelCtrl ]), element.on("click", listener).on("keypress", keypressHandler), 
+                }, attr, [ ngModelCtrl ]), attr.mdNoClick || element.on("click", listener), element.on("keypress", keypressHandler), 
                 ngModelCtrl.$render = render;
             };
         }
@@ -13342,6 +13152,18 @@ function() {
     MdCheckboxDirective.$inject = [ "inputDirective", "$mdInkRipple", "$mdAria", "$mdConstant", "$mdTheming", "$mdUtil" ];
 }(), function() {
     "use strict";
+    function mdCardDirective($mdTheming) {
+        return {
+            restrict: "E",
+            link: function($scope, $element) {
+                $mdTheming($element);
+            }
+        };
+    }
+    angular.module("material.components.card", [ "material.core" ]).directive("mdCard", mdCardDirective), 
+    mdCardDirective.$inject = [ "$mdTheming" ];
+}(), function() {
+    "use strict";
     function mdContentDirective($mdTheming) {
         function ContentController($scope, $element) {
             this.$scope = $scope, this.$element = $element;
@@ -13349,17 +13171,10 @@ function() {
         return {
             restrict: "E",
             controller: [ "$scope", "$element", ContentController ],
-            link: function(scope, element) {
-                element[0];
-                $mdTheming(element), scope.$broadcast("$mdContentLoaded", element), iosScrollFix(element[0]);
+            link: function($scope, $element) {
+                $mdTheming($element), $scope.$broadcast("$mdContentLoaded", $element);
             }
         };
-    }
-    function iosScrollFix(node) {
-        angular.element(node).on("$md.pressdown", function(ev) {
-            "t" === ev.pointer.type && (ev.$materialScrollFixed || (ev.$materialScrollFixed = !0, 
-            0 === node.scrollTop ? node.scrollTop = 1 : node.scrollHeight === node.scrollTop + node.offsetHeight && (node.scrollTop -= 1)));
-        });
     }
     angular.module("material.components.content", [ "material.core" ]).directive("mdContent", mdContentDirective), 
     mdContentDirective.$inject = [ "$mdTheming" ];
@@ -13403,24 +13218,20 @@ function() {
                 }
                 options.parent = angular.element(options.parent), options.popInTarget = angular.element((options.targetEvent || {}).target);
                 var closeButton = findCloseButton();
-                if (configureAria(element.find("md-dialog")), options.hasBackdrop) {
-                    var parentOffset = options.parent.prop("scrollTop");
-                    options.backdrop = angular.element('<md-backdrop class="md-dialog-backdrop md-opaque">'), 
-                    $mdTheming.inherit(options.backdrop, options.parent), $animate.enter(options.backdrop, options.parent), 
-                    element.css("top", parentOffset + "px");
-                }
-                return options.disableParentScroll && (options.lastOverflow = options.parent.css("overflow"), 
+                return configureAria(element.find("md-dialog")), options.hasBackdrop && (options.backdrop = angular.element('<md-backdrop class="md-dialog-backdrop md-opaque">'), 
+                $mdTheming.inherit(options.backdrop, options.parent), $animate.enter(options.backdrop, options.parent)), 
+                options.disableParentScroll && (options.oldOverflowStyle = options.parent.css("overflow"), 
                 options.parent.css("overflow", "hidden")), dialogPopIn(element, options.parent, options.popInTarget && options.popInTarget.length && options.popInTarget).then(function() {
                     options.escapeToClose && (options.rootElementKeyupCallback = function(e) {
                         e.keyCode === $mdConstant.KEY_CODE.ESCAPE && $timeout($mdDialog.cancel);
-                    }, $rootElement.on("keyup", options.rootElementKeyupCallback)), options.clickOutsideToClose && (options.dialogClickOutsideCallback = function(ev) {
-                        ev.target === element[0] && $timeout($mdDialog.cancel);
+                    }, $rootElement.on("keyup", options.rootElementKeyupCallback)), options.clickOutsideToClose && (options.dialogClickOutsideCallback = function(e) {
+                        e.target === element[0] && $timeout($mdDialog.cancel);
                     }, element.on("click", options.dialogClickOutsideCallback)), closeButton.focus();
                 });
             }
             function onRemove(scope, element, options) {
-                return options.backdrop && $animate.leave(options.backdrop), options.disableParentScroll && (options.parent.css("overflow", options.lastOverflow), 
-                delete options.lastOverflow), options.escapeToClose && $rootElement.off("keyup", options.rootElementKeyupCallback), 
+                return options.backdrop && $animate.leave(options.backdrop), options.disableParentScroll && (options.parent.css("overflow", options.oldOverflowStyle), 
+                $document[0].removeEventListener("scroll", options.captureScroll, !0)), options.escapeToClose && $rootElement.off("keyup", options.rootElementKeyupCallback), 
                 options.clickOutsideToClose && element.off("click", options.dialogClickOutsideCallback), 
                 dialogPopOut(element, options.parent, options.popInTarget && options.popInTarget.length && options.popInTarget).then(function() {
                     options.scope.$destroy(), element.remove(), options.popInTarget && options.popInTarget.focus();
@@ -13516,14 +13327,13 @@ function() {
     }
     angular.module("material.components.icon", [ "material.core" ]).directive("mdIcon", mdIconDirective);
 }(), function() {
-    function mdInputContainerDirective($mdTheming, $parse) {
+    function mdInputContainerDirective($mdTheming) {
         function postLink(scope, element) {
             $mdTheming(element);
         }
-        function ContainerCtrl($scope, $element, $attrs) {
+        function ContainerCtrl($scope, $element) {
             var self = this;
-            self.isErrorGetter = $attrs.mdIsError && $parse($attrs.mdIsError), self.element = $element, 
-            self.setFocused = function(isFocused) {
+            self.element = $element, self.setFocused = function(isFocused) {
                 $element.toggleClass("md-input-focused", !!isFocused);
             }, self.setHasValue = function(hasValue) {
                 $element.toggleClass("md-input-has-value", !!hasValue);
@@ -13535,7 +13345,7 @@ function() {
                 hasLabelAndInput && !self.label.attr("for") && self.label.attr("for", self.input.attr("id"));
             });
         }
-        return ContainerCtrl.$inject = [ "$scope", "$element", "$attrs" ], {
+        return ContainerCtrl.$inject = [ "$scope", "$element", "$mdUtil" ], {
             restrict: "E",
             link: postLink,
             controller: ContainerCtrl
@@ -13554,11 +13364,9 @@ function() {
     }
     function inputTextareaDirective($mdUtil, $window) {
         function postLink(scope, element, attr, ctrls) {
-            function ngModelPipelineCheckValue(arg) {
-                return containerCtrl.setHasValue(!ngModelCtrl.$isEmpty(arg)), arg;
-            }
-            function inputCheckValue() {
-                containerCtrl.setHasValue(element.val().length > 0 || (element[0].validity || {}).badInput);
+            function checkHasValue(value) {
+                return containerCtrl.setHasValue(!isEmpty(value) || (element[0].validity || {}).badInput), 
+                value;
             }
             function setupTextarea() {
                 function pipelineListener(value) {
@@ -13583,20 +13391,21 @@ function() {
                     angular.element($window).off("resize", onChangeTextarea);
                 });
             }
-            var containerCtrl = ctrls[0], ngModelCtrl = ctrls[1] || $mdUtil.fakeNgModel(), isReadonly = angular.isDefined(attr.readonly);
+            var containerCtrl = ctrls[0], ngModelCtrl = ctrls[1];
             if (containerCtrl) {
                 if (containerCtrl.input) throw new Error("<md-input-container> can only have *one* <input> or <textarea> child element!");
                 containerCtrl.input = element, element.addClass("md-input"), element.attr("id") || element.attr("id", "input_" + $mdUtil.nextUid()), 
                 "textarea" === element[0].tagName.toLowerCase() && setupTextarea();
-                var isErrorGetter = containerCtrl.isErrorGetter || function() {
-                    return ngModelCtrl.$invalid && ngModelCtrl.$touched;
+                var isEmpty = ngModelCtrl ? ngModelCtrl.$isEmpty : function() {
+                    return 0 === ("" + element.val()).length;
                 };
-                scope.$watch(isErrorGetter, containerCtrl.setInvalid), ngModelCtrl.$parsers.push(ngModelPipelineCheckValue), 
-                ngModelCtrl.$formatters.push(ngModelPipelineCheckValue), element.on("input", inputCheckValue), 
-                isReadonly || element.on("focus", function() {
+                ngModelCtrl ? (scope.$watch(function() {
+                    return ngModelCtrl.$dirty && ngModelCtrl.$invalid;
+                }, containerCtrl.setInvalid), ngModelCtrl.$formatters.push(checkHasValue), ngModelCtrl.$parsers.push(checkHasValue)) : checkHasValue(), 
+                element.on("input", checkHasValue), element.on("focus", function() {
                     containerCtrl.setFocused(!0);
                 }).on("blur", function() {
-                    containerCtrl.setFocused(!1), inputCheckValue();
+                    containerCtrl.setFocused(!1);
                 }), scope.$on("$destroy", function() {
                     containerCtrl.setFocused(!1), containerCtrl.setHasValue(!1), containerCtrl.input = null;
                 });
@@ -13631,21 +13440,8 @@ function() {
             link: postLink
         };
     }
-    function placeholderDirective() {
-        function postLink(scope, element, attr, inputContainer) {
-            if (inputContainer) {
-                var placeholderText = attr.placeholder;
-                element.removeAttr("placeholder"), inputContainer.element.append('<div class="md-placeholder">' + placeholderText + "</div>");
-            }
-        }
-        return {
-            restrict: "A",
-            require: "^^?mdInputContainer",
-            link: postLink
-        };
-    }
-    angular.module("material.components.input", [ "material.core" ]).directive("mdInputContainer", mdInputContainerDirective).directive("label", labelDirective).directive("input", inputTextareaDirective).directive("textarea", inputTextareaDirective).directive("mdMaxlength", mdMaxlengthDirective).directive("placeholder", placeholderDirective), 
-    mdInputContainerDirective.$inject = [ "$mdTheming", "$parse" ], inputTextareaDirective.$inject = [ "$mdUtil", "$window", "$compile", "$animate" ], 
+    angular.module("material.components.input", [ "material.core" ]).directive("mdInputContainer", mdInputContainerDirective).directive("label", labelDirective).directive("input", inputTextareaDirective).directive("textarea", inputTextareaDirective).directive("mdMaxlength", mdMaxlengthDirective), 
+    mdInputContainerDirective.$inject = [ "$mdTheming" ], inputTextareaDirective.$inject = [ "$mdUtil", "$window", "$compile", "$animate" ], 
     mdMaxlengthDirective.$inject = [ "$animate" ];
 }(), function() {
     "use strict";
@@ -13872,9 +13668,6 @@ function() {
                 isOpen: function() {
                     return instance && instance.isOpen();
                 },
-                isLockedOpen: function() {
-                    return instance && instance.isLockedOpen();
-                },
                 toggle: function() {
                     return instance ? instance.toggle() : $q.reject(errorMsg);
                 },
@@ -13890,7 +13683,7 @@ function() {
     function SidenavDirective($timeout, $animate, $parse, $mdMedia, $mdConstant, $compile, $mdTheming, $q, $document) {
         function postLink(scope, element, attr, sidenavCtrl) {
             function updateIsLocked(isLocked, oldValue) {
-                scope.isLockedOpen = isLocked, isLocked === oldValue ? element.toggleClass("md-locked-open", !!isLocked) : $animate[isLocked ? "addClass" : "removeClass"](element, "md-locked-open"), 
+                isLocked === oldValue ? element.toggleClass("md-locked-open", !!isLocked) : $animate[isLocked ? "addClass" : "removeClass"](element, "md-locked-open"), 
                 backdrop.toggleClass("md-locked-open", !!isLocked);
             }
             function updateIsOpen(isOpen) {
@@ -13942,8 +13735,6 @@ function() {
             return $q.when($scope.isOpen);
         }, self.isOpen = function() {
             return !!$scope.isOpen;
-        }, self.isLockedOpen = function() {
-            return !!$scope.isLockedOpen;
         }, self.open = function() {
             return self.$toggleOpen(!0);
         }, self.close = function() {
@@ -13957,25 +13748,48 @@ function() {
     SidenavController.$inject = [ "$scope", "$element", "$attrs", "$mdComponentRegistry", "$q" ];
 }(), function() {
     "use strict";
-    function SliderDirective($$rAF, $window, $mdAria, $mdUtil, $mdConstant, $mdTheming, $mdGesture, $parse) {
-        function postLink(scope, element, attr, ngModelCtrl) {
+    function SliderDirective($mdTheming) {
+        function postLink(scope, element, attr, ctrls) {
+            $mdTheming(element);
+            var ngModelCtrl = ctrls[0] || {
+                $setViewValue: function(val) {
+                    this.$viewValue = val, this.$viewChangeListeners.forEach(function(cb) {
+                        cb();
+                    });
+                },
+                $parsers: [],
+                $formatters: [],
+                $viewChangeListeners: []
+            }, sliderCtrl = ctrls[1];
+            sliderCtrl.init(ngModelCtrl);
+        }
+        return {
+            scope: {},
+            require: [ "?ngModel", "mdSlider" ],
+            controller: SliderController,
+            template: '<div class="md-track-container"><div class="md-track"></div><div class="md-track md-track-fill"></div><div class="md-track-ticks"></div></div><div class="md-thumb-container"><div class="md-thumb"></div><div class="md-focus-thumb"></div><div class="md-focus-ring"></div><div class="md-sign"><span class="md-thumb-text"></span></div><div class="md-disabled-thumb"></div></div>',
+            link: postLink
+        };
+    }
+    function SliderController($scope, $element, $attrs, $$rAF, $window, $mdAria, $mdUtil, $mdConstant) {
+        this.init = function(ngModelCtrl) {
             function updateAll() {
                 refreshSliderDimensions(), ngModelRender(), redrawTicks();
             }
             function updateMin(value) {
-                min = parseFloat(value), element.attr("aria-valuemin", value), updateAll();
+                min = parseFloat(value), $element.attr("aria-valuemin", value), updateAll();
             }
             function updateMax(value) {
-                max = parseFloat(value), element.attr("aria-valuemax", value), updateAll();
+                max = parseFloat(value), $element.attr("aria-valuemax", value), updateAll();
             }
             function updateStep(value) {
                 step = parseFloat(value), redrawTicks();
             }
             function updateAriaDisabled(isDisabled) {
-                element.attr("aria-disabled", !!isDisabled);
+                $element.attr("aria-disabled", !!isDisabled);
             }
             function redrawTicks() {
-                if (angular.isDefined(attr.mdDiscrete)) {
+                if (angular.isDefined($attrs.mdDiscrete)) {
                     var numSteps = Math.floor((max - min) / step);
                     if (!tickCanvas) {
                         var trackTicksStyle = $window.getComputedStyle(tickContainer[0]);
@@ -13995,11 +13809,11 @@ function() {
                 return throttledRefreshDimensions(), sliderDimensions;
             }
             function keydownListener(ev) {
-                if (!element[0].hasAttribute("disabled")) {
+                if (!$element[0].hasAttribute("disabled")) {
                     var changeAmount;
                     ev.keyCode === $mdConstant.KEY_CODE.LEFT_ARROW ? changeAmount = -step : ev.keyCode === $mdConstant.KEY_CODE.RIGHT_ARROW && (changeAmount = step), 
                     changeAmount && ((ev.metaKey || ev.ctrlKey || ev.altKey) && (changeAmount *= 4), 
-                    ev.preventDefault(), ev.stopPropagation(), scope.$evalAsync(function() {
+                    ev.preventDefault(), ev.stopPropagation(), $scope.$evalAsync(function() {
                         setModelValue(ngModelCtrl.$viewValue + changeAmount);
                     }));
                 }
@@ -14010,7 +13824,7 @@ function() {
             function ngModelRender() {
                 isNaN(ngModelCtrl.$viewValue) && (ngModelCtrl.$viewValue = ngModelCtrl.$modelValue);
                 var percent = (ngModelCtrl.$viewValue - min) / (max - min);
-                scope.modelValue = ngModelCtrl.$viewValue, element.attr("aria-valuenow", ngModelCtrl.$viewValue), 
+                $scope.modelValue = ngModelCtrl.$viewValue, $element.attr("aria-valuenow", ngModelCtrl.$viewValue), 
                 setSliderPercent(percent), thumbText.text(ngModelCtrl.$viewValue);
             }
             function minMaxValidator(value) {
@@ -14020,42 +13834,31 @@ function() {
                 return angular.isNumber(value) ? Math.round(value / step) * step : void 0;
             }
             function setSliderPercent(percent) {
-                activeTrack.css("width", 100 * percent + "%"), thumbContainer.css($mdConstant.CSS.TRANSFORM, "translate3d(" + 100 * percent + "%,0,0)"), 
-                element.toggleClass("md-min", 0 === percent);
+                activeTrack.css("width", 100 * percent + "%"), thumbContainer.css($mdConstant.CSS.TRANSFORM, "translate3d(" + getSliderDimensions().width * percent + "px,0,0)"), 
+                $element.toggleClass("md-min", 0 === percent);
             }
-            function onPressDown(ev) {
-                if (!isDisabledGetter()) {
-                    element.addClass("active"), element[0].focus(), refreshSliderDimensions();
-                    var exactVal = percentToValue(positionToPercent(ev.pointer.x)), closestVal = minMaxValidator(stepValidator(exactVal));
-                    scope.$apply(function() {
-                        setModelValue(closestVal), setSliderPercent(valueToPercent(closestVal));
-                    });
-                }
+            function onInput(ev) {
+                isSliding || ev.eventType !== Hammer.INPUT_START || $element[0].hasAttribute("disabled") ? isSliding && ev.eventType === Hammer.INPUT_END && (isSliding && isDiscrete && onPanEnd(ev), 
+                isSliding = !1, $element.removeClass("panning active")) : (isSliding = !0, $element.addClass("active"), 
+                $element[0].focus(), refreshSliderDimensions(), onPan(ev), ev.srcEvent.stopPropagation());
             }
-            function onPressUp(ev) {
-                if (!isDisabledGetter()) {
-                    element.removeClass("dragging active");
-                    var exactVal = percentToValue(positionToPercent(ev.pointer.x)), closestVal = minMaxValidator(stepValidator(exactVal));
-                    scope.$apply(function() {
+            function onPanStart() {
+                isSliding && $element.addClass("panning");
+            }
+            function onPan(ev) {
+                isSliding && (isDiscrete ? adjustThumbPosition(ev.center.x) : doSlide(ev.center.x), 
+                ev.preventDefault(), ev.srcEvent.stopPropagation());
+            }
+            function onPanEnd(ev) {
+                if (isDiscrete && !$element[0].hasAttribute("disabled")) {
+                    var exactVal = percentToValue(positionToPercent(ev.center.x)), closestVal = minMaxValidator(stepValidator(exactVal));
+                    setSliderPercent(valueToPercent(closestVal)), $$rAF(function() {
                         setModelValue(closestVal);
-                    });
+                    }), ev.preventDefault(), ev.srcEvent.stopPropagation();
                 }
-            }
-            function onDragStart(ev) {
-                isDisabledGetter() || (isDragging = !0, ev.stopPropagation(), element.addClass("dragging"), 
-                setSliderFromEvent(ev));
-            }
-            function onDrag(ev) {
-                isDragging && (ev.stopPropagation(), setSliderFromEvent(ev));
-            }
-            function onDragEnd(ev) {
-                isDragging && (ev.stopPropagation(), isDragging = !1);
-            }
-            function setSliderFromEvent(ev) {
-                isDiscrete ? adjustThumbPosition(ev.pointer.x) : doSlide(ev.pointer.x);
             }
             function doSlide(x) {
-                scope.$evalAsync(function() {
+                $scope.$evalAsync(function() {
                     setModelValue(percentToValue(positionToPercent(x)));
                 });
             }
@@ -14072,52 +13875,40 @@ function() {
             function valueToPercent(val) {
                 return (val - min) / (max - min);
             }
-            $mdTheming(element), ngModelCtrl = ngModelCtrl || {
-                $setViewValue: function(val) {
-                    this.$viewValue = val, this.$viewChangeListeners.forEach(function(cb) {
-                        cb();
-                    });
-                },
-                $parsers: [],
-                $formatters: [],
-                $viewChangeListeners: []
-            };
-            var isDisabledParsed = attr.ngDisabled && $parse(attr.ngDisabled), isDisabledGetter = isDisabledParsed ? function() {
-                return isDisabledParsed(scope.$parent);
-            } : angular.noop, thumb = angular.element(element[0].querySelector(".md-thumb")), thumbText = angular.element(element[0].querySelector(".md-thumb-text")), thumbContainer = thumb.parent(), trackContainer = angular.element(element[0].querySelector(".md-track-container")), activeTrack = angular.element(element[0].querySelector(".md-track-fill")), tickContainer = angular.element(element[0].querySelector(".md-track-ticks")), throttledRefreshDimensions = $mdUtil.throttle(refreshSliderDimensions, 5e3);
-            attr.min ? attr.$observe("min", updateMin) : updateMin(0), attr.max ? attr.$observe("max", updateMax) : updateMax(100), 
-            attr.step ? attr.$observe("step", updateStep) : updateStep(1);
+            var thumb = angular.element($element[0].querySelector(".md-thumb")), thumbText = angular.element($element[0].querySelector(".md-thumb-text")), thumbContainer = thumb.parent(), trackContainer = angular.element($element[0].querySelector(".md-track-container")), activeTrack = angular.element($element[0].querySelector(".md-track-fill")), tickContainer = angular.element($element[0].querySelector(".md-track-ticks")), throttledRefreshDimensions = $mdUtil.throttle(refreshSliderDimensions, 5e3);
+            $attrs.min ? $attrs.$observe("min", updateMin) : updateMin(0), $attrs.max ? $attrs.$observe("max", updateMax) : updateMax(100), 
+            $attrs.step ? $attrs.$observe("step", updateStep) : updateStep(1);
             var stopDisabledWatch = angular.noop;
-            attr.ngDisabled && (stopDisabledWatch = scope.$parent.$watch(attr.ngDisabled, updateAriaDisabled)), 
-            $mdAria.expect(element, "aria-label"), $mdGesture.register(element, "drag"), element.attr({
-                tabIndex: 0,
-                role: "slider"
-            }).on("keydown", keydownListener).on("$md.pressdown", onPressDown).on("$md.pressup", onPressUp).on("$md.dragstart", onDragStart).on("$md.drag", onDrag).on("$md.dragend", onDragEnd), 
-            setTimeout(updateAll);
-            var debouncedUpdateAll = $$rAF.throttle(updateAll);
-            angular.element($window).on("resize", debouncedUpdateAll), scope.$on("$destroy", function() {
-                angular.element($window).off("resize", debouncedUpdateAll), stopDisabledWatch();
+            $attrs.ngDisabled && (stopDisabledWatch = $scope.$parent.$watch($attrs.ngDisabled, updateAriaDisabled)), 
+            $mdAria.expect($element, "aria-label"), $element.attr("tabIndex", 0), $element.attr("role", "slider"), 
+            $element.on("keydown", keydownListener);
+            var hammertime = new Hammer($element[0], {
+                recognizers: [ [ Hammer.Pan, {
+                    direction: Hammer.DIRECTION_HORIZONTAL
+                } ] ]
+            });
+            hammertime.on("hammer.input", onInput), hammertime.on("panstart", onPanStart), hammertime.on("pan", onPan), 
+            hammertime.on("panend", onPanEnd), setTimeout(updateAll);
+            var debouncedUpdateAll = $$rAF.debounce(updateAll);
+            angular.element($window).on("resize", debouncedUpdateAll), $scope.$on("$destroy", function() {
+                angular.element($window).off("resize", debouncedUpdateAll), hammertime.destroy(), 
+                stopDisabledWatch();
             }), ngModelCtrl.$render = ngModelRender, ngModelCtrl.$viewChangeListeners.push(ngModelRender), 
             ngModelCtrl.$formatters.push(minMaxValidator), ngModelCtrl.$formatters.push(stepValidator);
             var min, max, step, tickCanvas, tickCtx, sliderDimensions = {};
             refreshSliderDimensions();
-            var isDragging = !1, isDiscrete = angular.isDefined(attr.mdDiscrete);
-        }
-        return {
-            scope: {},
-            require: "?ngModel",
-            template: '<div class="md-track-container"><div class="md-track"></div><div class="md-track md-track-fill"></div><div class="md-track-ticks"></div></div><div class="md-thumb-container"><div class="md-thumb"></div><div class="md-focus-thumb"></div><div class="md-focus-ring"></div><div class="md-sign"><span class="md-thumb-text"></span></div><div class="md-disabled-thumb"></div></div>',
-            link: postLink
+            var isSliding = !1, isDiscrete = angular.isDefined($attrs.mdDiscrete);
+            this._onInput = onInput, this._onPanStart = onPanStart, this._onPan = onPan;
         };
     }
     angular.module("material.components.slider", [ "material.core" ]).directive("mdSlider", SliderDirective), 
-    SliderDirective.$inject = [ "$$rAF", "$window", "$mdAria", "$mdUtil", "$mdConstant", "$mdTheming", "$mdGesture", "$parse" ];
+    SliderDirective.$inject = [ "$mdTheming" ], SliderController.$inject = [ "$scope", "$element", "$attrs", "$$rAF", "$window", "$mdAria", "$mdUtil", "$mdConstant" ];
 }(), function() {
     "use strict";
     function MdSticky($document, $mdConstant, $compile, $$rAF, $mdUtil) {
         function setupSticky(contentCtrl) {
             function add(element, stickyClone) {
-                stickyClone.addClass("md-sticky-clone"), stickyClone.css("top", stickyBaseoffset + "px");
+                stickyClone.addClass("md-sticky-clone");
                 var item = {
                     element: element,
                     clone: stickyClone
@@ -14168,10 +13959,10 @@ function() {
                 item && (null === amount || void 0 === amount ? item.translateY && (item.translateY = null, 
                 item.clone.css($mdConstant.CSS.TRANSFORM, "")) : (item.translateY = amount, item.clone.css($mdConstant.CSS.TRANSFORM, "translate3d(" + item.left + "px," + amount + "px,0)")));
             }
-            var contentEl = contentCtrl.$element, debouncedRefreshElements = $$rAF.throttle(refreshElements);
+            var contentEl = contentCtrl.$element, debouncedRefreshElements = $$rAF.debounce(refreshElements);
             setupAugmentedScrollEvents(contentEl), contentEl.on("$scrollstart", debouncedRefreshElements), 
             contentEl.on("$scroll", onScroll);
-            var self, stickyBaseoffset = contentEl.prop("offsetTop");
+            var self;
             return self = {
                 prev: null,
                 current: null,
@@ -14250,66 +14041,89 @@ function() {
     MdSubheaderDirective.$inject = [ "$mdSticky", "$compile", "$mdTheming" ];
 }(), function() {
     "use strict";
-    var module = angular.module("material.components.swipe", []);
-    [ "SwipeLeft", "SwipeRight" ].forEach(function(name) {
-        var directiveName = "md" + name, eventName = "$md." + name.toLowerCase();
-        module.directive(directiveName, [ "$parse", function($parse) {
-            function postLink(scope, element, attr) {
-                var fn = $parse(attr[directiveName]);
-                element.on(eventName, function(ev) {
-                    scope.$apply(function() {
-                        fn(scope, {
-                            $event: ev
-                        });
+    function MdSwipeFactory() {
+        return function(scope, eventTypes) {
+            return eventTypes || (eventTypes = "swipeleft swiperight"), function(element, onSwipeCallback, attachLater) {
+                function swipeHandler(ev) {
+                    ev.srcEvent.stopPropagation(), angular.isFunction(onSwipeCallback) && scope.$apply(function() {
+                        onSwipeCallback(ev);
                     });
+                }
+                function attachSwipe() {
+                    return hammertime.on(eventTypes, swipeHandler), function() {
+                        hammertime.off(eventTypes);
+                    };
+                }
+                function addRecognizers(list, events) {
+                    var hasPanning = events.indexOf("pan") > -1, hasSwipe = events.indexOf("swipe") > -1;
+                    return hasPanning && list.push([ Hammer.Pan, {
+                        direction: Hammer.DIRECTION_HORIZONTAL
+                    } ]), hasSwipe && list.push([ Hammer.Swipe, {
+                        direction: Hammer.DIRECTION_HORIZONTAL
+                    } ]), list;
+                }
+                var hammertime = new Hammer(element[0], {
+                    recognizers: addRecognizers([], eventTypes)
                 });
-            }
-            return {
-                restrict: "A",
-                link: postLink
+                return attachLater || attachSwipe(), scope.$on("$destroy", function() {
+                    hammertime.destroy();
+                }), attachSwipe;
             };
-        } ]);
-    });
+        };
+    }
+    function MdSwipeLeftDirective($parse, $mdSwipe) {
+        return {
+            restrict: "A",
+            link: swipePostLink($parse, $mdSwipe, "SwipeLeft")
+        };
+    }
+    function MdSwipeRightDirective($parse, $mdSwipe) {
+        return {
+            restrict: "A",
+            link: swipePostLink($parse, $mdSwipe, "SwipeRight")
+        };
+    }
+    function swipePostLink($parse, $mdSwipe, name) {
+        return function(scope, element, attrs) {
+            var direction = name.toLowerCase(), directiveName = "md" + name, parentGetter = $parse(attrs[directiveName]) || angular.noop, configureSwipe = $mdSwipe(scope, direction), requestSwipe = function(locals) {
+                parentGetter(scope, locals);
+            };
+            configureSwipe(element, function(ev) {
+                ev.type == direction && requestSwipe();
+            });
+        };
+    }
+    angular.module("material.components.swipe", []).factory("$mdSwipe", MdSwipeFactory).directive("mdSwipeLeft", MdSwipeLeftDirective).directive("mdSwipeRight", MdSwipeRightDirective), 
+    MdSwipeLeftDirective.$inject = [ "$parse", "$mdSwipe" ], MdSwipeRightDirective.$inject = [ "$parse", "$mdSwipe" ];
 }(), function() {
     "use strict";
-    function MdSwitch(mdCheckboxDirective, $mdTheming, $mdUtil, $document, $mdConstant, $parse, $$rAF, $mdGesture) {
+    function MdSwitch(mdCheckboxDirective, $mdTheming, $mdUtil, $document, $mdConstant, $parse, $$rAF) {
         function compile(element, attr) {
             var checkboxLink = checkboxDirective.compile(element, attr);
             return element.addClass("md-dragging"), function(scope, element, attr, ngModel) {
-                function onDragStart(ev) {
-                    disabledGetter(scope) || (ev.stopPropagation(), element.addClass("md-dragging"), 
-                    drag = {
-                        width: thumbContainer.prop("offsetWidth")
-                    }, element.removeClass("transition"));
+                function onDragStart(ev, drag) {
+                    return disabledGetter(scope) ? ev.preventDefault() : (drag.width = thumbContainer.prop("offsetWidth"), 
+                    void element.addClass("md-dragging"));
                 }
-                function onDrag(ev) {
-                    if (drag) {
-                        ev.stopPropagation(), ev.srcEvent && ev.srcEvent.preventDefault();
-                        var percent = ev.pointer.distanceX / drag.width, translate = ngModel.$viewValue ? 1 + percent : percent;
-                        translate = Math.max(0, Math.min(1, translate)), thumbContainer.css($mdConstant.CSS.TRANSFORM, "translate3d(" + 100 * translate + "%,0,0)"), 
-                        drag.translate = translate;
-                    }
+                function onDrag(ev, drag) {
+                    var percent = drag.distance / drag.width, translate = ngModel.$viewValue ? 1 - percent : -percent;
+                    translate = Math.max(0, Math.min(1, translate)), thumbContainer.css($mdConstant.CSS.TRANSFORM, "translate3d(" + 100 * translate + "%,0,0)"), 
+                    drag.translate = translate;
                 }
-                function onDragEnd(ev) {
-                    if (drag) {
-                        ev.stopPropagation(), element.removeClass("md-dragging"), thumbContainer.css($mdConstant.CSS.TRANSFORM, "");
-                        var isChanged = ngModel.$viewValue ? drag.translate < .5 : drag.translate > .5;
-                        isChanged && applyModelValue(!ngModel.$viewValue), drag = null;
-                    }
-                }
-                function applyModelValue(newValue) {
-                    scope.$apply(function() {
-                        ngModel.$setViewValue(newValue), ngModel.$render();
+                function onDragEnd(ev, drag) {
+                    if (disabledGetter(scope)) return !1;
+                    element.removeClass("md-dragging"), thumbContainer.css($mdConstant.CSS.TRANSFORM, "");
+                    var isChanged = Math.abs(drag.distance || 0) < 2 || (ngModel.$viewValue ? drag.translate < .5 : drag.translate > .5);
+                    isChanged && scope.$apply(function() {
+                        ngModel.$setViewValue(!ngModel.$viewValue), ngModel.$render();
                     });
                 }
                 ngModel = ngModel || $mdUtil.fakeNgModel();
                 var disabledGetter = $parse(attr.ngDisabled), thumbContainer = angular.element(element[0].querySelector(".md-thumb-container")), switchContainer = angular.element(element[0].querySelector(".md-container"));
                 $$rAF(function() {
                     element.removeClass("md-dragging");
-                }), checkboxLink(scope, element, attr, ngModel), angular.isDefined(attr.ngDisabled) && scope.$watch(disabledGetter, function(isDisabled) {
-                    element.attr("tabindex", isDisabled ? -1 : 0);
-                }), $mdGesture.register(switchContainer, "drag"), switchContainer.on("$md.dragstart", onDragStart).on("$md.drag", onDrag).on("$md.dragend", onDragEnd);
-                var drag;
+                }), attr.mdNoClick = !0, checkboxLink(scope, element, attr, ngModel), $mdUtil.attachDragBehavior(scope, switchContainer), 
+                switchContainer.on("$md.dragstart", onDragStart).on("$md.drag", onDrag).on("$md.dragend", onDragEnd);
             };
         }
         var checkboxDirective = mdCheckboxDirective[0];
@@ -14322,7 +14136,7 @@ function() {
         };
     }
     angular.module("material.components.switch", [ "material.core", "material.components.checkbox" ]).directive("mdSwitch", MdSwitch), 
-    MdSwitch.$inject = [ "mdCheckboxDirective", "$mdTheming", "$mdUtil", "$document", "$mdConstant", "$parse", "$$rAF", "$mdGesture" ];
+    MdSwitch.$inject = [ "mdCheckboxDirective", "$mdTheming", "$mdUtil", "$document", "$mdConstant", "$parse", "$$rAF" ];
 }(), function() {
     "use strict";
     angular.module("material.components.tabs", [ "material.core" ]);
@@ -14407,16 +14221,18 @@ function() {
         };
     }
     function MdToastProvider($$interimElementProvider) {
-        function toastDefaultOptions($timeout, $animate, $mdTheming, $mdToast) {
+        function toastDefaultOptions($timeout, $animate, $mdSwipe, $mdTheming, $mdToast) {
             function onShow(scope, element, options) {
-                return element.addClass(options.position.split(" ").map(function(pos) {
+                element.addClass(options.position.split(" ").map(function(pos) {
                     return "md-" + pos;
-                }).join(" ")), options.parent.addClass(toastOpenClass(options.position)), options.onSwipe = function(ev) {
-                    element.addClass("md-" + ev.type.replace("$md.", "")), $timeout($mdToast.cancel);
-                }, element.on("$md.swipeleft $md.swiperight", options.onSwipe), $animate.enter(element, options.parent);
+                }).join(" ")), options.parent.addClass(toastOpenClass(options.position));
+                var configureSwipe = $mdSwipe(scope, "swipeleft swiperight");
+                return options.detachSwipe = configureSwipe(element, function(ev) {
+                    element.addClass("md-" + ev.type), $timeout($mdToast.cancel);
+                }), $animate.enter(element, options.parent);
             }
             function onRemove(scope, element, options) {
-                return element.off("$md.swipeleft $md.swiperight", options.onSwipe), options.parent.removeClass(toastOpenClass(options.position)), 
+                return options.detachSwipe(), options.parent.removeClass(toastOpenClass(options.position)), 
                 $animate.leave(element);
             }
             function toastOpenClass(position) {
@@ -14430,7 +14246,7 @@ function() {
                 hideDelay: 3e3
             };
         }
-        return toastDefaultOptions.$inject = [ "$timeout", "$animate", "$mdTheming", "$mdToast" ], 
+        return toastDefaultOptions.$inject = [ "$timeout", "$animate", "$mdSwipe", "$mdTheming", "$mdToast" ], 
         $$interimElementProvider("$mdToast").setDefaults({
             methods: [ "position", "hideDelay", "capsule" ],
             options: toastDefaultOptions
@@ -14439,7 +14255,7 @@ function() {
             methods: [ "content", "action", "highlightAction" ],
             options: [ "$mdToast", function($mdToast) {
                 return {
-                    template: [ "<md-toast ng-class=\"{'md-capsule': toast.capsule}\">", "<span flex>{{ toast.content }}</span>", '<md-button class="md-action" ng-if="toast.action" ng-click="toast.resolve()" ng-class="{\'md-highlight\': toast.highlightAction}">', "{{ toast.action }}", "</md-button>", "</md-toast>" ].join(""),
+                    template: [ "<md-toast ng-class=\"{'md-capsule': toast.capsule}\">", "<span flex>{{ toast.content }}</span>", '<md-button ng-if="toast.action" ng-click="toast.resolve()" ng-class="{\'md-action\': toast.highlightAction}">', "{{ toast.action }}", "</md-button>", "</md-toast>" ].join(""),
                     controller: function() {
                         this.resolve = function() {
                             $mdToast.hide();
@@ -14451,7 +14267,7 @@ function() {
             } ]
         });
     }
-    angular.module("material.components.toast", [ "material.core", "material.components.button" ]).directive("mdToast", MdToastDirective).provider("$mdToast", MdToastProvider), 
+    angular.module("material.components.toast", [ "material.core", "material.components.swipe", "material.components.button" ]).directive("mdToast", MdToastDirective).provider("$mdToast", MdToastProvider), 
     MdToastProvider.$inject = [ "$$interimElementProvider" ];
 }(), function() {
     "use strict";
@@ -14477,7 +14293,7 @@ function() {
                         contentElement.css($mdConstant.CSS.TRANSFORM, "translate3d(0," + (toolbarHeight - y) * shrinkSpeedFactor + "px,0)"), 
                         prevScrollTop = scrollTop;
                     }
-                    var toolbarHeight, contentElement, y = 0, prevScrollTop = 0, shrinkSpeedFactor = attr.mdShrinkSpeedFactor || .5, debouncedContentScroll = $$rAF.throttle(onContentScroll), debouncedUpdateHeight = $mdUtil.debounce(updateToolbarHeight, 5e3);
+                    var toolbarHeight, contentElement, y = 0, prevScrollTop = 0, shrinkSpeedFactor = attr.mdShrinkSpeedFactor || .5, debouncedContentScroll = $$rAF.debounce(onContentScroll), debouncedUpdateHeight = $mdUtil.debounce(updateToolbarHeight, 5e3);
                     scope.$on("$mdContentLoaded", onMdContentLoad);
                 }
                 $mdTheming(element), angular.isDefined(attr.mdScrollShrink) && setupScrollShrink();
@@ -14486,6 +14302,9 @@ function() {
     }
     angular.module("material.components.toolbar", [ "material.core", "material.components.content" ]).directive("mdToolbar", mdToolbarDirective), 
     mdToolbarDirective.$inject = [ "$$rAF", "$mdConstant", "$mdUtil", "$mdTheming" ];
+}(), function() {
+    "use strict";
+    angular.module("material.components.whiteframe", []);
 }(), function() {
     "use strict";
     function MdTooltipDirective($timeout, $window, $$rAF, $document, $mdUtil, $mdTheming, $rootElement) {
@@ -14536,7 +14355,7 @@ function() {
             }), scope.$watch("visible", function(isVisible) {
                 isVisible ? showTooltip() : hideTooltip();
             });
-            var debouncedOnResize = $$rAF.throttle(function() {
+            var debouncedOnResize = $$rAF.debounce(function() {
                 scope.visible && positionTooltip();
             });
             angular.element($window).on("resize", debouncedOnResize), scope.$on("$destroy", function() {
@@ -14559,13 +14378,10 @@ function() {
     MdTooltipDirective.$inject = [ "$timeout", "$window", "$$rAF", "$document", "$mdUtil", "$mdTheming", "$rootElement" ];
 }(), function() {
     "use strict";
-    angular.module("material.components.whiteframe", []);
-}(), function() {
-    "use strict";
     function MdTabInkDirective($$rAF) {
         function postLink(scope, element, attr, ctrls) {
             function updateBar() {
-                var selected = tabsCtrl.getSelectedItem(), hideInkBar = !selected || tabsCtrl.count() < 2 || mdNoBar;
+                var selected = tabsCtrl.getSelectedItem(), hideInkBar = !selected || tabsCtrl.count() < 2;
                 if (element.css("display", hideInkBar ? "none" : "block"), !hideInkBar && scope.pagination && scope.pagination.tabData) {
                     var index = tabsCtrl.getSelectedIndex(), data = scope.pagination.tabData.tabs[index] || {
                         left: 0,
@@ -14573,13 +14389,15 @@ function() {
                         width: 0
                     }, right = element.parent().prop("offsetWidth") - data.right, classNames = [ "md-transition-left", "md-transition-right", "md-no-transition" ], classIndex = lastIndex > index ? 0 : index > lastIndex ? 1 : 2;
                     element.removeClass(classNames.join(" ")).addClass(classNames[classIndex]).css({
-                        left: data.left + "px",
+                        left: data.left + 1 + "px",
                         right: right + "px"
                     }), lastIndex = index;
                 }
             }
-            var mdNoBar = !!ctrls[0], tabsCtrl = ctrls[1], debouncedUpdateBar = $$rAF.throttle(updateBar);
-            tabsCtrl.inkBarElement = element, scope.$on("$mdTabsPaginationChanged", debouncedUpdateBar);
+            if (!ctrls[0]) {
+                var tabsCtrl = ctrls[1], debouncedUpdateBar = $$rAF.debounce(updateBar);
+                tabsCtrl.inkBarElement = element, scope.$on("$mdTabsPaginationChanged", debouncedUpdateBar);
+            }
         }
         var lastIndex = 0;
         return {
@@ -14598,13 +14416,13 @@ function() {
                 if (tab) {
                     var pageIndex = getPageForTab(tab);
                     state.active && pageIndex !== state.page ? (oldTab && oldTab.element.blur(), setPage(pageIndex).then(function() {
-                        locked = !1, tab.element.focus();
+                        tab.element.focus();
                     })) : tab.element.focus();
                 }
             }
             function userChangePage(increment) {
                 var sizeData = state.tabData, newPage = Math.max(0, Math.min(sizeData.pages.length - 1, state.page + increment)), newTabIndex = sizeData.pages[newPage][increment > 0 ? "firstTabIndex" : "lastTabIndex"], newTab = tabsCtrl.itemAt(newTabIndex);
-                locked = !0, onTabFocus(newTab);
+                onTabFocus(newTab);
             }
             function updatePagination() {
                 function enablePagination() {
@@ -14700,14 +14518,14 @@ function() {
                     slideTabButtons(-state.tabData.pages[page].left);
                 }
             }
-            var tabs = element[0].getElementsByTagName("md-tab"), debouncedUpdatePagination = $$rAF.throttle(updatePagination), tabsParent = element.children(), locked = !1, state = scope.pagination = {
+            var tabs = element[0].getElementsByTagName("md-tab"), debouncedUpdatePagination = $$rAF.debounce(updatePagination), tabsParent = element.children(), state = scope.pagination = {
                 page: -1,
                 active: !1,
                 clickNext: function() {
-                    locked || userChangePage(1);
+                    userChangePage(1);
                 },
                 clickPrevious: function() {
-                    locked || userChangePage(-1);
+                    userChangePage(-1);
                 }
             };
             scope.$on("$mdTabsChanged", debouncedUpdatePagination), angular.element($window).on("resize", debouncedUpdatePagination), 
@@ -14740,7 +14558,7 @@ function() {
             }, 0, !1));
         }
         function onRemove() {
-            $animate.leave(self.contentContainer).then(function() {
+            self.hammertime.destroy(), $animate.leave(self.contentContainer).then(function() {
                 self.contentScope && self.contentScope.$destroy(), self.contentScope = null;
             });
         }
@@ -14748,28 +14566,22 @@ function() {
             self.contentContainer[rightToLeft ? "addClass" : "removeClass"]("md-transition-rtl");
         }
         function onSelect(rightToLeft) {
-            $mdUtil.reconnectScope(self.contentScope), $element.addClass("active").attr({
-                "aria-selected": !0,
-                tabIndex: 0
-            }).on("$md.swipeleft $md.swiperight", onSwipe), toggleAnimationClass(rightToLeft), 
-            $animate.removeClass(self.contentContainer, "ng-hide"), $scope.onSelect();
+            $mdUtil.reconnectScope(self.contentScope), self.hammertime.on("swipeleft swiperight", $scope.onSwipe), 
+            $element.addClass("active"), $element.attr("aria-selected", !0), $element.attr("tabIndex", 0), 
+            toggleAnimationClass(rightToLeft), $animate.removeClass(self.contentContainer, "ng-hide"), 
+            $scope.onSelect();
         }
         function onDeselect(rightToLeft) {
-            $mdUtil.disconnectScope(self.contentScope), $element.removeClass("active").attr({
-                "aria-selected": !1,
-                tabIndex: -1
-            }).off("$md.swipeleft $md.swiperight", onSwipe), toggleAnimationClass(rightToLeft), 
-            $animate.addClass(self.contentContainer, "ng-hide"), $scope.onDeselect();
+            $mdUtil.disconnectScope(self.contentScope), self.hammertime.off("swipeleft swiperight", $scope.onSwipe), 
+            $element.removeClass("active"), $element.attr("aria-selected", !1), $element.attr("tabIndex", -1), 
+            toggleAnimationClass(rightToLeft), $animate.addClass(self.contentContainer, "ng-hide"), 
+            $scope.onDeselect();
         }
-        function onSwipe(ev) {
-            $scope.$apply(function() {
-                tabsCtrl.select(/left/.test(ev.type) ? tabsCtrl.next() : tabsCtrl.previous());
-            });
-        }
-        var self = this, tabsCtrl = $element.controller("mdTabs");
+        var self = this;
         self.contentContainer = angular.element('<div class="md-tab-content ng-hide">'), 
-        self.element = $element, self.isDisabled = isDisabled, self.onAdd = onAdd, self.onRemove = onRemove, 
-        self.onSelect = onSelect, self.onDeselect = onDeselect;
+        self.hammertime = new Hammer(self.contentContainer[0]), self.element = $element, 
+        self.isDisabled = isDisabled, self.onAdd = onAdd, self.onRemove = onRemove, self.onSelect = onSelect, 
+        self.onDeselect = onDeselect;
         var disabledParsed = $parse($attrs.ngDisabled);
     }
     angular.module("material.components.tabs").controller("$mdTab", TabItemController), 
@@ -14797,6 +14609,11 @@ function() {
                         tabsCtrl.focus(tabsCtrl.previous(tabItemCtrl));
                     }) : ev.keyCode === $mdConstant.KEY_CODE.RIGHT_ARROW && scope.$evalAsync(function() {
                         tabsCtrl.focus(tabsCtrl.next(tabItemCtrl));
+                    });
+                }
+                function onSwipe(ev) {
+                    scope.$apply(function() {
+                        tabsCtrl.select("swipeleft" === ev.type ? tabsCtrl.next() : tabsCtrl.previous());
                     });
                 }
                 function watchNgRepeatIndex() {
@@ -14836,7 +14653,7 @@ function() {
                     }
                 }
                 var tabItemCtrl = ctrls[0], tabsCtrl = ctrls[1];
-                $timeout(element.addClass.bind(element, "md-tab-themed"), 0, !1), scope.$watch(function() {
+                scope.$watch(function() {
                     return attr.label;
                 }, function() {
                     $timeout(function() {
@@ -14853,7 +14670,7 @@ function() {
                         tabsCtrl.scope.$broadcast("$mdTabsChanged");
                     }, 0, !1);
                 }), angular.isDefined(attr.ngClick) || element.on("click", defaultClickListener), 
-                element.on("keydown", keydownListener), angular.isNumber(scope.$parent.$index) && watchNgRepeatIndex(), 
+                element.on("keydown", keydownListener), scope.onSwipe = onSwipe, angular.isNumber(scope.$parent.$index) && watchNgRepeatIndex(), 
                 angular.isDefined(attr.mdActive) && watchActiveAttribute(), watchDisabled();
             };
         }
@@ -14964,7 +14781,7 @@ function() {
         };
     }
     angular.module("material.components.tabs").directive("mdTabs", TabsDirective), TabsDirective.$inject = [ "$mdTheming" ];
-}(), angular.module("material.core").constant("$MD_THEME_CSS", "md-backdrop.md-opaque.md-THEME_NAME-theme {  background-color: '{{foreground-4-0.5}}'; }md-bottom-sheet.md-THEME_NAME-theme {  background-color: '{{background-50}}';  border-top-color: '{{background-300}}'; }  md-bottom-sheet.md-THEME_NAME-theme.md-list md-item {    color: '{{foreground-1}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    background-color: '{{background-50}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    color: '{{foreground-1}}'; }md-toolbar .md-button.md-THEME_NAME-theme.md-fab {  background-color: white; }.md-button.md-THEME_NAME-theme {  border-radius: 3px; }  .md-button.md-THEME_NAME-theme:not([disabled]):hover, .md-button.md-THEME_NAME-theme:not([disabled]):focus {    background-color: '{{background-500-0.2}}'; }  .md-button.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }    .md-button.md-THEME_NAME-theme.md-primary.md-raised, .md-button.md-THEME_NAME-theme.md-primary.md-fab {      color: '{{primary-contrast}}';      background-color: '{{primary-color}}'; }      .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):focus {        background-color: '{{primary-600}}'; }  .md-button.md-THEME_NAME-theme.md-fab {    border-radius: 50%;    background-color: '{{accent-color}}';    color: '{{accent-contrast}}'; }    .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):focus {      background-color: '{{accent-A700}}'; }  .md-button.md-THEME_NAME-theme.md-raised {    color: '{{background-contrast}}';    background-color: '{{background-50}}'; }    .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):focus {      background-color: '{{background-200}}'; }  .md-button.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }    .md-button.md-THEME_NAME-theme.md-warn.md-raised, .md-button.md-THEME_NAME-theme.md-warn.md-fab {      color: '{{warn-contrast}}';      background-color: '{{warn-color}}'; }      .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):focus {        background-color: '{{warn-700}}'; }  .md-button.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }    .md-button.md-THEME_NAME-theme.md-accent.md-raised, .md-button.md-THEME_NAME-theme.md-accent.md-fab {      color: '{{accent-contrast}}';      background-color: '{{accent-color}}'; }      .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):focus {        background-color: '{{accent-700}}'; }  .md-button.md-THEME_NAME-theme[disabled], .md-button.md-THEME_NAME-theme.md-raised[disabled], .md-button.md-THEME_NAME-theme.md-fab[disabled] {    color: '{{foreground-3}}';    background-color: transparent;    cursor: not-allowed; }md-card.md-THEME_NAME-theme {  border-radius: 2px; }  md-card.md-THEME_NAME-theme .md-card-image {    border-radius: 2px 2px 0 0; }md-checkbox.md-THEME_NAME-theme .md-ripple {  color: '{{accent-600}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon {  background-color: '{{accent-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary .md-ripple {  color: '{{primary-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-icon {  background-color: '{{primary-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-ripple {  color: '{{warn-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon {  background-color: '{{warn-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme[disabled] .md-icon {  border-color: '{{foreground-3}}'; }md-checkbox.md-THEME_NAME-theme[disabled].md-checked .md-icon {  background-color: '{{foreground-3}}'; }md-content.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-dialog.md-THEME_NAME-theme {  border-radius: 4px;  background-color: '{{background-hue-3}}'; }  md-dialog.md-THEME_NAME-theme.md-content-overflow .md-actions {    border-top-color: '{{foreground-4}}'; }md-divider.md-THEME_NAME-theme {  border-top-color: '{{foreground-4}}'; }md-input-container.md-THEME_NAME-theme .md-input {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}';  text-shadow: '{{foreground-shadow}}'; }  md-input-container.md-THEME_NAME-theme .md-input::-webkit-input-placeholder, md-input-container.md-THEME_NAME-theme .md-input::-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme label, md-input-container.md-THEME_NAME-theme .md-placeholder {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-has-value label {  color: '{{foreground-2}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused .md-input {  border-color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused label {  color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent .md-input {  border-color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid data-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid x-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid [ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [data-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [x-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid .md-char-counter {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme .md-input[disabled] {  border-bottom-color: transparent;  color: '{{foreground-3}}';  background-image: linear-gradient(to right, '{{foreground-4}}' 0%, '{{foreground-4}}' 33%, transparent 0%); }md-progress-circular.md-THEME_NAME-theme {  background-color: transparent; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-gap {    border-top-color: '{{primary-color}}';    border-bottom-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-top-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-right-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle {    border-left-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-gap {    border-top-color: '{{warn-color}}';    border-bottom-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-top-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-right-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle {    border-left-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-gap {    border-top-color: '{{accent-color}}';    border-bottom-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-top-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-right-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle {    border-left-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme .md-container {  background-color: '{{primary-100}}'; }md-progress-linear.md-THEME_NAME-theme .md-bar {  background-color: '{{primary-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-container {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-bar {  background-color: '{{warn-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-container {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-bar {  background-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-bar1 {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-dashed:before {  background: radial-gradient('{{warn-100}}' 0%, '{{warn-100}}' 16%, transparent 42%); }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-bar1 {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-dashed:before {  background: radial-gradient('{{accent-100}}' 0%, '{{accent-100}}' 16%, transparent 42%); }md-radio-button.md-THEME_NAME-theme .md-off {  border-color: '{{foreground-2}}'; }md-radio-button.md-THEME_NAME-theme .md-on {  background-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-off {  border-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-ink-ripple {  color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme .md-container .md-ripple {  color: '{{accent-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary .md-on {  background-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-off {  border-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-ink-ripple {  color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary .md-container .md-ripple {  color: '{{primary-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-on {  background-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-off {  border-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-ink-ripple {  color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-container .md-ripple {  color: '{{warn-600}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-off {  border-color: '{{foreground-3}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-on {  border-color: '{{foreground-3}}'; }md-radio-group.md-THEME_NAME-theme:focus:not(:empty) {  border-color: '{{foreground-1}}'; }md-sidenav.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track {  background-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme .md-track-ticks {  background-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-focus-thumb {  background-color: '{{foreground-2}}'; }md-slider.md-THEME_NAME-theme .md-focus-ring {  border-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-disabled-thumb {  border-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme.md-min .md-thumb:after {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track.md-track-fill {  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb:after {  border-color: '{{primary-color}}';  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-sign {  background-color: '{{primary-color}}'; }  md-slider.md-THEME_NAME-theme .md-sign:after {    border-top-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb-text {  color: '{{primary-contrast}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-track-fill {  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb:after {  border-color: '{{warn-color}}';  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-sign {  background-color: '{{warn-color}}'; }  md-slider.md-THEME_NAME-theme.md-warn .md-sign:after {    border-top-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb-text {  color: '{{warn-contrast}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-track-fill {  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-thumb:after {  border-color: '{{primary-color}}';  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-sign {  background-color: '{{primary-color}}'; }  md-slider.md-THEME_NAME-theme.md-primary .md-sign:after {    border-top-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-thumb-text {  color: '{{primary-contrast}}'; }md-slider.md-THEME_NAME-theme[disabled] .md-thumb:after {  border-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme[disabled]:not(.md-min) .md-thumb:after {  background-color: '{{foreground-3}}'; }.md-subheader.md-THEME_NAME-theme {  color: '{{ foreground-2-0.23 }}';  background-color: '{{background-hue-3}}'; }  .md-subheader.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme .md-thumb {  background-color: '{{background-50}}'; }md-switch.md-THEME_NAME-theme .md-bar {  background-color: '{{background-500}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-thumb {  background-color: '{{accent-color}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-bar {  background-color: '{{accent-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-primary .md-thumb {  background-color: '{{primary-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-primary .md-bar {  background-color: '{{primary-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-thumb {  background-color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-bar {  background-color: '{{warn-color-0.5}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-thumb {  background-color: '{{background-400}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-bar {  background-color: '{{foreground-4}}'; }md-switch.md-THEME_NAME-theme:focus .md-label:not(:empty) {  border-color: '{{foreground-1}}';  border-style: dotted; }md-tabs.md-THEME_NAME-theme .md-header {  background-color: '{{primary-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent .md-header {  background-color: '{{accent-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]) {  color: '{{accent-100}}'; }  md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]).active {    color: '{{accent-contrast}}'; }md-tabs.md-THEME_NAME-theme.md-warn .md-header {  background-color: '{{warn-color}}'; }md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]) {  color: '{{warn-100}}'; }  md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]).active {    color: '{{warn-contrast}}'; }md-tabs.md-THEME_NAME-theme md-tabs-ink-bar {  color: '{{primary-contrast}}';  background: '{{primary-contrast}}'; }md-tabs.md-THEME_NAME-theme md-tab {  color: '{{primary-100}}'; }  md-tabs.md-THEME_NAME-theme md-tab.active {    color: '{{primary-contrast}}'; }  md-tabs.md-THEME_NAME-theme md-tab[disabled] {    color: '{{foreground-4}}'; }  md-tabs.md-THEME_NAME-theme md-tab:focus {    color: '{{primary-contrast}}';    background-color: '{{primary-contrast-0.1}}'; }  md-tabs.md-THEME_NAME-theme md-tab .md-ripple-container {    color: '{{primary-contrast}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  text-shadow: '{{foreground-shadow}}'; }  md-input-group.md-THEME_NAME-theme input::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme input::-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-ms-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme label {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused input, md-input-group.md-THEME_NAME-theme.md-input-focused textarea {  border-color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused label {  color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent input, md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent textarea {  border-color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-has-value:not(.md-input-focused) label {  color: '{{foreground-2}}'; }md-input-group.md-THEME_NAME-theme .md-input[disabled] {  border-bottom-color: '{{foreground-4}}';  color: '{{foreground-3}}'; }md-toast.md-THEME_NAME-theme {  background-color: '{{foreground-1}}';  color: '{{background-50}}'; }  md-toast.md-THEME_NAME-theme .md-button {    color: '{{background-50}}'; }    md-toast.md-THEME_NAME-theme .md-button.md-highlight {      color: '{{primary-A200}}'; }      md-toast.md-THEME_NAME-theme .md-button.md-highlight.md-accent {        color: '{{accent-A200}}'; }      md-toast.md-THEME_NAME-theme .md-button.md-highlight.md-warn {        color: '{{warn-A200}}'; }md-toolbar.md-THEME_NAME-theme {  background-color: '{{primary-color}}';  color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme .md-button {    color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-accent {    background-color: '{{accent-color}}';    color: '{{accent-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-warn {    background-color: '{{warn-color}}';    color: '{{warn-contrast}}'; }md-tooltip.md-THEME_NAME-theme {  color: '{{background-A100}}'; }  md-tooltip.md-THEME_NAME-theme .md-background {    background-color: '{{foreground-2}}'; }"), 
+}(), angular.module("material.core").constant("$MD_THEME_CSS", "md-backdrop.md-opaque.md-THEME_NAME-theme {  background-color: '{{foreground-4-0.5}}';  position: absolute; }md-bottom-sheet.md-THEME_NAME-theme {  background-color: '{{background-50}}';  border-top-color: '{{background-300}}'; }  md-bottom-sheet.md-THEME_NAME-theme.md-list md-item {    color: '{{foreground-1}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    background-color: '{{background-50}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    color: '{{foreground-1}}'; }.md-button.md-THEME_NAME-theme {  border-radius: 3px; }  .md-button.md-THEME_NAME-theme:not([disabled]):hover, .md-button.md-THEME_NAME-theme:not([disabled]):focus {    background-color: '{{background-500-0.2}}'; }  .md-button.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }    .md-button.md-THEME_NAME-theme.md-primary.md-raised, .md-button.md-THEME_NAME-theme.md-primary.md-fab {      color: '{{primary-contrast}}';      background-color: '{{primary-color}}'; }      .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):focus {        background-color: '{{primary-600}}'; }  .md-button.md-THEME_NAME-theme.md-fab {    border-radius: 50%; }  .md-button.md-THEME_NAME-theme.md-raised, .md-button.md-THEME_NAME-theme.md-fab {    color: '{{background-contrast}}';    background-color: '{{background-500-0.185}}'; }    .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):focus {      background-color: '{{background-500-0.3}}'; }  .md-button.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }    .md-button.md-THEME_NAME-theme.md-warn.md-raised, .md-button.md-THEME_NAME-theme.md-warn.md-fab {      color: '{{warn-contrast}}';      background-color: '{{warn-color}}'; }      .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):focus {        background-color: '{{warn-700}}'; }  .md-button.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }    .md-button.md-THEME_NAME-theme.md-accent.md-raised, .md-button.md-THEME_NAME-theme.md-accent.md-fab {      color: '{{accent-contrast}}';      background-color: '{{accent-color}}'; }      .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):focus {        background-color: '{{accent-700}}'; }  .md-button.md-THEME_NAME-theme[disabled], .md-button.md-THEME_NAME-theme.md-raised[disabled], .md-button.md-THEME_NAME-theme.md-fab[disabled] {    color: '{{foreground-3}}';    background-color: transparent;    cursor: not-allowed; }md-checkbox.md-THEME_NAME-theme .md-ripple {  color: '{{primary-600}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon {  background-color: '{{primary-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-accent .md-ripple {  color: '{{accent-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-accent.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-accent .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-accent.md-checked .md-icon {  background-color: '{{accent-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-accent.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-ripple {  color: '{{warn-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon {  background-color: '{{warn-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme[disabled] .md-icon {  border-color: '{{foreground-3}}'; }md-checkbox.md-THEME_NAME-theme[disabled].md-checked .md-icon {  background-color: '{{foreground-3}}'; }md-card.md-THEME_NAME-theme {  border-radius: 2px; }  md-card.md-THEME_NAME-theme .md-card-image {    border-radius: 2px 2px 0 0; }md-content.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-dialog.md-THEME_NAME-theme {  border-radius: 4px;  background-color: '{{background-hue-3}}'; }  md-dialog.md-THEME_NAME-theme.md-content-overflow .md-actions {    border-top-color: '{{foreground-4}}'; }md-divider.md-THEME_NAME-theme {  border-top-color: '{{foreground-4}}'; }md-input-container.md-THEME_NAME-theme .md-input {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}';  text-shadow: '{{foreground-shadow}}'; }  md-input-container.md-THEME_NAME-theme .md-input::-webkit-input-placeholder, md-input-container.md-THEME_NAME-theme .md-input::-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme label {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-has-value label {  color: '{{foreground-2}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused .md-input {  border-color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused label {  color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent .md-input {  border-color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid data-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid x-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid [ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [data-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [x-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid .md-char-counter {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme .md-input[disabled] {  border-bottom-color: transparent;  color: '{{foreground-3}}';  background-image: linear-gradient(to right, '{{foreground-4}}' 0%, '{{foreground-4}}' 33%, transparent 0%); }md-progress-circular.md-THEME_NAME-theme {  background-color: transparent; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-gap {    border-top-color: '{{primary-color}}';    border-bottom-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-top-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-right-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle {    border-left-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-gap {    border-top-color: '{{warn-color}}';    border-bottom-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-top-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-right-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle {    border-left-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-gap {    border-top-color: '{{accent-color}}';    border-bottom-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-top-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-right-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle {    border-left-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme .md-container {  background-color: '{{primary-100}}'; }md-progress-linear.md-THEME_NAME-theme .md-bar {  background-color: '{{primary-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-container {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-bar {  background-color: '{{warn-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-container {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-bar {  background-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-bar1 {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-dashed:before {  background: radial-gradient('{{warn-100}}' 0%, '{{warn-100}}' 16%, transparent 42%); }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-bar1 {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-dashed:before {  background: radial-gradient('{{accent-100}}' 0%, '{{accent-100}}' 16%, transparent 42%); }md-radio-button.md-THEME_NAME-theme .md-off {  border-color: '{{foreground-2}}'; }md-radio-button.md-THEME_NAME-theme .md-on {  background-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-off {  border-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-ink-ripple {  color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme .md-container .md-ripple {  color: '{{primary-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-accent .md-on {  background-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-accent.md-checked .md-off {  border-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-accent.md-checked .md-ink-ripple {  color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-accent .md-container .md-ripple {  color: '{{accent-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-on {  background-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-off {  border-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-ink-ripple {  color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-container .md-ripple {  color: '{{warn-600}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-off {  border-color: '{{foreground-3}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-on {  border-color: '{{foreground-3}}'; }md-radio-group.md-THEME_NAME-theme:focus:not(:empty) {  border-color: '{{foreground-1}}'; }md-sidenav.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track {  background-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme .md-track-ticks {  background-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-focus-thumb {  background-color: '{{foreground-2}}'; }md-slider.md-THEME_NAME-theme .md-focus-ring {  border-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-disabled-thumb {  border-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme.md-min .md-thumb:after {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track.md-track-fill {  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb:after {  border-color: '{{primary-color}}';  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-sign {  background-color: '{{primary-color}}'; }  md-slider.md-THEME_NAME-theme .md-sign:after {    border-top-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb-text {  color: '{{primary-contrast}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-track-fill {  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb:after {  border-color: '{{warn-color}}';  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-sign {  background-color: '{{warn-color}}'; }  md-slider.md-THEME_NAME-theme.md-warn .md-sign:after {    border-top-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb-text {  color: '{{warn-contrast}}'; }md-slider.md-THEME_NAME-theme.md-accent .md-track-fill {  background-color: '{{accent-color}}'; }md-slider.md-THEME_NAME-theme.md-accent .md-thumb:after {  border-color: '{{accent-color}}';  background-color: '{{accent-color}}'; }md-slider.md-THEME_NAME-theme.md-accent .md-sign {  background-color: '{{accent-color}}'; }  md-slider.md-THEME_NAME-theme.md-accent .md-sign:after {    border-top-color: '{{accent-color}}'; }md-slider.md-THEME_NAME-theme.md-accent .md-thumb-text {  color: '{{accent-contrast}}'; }md-slider.md-THEME_NAME-theme[disabled] .md-thumb:after {  border-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme[disabled]:not(.md-min) .md-thumb:after {  background-color: '{{foreground-3}}'; }.md-subheader.md-THEME_NAME-theme {  color: '{{ foreground-2-0.23 }}';  background-color: '{{background-hue-3}}'; }  .md-subheader.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme .md-thumb {  background-color: '{{background-50}}'; }md-switch.md-THEME_NAME-theme .md-bar {  background-color: '{{background-500}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-thumb {  background-color: '{{primary-color}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-bar {  background-color: '{{primary-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-accent .md-thumb {  background-color: '{{accent-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-accent .md-bar {  background-color: '{{accent-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-thumb {  background-color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-bar {  background-color: '{{warn-color-0.5}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-thumb {  background-color: '{{background-400}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-bar {  background-color: '{{foreground-4}}'; }md-switch.md-THEME_NAME-theme:focus .md-label:not(:empty) {  border-color: '{{foreground-1}}';  border-style: dotted; }md-tabs.md-THEME_NAME-theme .md-header {  background-color: '{{primary-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent .md-header {  background-color: '{{accent-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]) {  color: '{{accent-100}}'; }  md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]).active {    color: '{{accent-contrast}}'; }md-tabs.md-THEME_NAME-theme.md-warn .md-header {  background-color: '{{warn-color}}'; }md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]) {  color: '{{warn-100}}'; }  md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]).active {    color: '{{warn-contrast}}'; }md-tabs.md-THEME_NAME-theme md-tabs-ink-bar {  color: '{{primary-contrast}}';  background: '{{primary-contrast}}'; }md-tabs.md-THEME_NAME-theme md-tab {  color: '{{primary-100}}'; }  md-tabs.md-THEME_NAME-theme md-tab.active {    color: '{{primary-contrast}}'; }  md-tabs.md-THEME_NAME-theme md-tab[disabled] {    color: '{{foreground-4}}'; }  md-tabs.md-THEME_NAME-theme md-tab:focus {    color: '{{primary-contrast}}';    background-color: '{{primary-contrast-0.1}}'; }  md-tabs.md-THEME_NAME-theme md-tab .md-ripple-container {    color: '{{primary-contrast}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  text-shadow: '{{foreground-shadow}}'; }  md-input-group.md-THEME_NAME-theme input::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme input::-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-ms-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme label {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused input, md-input-group.md-THEME_NAME-theme.md-input-focused textarea {  border-color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused label {  color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent input, md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent textarea {  border-color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-has-value:not(.md-input-focused) label {  color: '{{foreground-2}}'; }md-input-group.md-THEME_NAME-theme .md-input[disabled] {  border-bottom-color: '{{foreground-4}}';  color: '{{foreground-3}}'; }md-toast.md-THEME_NAME-theme {  background-color: '{{foreground-1}}';  color: '{{background-50}}'; }  md-toast.md-THEME_NAME-theme .md-button {    color: '{{background-50}}'; }  md-toast.md-THEME_NAME-theme .md-action {    color: '{{primary-A200}}'; }    md-toast.md-THEME_NAME-theme .md-action.md-accent {      color: '{{accent-A200}}'; }    md-toast.md-THEME_NAME-theme .md-action.md-warn {      color: '{{warn-A200}}'; }md-toolbar.md-THEME_NAME-theme {  background-color: '{{primary-color}}';  color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme .md-button {    color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-accent {    background-color: '{{accent-color}}';    color: '{{accent-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-warn {    background-color: '{{warn-color}}';    color: '{{warn-contrast}}'; }md-tooltip.md-THEME_NAME-theme {  color: '{{background-A100}}'; }  md-tooltip.md-THEME_NAME-theme .md-background {    background-color: '{{foreground-2}}'; }"), 
 function() {
     "use strict";
     angular.module("wu.masonry", []).controller("MasonryCtrl", [ "$scope", "$element", "$timeout", function($scope, $element, $timeout) {
@@ -15052,9 +14869,9 @@ function() {
         angular.isString(preferred) ? $translate.use(preferred) : storage.put(key, $translate.use());
     };
     storage ? storage.get(key) ? $translate.use(storage.get(key))["catch"](fallbackFromIncorrectStorageValue) : fallbackFromIncorrectStorageValue() : angular.isString($translate.preferredLanguage()) && $translate.use($translate.preferredLanguage());
-} ]), angular.module("pascalprecht.translate").provider("$translate", [ "$STORAGE_KEY", "$windowProvider", function($STORAGE_KEY, $windowProvider) {
-    var $preferredLanguage, $languageKeyAliases, $fallbackLanguage, $fallbackWasString, $uses, $nextLang, $storageFactory, $storagePrefix, $missingTranslationHandlerFactory, $interpolationFactory, $loaderFactory, $loaderOptions, $notFoundIndicatorLeft, $notFoundIndicatorRight, loaderCache, $translationTable = {}, $availableLanguageKeys = [], $storageKey = $STORAGE_KEY, $interpolatorFactories = [], $interpolationSanitizationStrategy = !1, $cloakClassName = "translate-cloak", $postCompilingEnabled = !1, NESTED_OBJECT_DELIMITER = ".", directivePriority = 0, version = "2.6.0", getFirstBrowserLanguage = function() {
-        var i, language, nav = $windowProvider.$get().navigator, browserLanguagePropertyKeys = [ "language", "browserLanguage", "systemLanguage", "userLanguage" ];
+} ]), angular.module("pascalprecht.translate").provider("$translate", [ "$STORAGE_KEY", function($STORAGE_KEY) {
+    var $preferredLanguage, $languageKeyAliases, $fallbackLanguage, $fallbackWasString, $uses, $nextLang, $storageFactory, $storagePrefix, $missingTranslationHandlerFactory, $interpolationFactory, $loaderFactory, $loaderOptions, $notFoundIndicatorLeft, $notFoundIndicatorRight, loaderCache, $translationTable = {}, $availableLanguageKeys = [], $storageKey = $STORAGE_KEY, $interpolatorFactories = [], $interpolationSanitizationStrategy = !1, $cloakClassName = "translate-cloak", $postCompilingEnabled = !1, NESTED_OBJECT_DELIMITER = ".", version = "2.5.2", getFirstBrowserLanguage = function() {
+        var i, language, nav = window.navigator, browserLanguagePropertyKeys = [ "language", "browserLanguage", "systemLanguage", "userLanguage" ];
         if (angular.isArray(nav.languages)) for (i = 0; i < nav.languages.length; i++) if (language = nav.languages[i], 
         language && language.length) return language;
         for (i = 0; i < browserLanguagePropertyKeys.length; i++) if (language = nav[browserLanguagePropertyKeys[i]], 
@@ -15175,18 +14992,15 @@ function() {
     }, this.useLoaderCache = function(cache) {
         return cache === !1 ? loaderCache = void 0 : cache === !0 ? loaderCache = !0 : "undefined" == typeof cache ? loaderCache = "$translationCache" : cache && (loaderCache = cache), 
         this;
-    }, this.directivePriority = function(priority) {
-        return void 0 === priority ? directivePriority : (directivePriority = priority, 
-        this);
     }, this.$get = [ "$log", "$injector", "$rootScope", "$q", function($log, $injector, $rootScope, $q) {
-        var Storage, fallbackIndex, startFallbackIteration, defaultInterpolator = $injector.get($interpolationFactory || "$translateDefaultInterpolation"), pendingLoader = !1, interpolatorHashMap = {}, langPromises = {}, $translate = function(translationId, interpolateParams, interpolationId, defaultTranslationText) {
+        var Storage, fallbackIndex, startFallbackIteration, defaultInterpolator = $injector.get($interpolationFactory || "$translateDefaultInterpolation"), pendingLoader = !1, interpolatorHashMap = {}, langPromises = {}, $translate = function(translationId, interpolateParams, interpolationId) {
             if (angular.isArray(translationId)) {
                 var translateAll = function(translationIds) {
                     for (var results = {}, promises = [], translate = function(translationId) {
                         var deferred = $q.defer(), regardless = function(value) {
                             results[translationId] = value, deferred.resolve([ translationId, value ]);
                         };
-                        return $translate(translationId, interpolateParams, interpolationId, defaultTranslationText).then(regardless, regardless), 
+                        return $translate(translationId, interpolateParams, interpolationId).then(regardless, regardless), 
                         deferred.promise;
                     }, i = 0, c = translationIds.length; c > i; i++) promises.push(translate(translationIds[i]));
                     return $q.all(promises).then(function() {
@@ -15209,8 +15023,8 @@ function() {
                 return promise;
             }();
             return promiseToWaitFor ? promiseToWaitFor.then(function() {
-                determineTranslation(translationId, interpolateParams, interpolationId, defaultTranslationText).then(deferred.resolve, deferred.reject);
-            }, deferred.reject) : determineTranslation(translationId, interpolateParams, interpolationId, defaultTranslationText).then(deferred.resolve, deferred.reject), 
+                determineTranslation(translationId, interpolateParams, interpolationId).then(deferred.resolve, deferred.reject);
+            }, deferred.reject) : determineTranslation(translationId, interpolateParams, interpolationId).then(deferred.resolve, deferred.reject), 
             deferred.promise;
         }, applyNotFoundIndicators = function(translationId) {
             return $notFoundIndicatorLeft && (translationId = [ $notFoundIndicatorLeft, translationId ].join(" ")), 
@@ -15274,35 +15088,29 @@ function() {
         }, getFallbackTranslation = function(langKey, translationId, interpolateParams, Interpolator) {
             var deferred = $q.defer();
             return getTranslationTable(langKey).then(function(translationTable) {
-                if (Object.prototype.hasOwnProperty.call(translationTable, translationId)) {
-                    Interpolator.setLocale(langKey);
-                    var translation = translationTable[translationId];
-                    "@:" === translation.substr(0, 2) ? getFallbackTranslation(langKey, translation.substr(2), interpolateParams, Interpolator).then(deferred.resolve, deferred.reject) : deferred.resolve(Interpolator.interpolate(translationTable[translationId], interpolateParams)), 
-                    Interpolator.setLocale($uses);
-                } else deferred.reject();
+                Object.prototype.hasOwnProperty.call(translationTable, translationId) ? (Interpolator.setLocale(langKey), 
+                deferred.resolve(Interpolator.interpolate(translationTable[translationId], interpolateParams)), 
+                Interpolator.setLocale($uses)) : deferred.reject();
             }, deferred.reject), deferred.promise;
         }, getFallbackTranslationInstant = function(langKey, translationId, interpolateParams, Interpolator) {
             var result, translationTable = $translationTable[langKey];
-            if (translationTable && Object.prototype.hasOwnProperty.call(translationTable, translationId)) {
-                if (Interpolator.setLocale(langKey), result = Interpolator.interpolate(translationTable[translationId], interpolateParams), 
-                "@:" === result.substr(0, 2)) return getFallbackTranslationInstant(langKey, result.substr(2), interpolateParams, Interpolator);
-                Interpolator.setLocale($uses);
-            }
-            return result;
+            return translationTable && Object.prototype.hasOwnProperty.call(translationTable, translationId) && (Interpolator.setLocale(langKey), 
+            result = Interpolator.interpolate(translationTable[translationId], interpolateParams), 
+            Interpolator.setLocale($uses)), result;
         }, translateByHandler = function(translationId) {
             if ($missingTranslationHandlerFactory) {
                 var resultString = $injector.get($missingTranslationHandlerFactory)(translationId, $uses);
                 return void 0 !== resultString ? resultString : translationId;
             }
             return translationId;
-        }, resolveForFallbackLanguage = function(fallbackLanguageIndex, translationId, interpolateParams, Interpolator, defaultTranslationText) {
+        }, resolveForFallbackLanguage = function(fallbackLanguageIndex, translationId, interpolateParams, Interpolator) {
             var deferred = $q.defer();
             if (fallbackLanguageIndex < $fallbackLanguage.length) {
                 var langKey = $fallbackLanguage[fallbackLanguageIndex];
                 getFallbackTranslation(langKey, translationId, interpolateParams, Interpolator).then(deferred.resolve, function() {
-                    resolveForFallbackLanguage(fallbackLanguageIndex + 1, translationId, interpolateParams, Interpolator, defaultTranslationText).then(deferred.resolve);
+                    resolveForFallbackLanguage(fallbackLanguageIndex + 1, translationId, interpolateParams, Interpolator).then(deferred.resolve);
                 });
-            } else deferred.resolve(defaultTranslationText ? defaultTranslationText : translateByHandler(translationId));
+            } else deferred.resolve(translateByHandler(translationId));
             return deferred.promise;
         }, resolveForFallbackLanguageInstant = function(fallbackLanguageIndex, translationId, interpolateParams, Interpolator) {
             var result;
@@ -15312,23 +15120,23 @@ function() {
                 result || (result = resolveForFallbackLanguageInstant(fallbackLanguageIndex + 1, translationId, interpolateParams, Interpolator));
             }
             return result;
-        }, fallbackTranslation = function(translationId, interpolateParams, Interpolator, defaultTranslationText) {
-            return resolveForFallbackLanguage(startFallbackIteration > 0 ? startFallbackIteration : fallbackIndex, translationId, interpolateParams, Interpolator, defaultTranslationText);
+        }, fallbackTranslation = function(translationId, interpolateParams, Interpolator) {
+            return resolveForFallbackLanguage(startFallbackIteration > 0 ? startFallbackIteration : fallbackIndex, translationId, interpolateParams, Interpolator);
         }, fallbackTranslationInstant = function(translationId, interpolateParams, Interpolator) {
             return resolveForFallbackLanguageInstant(startFallbackIteration > 0 ? startFallbackIteration : fallbackIndex, translationId, interpolateParams, Interpolator);
-        }, determineTranslation = function(translationId, interpolateParams, interpolationId, defaultTranslationText) {
+        }, determineTranslation = function(translationId, interpolateParams, interpolationId) {
             var deferred = $q.defer(), table = $uses ? $translationTable[$uses] : $translationTable, Interpolator = interpolationId ? interpolatorHashMap[interpolationId] : defaultInterpolator;
             if (table && Object.prototype.hasOwnProperty.call(table, translationId)) {
                 var translation = table[translationId];
-                "@:" === translation.substr(0, 2) ? $translate(translation.substr(2), interpolateParams, interpolationId, defaultTranslationText).then(deferred.resolve, deferred.reject) : deferred.resolve(Interpolator.interpolate(translation, interpolateParams));
+                "@:" === translation.substr(0, 2) ? $translate(translation.substr(2), interpolateParams, interpolationId).then(deferred.resolve, deferred.reject) : deferred.resolve(Interpolator.interpolate(translation, interpolateParams));
             } else {
                 var missingTranslationHandlerTranslation;
                 $missingTranslationHandlerFactory && !pendingLoader && (missingTranslationHandlerTranslation = translateByHandler(translationId)), 
-                $uses && $fallbackLanguage && $fallbackLanguage.length ? fallbackTranslation(translationId, interpolateParams, Interpolator, defaultTranslationText).then(function(translation) {
+                $uses && $fallbackLanguage && $fallbackLanguage.length ? fallbackTranslation(translationId, interpolateParams, Interpolator).then(function(translation) {
                     deferred.resolve(translation);
                 }, function(_translationId) {
                     deferred.reject(applyNotFoundIndicators(_translationId));
-                }) : $missingTranslationHandlerFactory && !pendingLoader && missingTranslationHandlerTranslation ? deferred.resolve(defaultTranslationText ? defaultTranslationText : missingTranslationHandlerTranslation) : defaultTranslationText ? deferred.resolve(defaultTranslationText) : deferred.reject(applyNotFoundIndicators(translationId));
+                }) : $missingTranslationHandlerFactory && !pendingLoader && missingTranslationHandlerTranslation ? deferred.resolve(missingTranslationHandlerTranslation) : deferred.reject(applyNotFoundIndicators(translationId));
             }
             return deferred.promise;
         }, determineTranslationInstant = function(translationId, interpolateParams, interpolationId) {
@@ -15425,7 +15233,7 @@ function() {
             $fallbackLanguage && $fallbackLanguage.length && (possibleLangKeys = possibleLangKeys.concat($fallbackLanguage));
             for (var j = 0, d = possibleLangKeys.length; d > j; j++) {
                 var possibleLangKey = possibleLangKeys[j];
-                if ($translationTable[possibleLangKey] && ("undefined" != typeof $translationTable[possibleLangKey][translationId] ? result = determineTranslationInstant(translationId, interpolateParams, interpolationId) : ($notFoundIndicatorLeft || $notFoundIndicatorRight) && (result = applyNotFoundIndicators(translationId))), 
+                if ($translationTable[possibleLangKey] && "undefined" != typeof $translationTable[possibleLangKey][translationId] && (result = determineTranslationInstant(translationId, interpolateParams, interpolationId)), 
                 "undefined" != typeof result) break;
             }
             return result || "" === result || (result = defaultInterpolator.interpolate(translationId, interpolateParams), 
@@ -15435,8 +15243,6 @@ function() {
             return version;
         }, $translate.loaderCache = function() {
             return loaderCache;
-        }, $translate.directivePriority = function() {
-            return directivePriority;
         }, $loaderFactory && (angular.equals($translationTable, {}) && $translate.use($translate.use()), 
         $fallbackLanguage && $fallbackLanguage.length)) for (var processAsyncResult = function(translation) {
             return translations(translation.key, translation.table), $rootScope.$emit("$translateChangeEnd", {
@@ -15449,7 +15255,7 @@ function() {
     var $locale, $translateInterpolator = {}, $identifier = "default", $sanitizeValueStrategy = null, sanitizeValueStrategies = {
         escaped: function(params) {
             var result = {};
-            for (var key in params) Object.prototype.hasOwnProperty.call(params, key) && (result[key] = angular.isNumber(params[key]) ? params[key] : angular.element("<div></div>").text(params[key]).html());
+            for (var key in params) Object.prototype.hasOwnProperty.call(params, key) && (result[key] = angular.element("<div></div>").text(params[key]).html());
             return result;
         }
     }, sanitizeParams = function(params) {
@@ -15468,38 +15274,30 @@ function() {
     }, $translateInterpolator;
 } ]), angular.module("pascalprecht.translate").constant("$STORAGE_KEY", "NG_TRANSLATE_LANG_KEY"), 
 angular.module("pascalprecht.translate").directive("translate", [ "$translate", "$q", "$interpolate", "$compile", "$parse", "$rootScope", function($translate, $q, $interpolate, $compile, $parse, $rootScope) {
-    var trim = function() {
-        return this.replace(/^\s+|\s+$/g, "");
-    };
     return {
         restrict: "AE",
         scope: !0,
-        priority: $translate.directivePriority(),
         compile: function(tElement, tAttr) {
             var translateValuesExist = tAttr.translateValues ? tAttr.translateValues : void 0, translateInterpolation = tAttr.translateInterpolation ? tAttr.translateInterpolation : void 0, translateValueExist = tElement[0].outerHTML.match(/translate-value-+/i), interpolateRegExp = "^(.*)(" + $interpolate.startSymbol() + ".*" + $interpolate.endSymbol() + ")(.*)", watcherRegExp = "^(.*)" + $interpolate.startSymbol() + "(.*)" + $interpolate.endSymbol() + "(.*)";
             return function(scope, iElement, iAttr) {
                 scope.interpolateParams = {}, scope.preText = "", scope.postText = "";
                 var translationIds = {}, observeElementTranslation = function(translationId) {
-                    if (angular.isFunction(observeElementTranslation._unwatchOld) && (observeElementTranslation._unwatchOld(), 
-                    observeElementTranslation._unwatchOld = void 0), angular.equals(translationId, "") || !angular.isDefined(translationId)) {
-                        var interpolateMatches = trim.apply(iElement.text()).match(interpolateRegExp);
-                        if (angular.isArray(interpolateMatches)) {
-                            scope.preText = interpolateMatches[1], scope.postText = interpolateMatches[3], translationIds.translate = $interpolate(interpolateMatches[2])(scope.$parent);
-                            var watcherMatches = iElement.text().match(watcherRegExp);
-                            angular.isArray(watcherMatches) && watcherMatches[2] && watcherMatches[2].length && (observeElementTranslation._unwatchOld = scope.$watch(watcherMatches[2], function(newValue) {
-                                translationIds.translate = newValue, updateTranslations();
-                            }));
-                        } else translationIds.translate = iElement.text().replace(/^\s+|\s+$/g, "");
+                    if (angular.equals(translationId, "") || !angular.isDefined(translationId)) {
+                        var interpolateMatches = iElement.text().match(interpolateRegExp);
+                        angular.isArray(interpolateMatches) ? (scope.preText = interpolateMatches[1], scope.postText = interpolateMatches[3], 
+                        translationIds.translate = $interpolate(interpolateMatches[2])(scope.$parent), watcherMatches = iElement.text().match(watcherRegExp), 
+                        angular.isArray(watcherMatches) && watcherMatches[2] && watcherMatches[2].length && scope.$watch(watcherMatches[2], function(newValue) {
+                            translationIds.translate = newValue, updateTranslations();
+                        })) : translationIds.translate = iElement.text().replace(/^\s+|\s+$/g, "");
                     } else translationIds.translate = translationId;
                     updateTranslations();
                 }, observeAttributeTranslation = function(translateAttr) {
                     iAttr.$observe(translateAttr, function(translationId) {
                         translationIds[translateAttr] = translationId, updateTranslations();
                     });
-                }, firstAttributeChangedEvent = !0;
+                };
                 iAttr.$observe("translate", function(translationId) {
-                    "undefined" == typeof translationId ? observeElementTranslation("") : "" === translationId && firstAttributeChangedEvent || (translationIds.translate = translationId, 
-                    updateTranslations()), firstAttributeChangedEvent = !1;
+                    observeElementTranslation(translationId);
                 });
                 for (var translateAttr in iAttr) iAttr.hasOwnProperty(translateAttr) && "translateAttr" === translateAttr.substr(0, 13) && observeAttributeTranslation(translateAttr);
                 if (iAttr.$observe("translateDefault", function(value) {
@@ -15518,13 +15316,13 @@ angular.module("pascalprecht.translate").directive("translate", [ "$translate", 
                     for (var attr in iAttr) Object.prototype.hasOwnProperty.call(iAttr, attr) && "translateValue" === attr.substr(0, 14) && "translateValues" !== attr && observeValueAttribute(attr);
                 }
                 var updateTranslations = function() {
-                    for (var key in translationIds) translationIds.hasOwnProperty(key) && updateTranslation(key, translationIds[key], scope, scope.interpolateParams, scope.defaultText);
-                }, updateTranslation = function(translateAttr, translationId, scope, interpolateParams, defaultTranslationText) {
-                    translationId ? $translate(translationId, interpolateParams, translateInterpolation, defaultTranslationText).then(function(translation) {
+                    for (var key in translationIds) translationIds.hasOwnProperty(key) && translationIds[key] && updateTranslation(key, translationIds[key], scope, scope.interpolateParams);
+                }, updateTranslation = function(translateAttr, translationId, scope, interpolateParams) {
+                    $translate(translationId, interpolateParams, translateInterpolation).then(function(translation) {
                         applyTranslation(translation, scope, !0, translateAttr);
                     }, function(translationId) {
                         applyTranslation(translationId, scope, !1, translateAttr);
-                    }) : applyTranslation(translationId, scope, !1, translateAttr);
+                    });
                 }, applyTranslation = function(value, scope, successful, translateAttr) {
                     if ("translate" === translateAttr) {
                         successful || "undefined" == typeof scope.defaultText || (value = scope.defaultText), 
