@@ -125,7 +125,7 @@ public class DefaultPictureFacade implements PictureFacade {
 	/**
 	 * Method for generating thumbnails.
 	 * @param picture
-	 * @return List of pictures' thumbnails.
+	 * @return collection of thumbnails.
 	 */
 	private List<PictureThumbnail> generateThumbnails(final Picture picture) {
 		
