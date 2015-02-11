@@ -1,30 +1,34 @@
 package com.optigra.funnypictures.facade.facade.content;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.optigra.funnypictures.content.model.Content;
 import com.optigra.funnypictures.content.service.ContentService;
 import com.optigra.funnypictures.facade.resources.content.ContentResource;
 import com.optigra.funnypictures.facade.resources.content.ContentResourceNamingStrategy;
+import com.optigra.funnypictures.generator.api.ImageHandle;
 import com.optigra.funnypictures.model.content.MimeType;
+import com.optigra.funnypictures.service.conversion.ImageConversionService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultContentFacadeTest {
 
 	@Mock
 	private ContentService contentService;
+	
+	@Mock
+	private ImageConversionService imageConversionService;
 	
 	@Mock
 	private ContentResourceNamingStrategy namingStrategy; 
@@ -65,16 +69,19 @@ public class DefaultContentFacadeTest {
 		//Given
 		ContentResource resource = new ContentResource();
 		resource.setContentStream(contentStream);
-		
-		//When
 		String identifier = new String("identifier");
 		when(namingStrategy.createIdentifier(Mockito.any(ContentResource.class))).thenReturn(identifier);
+		InputStream convertedStream = new ByteArrayInputStream(new byte[]{1, 2, 3});
+		ImageHandle converted = new ImageHandle(convertedStream, MimeType.IMAGE_BMP_BMP);
+		when(imageConversionService.convert(any(ImageHandle.class), any(MimeType.class))).thenReturn(converted);
+		
+		//When
 		unit.storeContent(resource);
 		
 		//Then
 		Mockito.verify(contentService).saveContent(contentCaptor.capture());
 		Content actualContent = contentCaptor.getValue();
-		assertSame(contentStream, actualContent.getContentStream());
+		assertSame(convertedStream, actualContent.getContentStream());
 		assertEquals(identifier.toString(), actualContent.getPath());
 	}
 }

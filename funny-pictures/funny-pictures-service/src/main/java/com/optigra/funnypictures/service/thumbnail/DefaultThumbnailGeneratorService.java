@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.optigra.funnypictures.content.model.Content;
@@ -25,6 +27,8 @@ import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 public class DefaultThumbnailGeneratorService implements
 		ThumbnailGeneratorService {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultThumbnailGeneratorService.class);
+	
 	@Resource(name = "thumbnailGenerator")
 	private ThumbnailGenerator thumbnailGenerator;
 	
@@ -33,14 +37,17 @@ public class DefaultThumbnailGeneratorService implements
 	
 	@Override
 	public List<ThumbnailContent> generateThumbnails(final Content content) {
+		LOG.debug("Starting generation of thumbnails for content: {}", content);
 		ThumbnailType[] thumbnailTypes = new ThumbnailType[]{ThumbnailType.SMALL, 
 				ThumbnailType.MEDIUM, ThumbnailType.BIG};
 		List<ThumbnailContent> thumbnails = new ArrayList<ThumbnailContent>();
 		for (ThumbnailType thumbnailType : thumbnailTypes) {
+			LOG.debug("Generating thumbnail of type {}", thumbnailType);
 			Content generatorInputContent = contentService.getContentByPath(content.getPath());
 			ThumbnailContent thumbnail = generateThumbnail(generatorInputContent, thumbnailType);
 			thumbnails.add(thumbnail);
 		}
+		LOG.debug("Thumbnail set generated.");
 		return thumbnails;
 	}
 

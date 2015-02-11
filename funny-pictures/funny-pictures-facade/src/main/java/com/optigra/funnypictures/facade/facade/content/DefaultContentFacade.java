@@ -12,6 +12,9 @@ import com.optigra.funnypictures.content.model.Content;
 import com.optigra.funnypictures.content.service.ContentService;
 import com.optigra.funnypictures.facade.resources.content.ContentResource;
 import com.optigra.funnypictures.facade.resources.content.ContentResourceNamingStrategy;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.model.content.MimeType;
+import com.optigra.funnypictures.service.conversion.ImageConversionService;
 
 /**
  * Default implementation of ContentFacade.
@@ -31,6 +34,9 @@ public class DefaultContentFacade implements ContentFacade {
 
 	@Resource(name = "namingStrategy")
 	private ContentResourceNamingStrategy namingStrategy;
+	
+	@Resource(name = "imageConversionService")
+	private ImageConversionService imageConversionService;
 
 	@Override
 	public ContentResource getContent(final String uri) {
@@ -59,15 +65,23 @@ public class DefaultContentFacade implements ContentFacade {
 
 	@Override
 	public ContentResource storeContent(final ContentResource resource) {
+		
+		ImageHandle incomingImageHandle = new ImageHandle(resource.getContentStream(), resource.getMimeType());
+		ImageHandle convertedImageHandle = imageConversionService.convert(incomingImageHandle, MimeType.IMAGE_PNG_PNG);
+		
+		ContentResource convertedResource = new ContentResource();
+		convertedResource.setPath(resource.getPath());
+		convertedResource.setContentStream(convertedImageHandle.getImageInputStream());
+		convertedResource.setMimeType(convertedImageHandle.getImageFormat());
 
-		String identifier = namingStrategy.createIdentifier(resource);
-		LOG.info("Store content with identifier: %s", identifier);
+		String identifier = namingStrategy.createIdentifier(convertedResource);
+		LOG.info("Store content with identifier: {}", identifier);
 
-		InputStream contentStream = resource.getContentStream();
+		InputStream contentStream = convertedResource.getContentStream();
 		Content content = new Content();
 		content.setContentStream(contentStream);
 		content.setPath(identifier);
-		content.setMimeType(resource.getMimeType());
+		content.setMimeType(convertedResource.getMimeType());
 
 		contentService.saveContent(content);
 

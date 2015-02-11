@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import org.im4java.core.CompositeCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
-import org.im4java.process.OutputConsumer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +47,6 @@ public class BaseAdviceMemeGeneratorTest {
 	
 	@Captor
 	private ArgumentCaptor<IMOperation> convertOperationCaptor;
-	
-	@Captor
-	private ArgumentCaptor<OutputConsumer> outputConsumerCaptor;
 	
 	@Before
 	public void setUp() throws IOException {

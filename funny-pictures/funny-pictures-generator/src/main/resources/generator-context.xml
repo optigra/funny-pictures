@@ -18,7 +18,9 @@
 		<property name="outputFormat" value="${generator.output.format}" />
 	</bean>
 	
-	<bean id="imageLabeller" class="com.optigra.funnypictures.generator.BaseLabelledImageGenerator">
-	</bean>
+	<bean id="imageLabeller" class="com.optigra.funnypictures.generator.BaseLabelledImageGenerator"/>
+	
+	<bean id="imageConverter" class="com.optigra.funnypictures.generator.util.ImageConverter"/>
+	
 
 </beans>
