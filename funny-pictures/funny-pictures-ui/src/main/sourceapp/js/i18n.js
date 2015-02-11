@@ -26,8 +26,9 @@ funnyControllers.config(['$translateProvider', function ($translateProvider) {
         HOME_HEADER: "Home",
         TEMPLATES_HEADER: "Templates",
         CREATE_TEMPLATE_HEADER: "Create template",
-        CONTACT_US_HEADER: "Contact us"
-
+        CONTACT_US_HEADER: "Contact us",
+        COMMENTS_FALLBACK_1: "Please enable JavaScript to view the",
+        COMMENTS_FALLBACK_2: "comments powered by Disqus."
     });
 
     $translateProvider.translations('uk', {
@@ -57,7 +58,9 @@ funnyControllers.config(['$translateProvider', function ($translateProvider) {
         HOME_HEADER: "Головна",
         TEMPLATES_HEADER: "Шаблони",
         CREATE_TEMPLATE_HEADER: "Створити шаблон",
-        CONTACT_US_HEADER: "Контакти"
+        CONTACT_US_HEADER: "Контакти",
+        COMMENTS_FALLBACK_1: "Будь ласка, включіть JavaScript для перегляду",
+        COMMENTS_FALLBACK_2: "Disqus коментарів."
     });
 
     $translateProvider.determinePreferredLanguage();

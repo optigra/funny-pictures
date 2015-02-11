@@ -27,6 +27,10 @@
                 </div>
             </md-card-content>
         </md-card>
+        <div id="disqus_thread" class="comments">
+            <noscript>{{'COMMENTS_FALLBACK_1' | translate}} <a href="https://disqus.com/?ref_noscript">{{'COMMENTS_FALLBACK_2' | translate}}</a>
+            </noscript>
+        </div>
     </div>
     <div class="image-preview-wrapper" flex="50">
         <div masonry>
@@ -39,3 +43,15 @@
         <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-show="showPagination()"></pagination>
     </div>
 </md-content>
+
+<script type="text/javascript">
+var disqus_shortname = 'funnypicturesmeme';
+
+(function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>

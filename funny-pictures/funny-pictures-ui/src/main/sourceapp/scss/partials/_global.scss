@@ -52,7 +52,7 @@ md-input-container {
 }
 .header {
     .lang {
-        color: rgb(187,222,251);
+        color: rgb(197,202,233);
         font-size: .7em;
         cursor: pointer;
         &.current {
@@ -63,4 +63,8 @@ md-input-container {
     .divider {
         margin: 0 5px;
     }
+}
+.comments {
+    margin-top: 2.5em;
+    padding: 0 25px;
 }
