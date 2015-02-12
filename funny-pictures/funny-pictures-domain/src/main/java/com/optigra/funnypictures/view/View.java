@@ -1,5 +1,6 @@
 package com.optigra.funnypictures.view;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -13,7 +14,7 @@ import javax.persistence.MappedSuperclass;
  *
  */
 @MappedSuperclass
-public class View {
+public class View implements Serializable {
 	 private static final long serialVersionUID = 1L;
 
 	    @Id

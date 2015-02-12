@@ -29,6 +29,10 @@ public abstract class AbstractDao<E, T> implements Dao<E, T> {
 		this.queryBuilder = queryBuilder;
 	}
 	
+	public PersistenceManager<E, T> getPersistenceManager() {
+		return persistenceManager;
+	}
+	
 	/**
 	 * Method to get Class of an Entity.
 	 * @return Class of an Entity.

@@ -180,8 +180,35 @@
 		</createTable>
 	</changeSet>
 	
+	<changeSet id="createUser" author="Oleh Zasadnyy">
+		<createTable tableName="user_accounts">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="email" type="varchar(100)">
+				<constraints nullable="false" />
+			</column>
+			<column name="first_name" type="varchar(100)">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_name" type="varchar(100)">
+				<constraints nullable="false" />
+			</column>
+			
+			<column name="password" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="role" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="sign_in_provider" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	
 	<changeSet id="createRandomPictureThumbnail" author="Oleh Zasadnyy">
-		<createView viewName="v_random_picture_thumbnail">
+		<createView viewName="v_random_picture_thumbnail" replaceIfExists="true">
 			 SELECT DISTINCT s.id,
 			    s.picture_id,
 			    s.update_date,
@@ -201,7 +228,7 @@
 	</changeSet>
 	
 	<changeSet id="createRandomPictureThumbnailSM" author="Oleh Zasadnyy">
-		<createView viewName="v_random_picture_thumbnail_sm">
+		<createView viewName="v_random_picture_thumbnail_sm" replaceIfExists="true"> 
 			 	SELECT  pt.id, pt.picture_id, pt.update_date, pt.create_date, pt.url, pt.type
 				FROM picture_thumbnail pt
 				JOIN (SELECT *, trunc(random() * 2) AS random_value FROM (SELECT DISTINCT picture_id FROM picture_thumbnail) dd) ran 
