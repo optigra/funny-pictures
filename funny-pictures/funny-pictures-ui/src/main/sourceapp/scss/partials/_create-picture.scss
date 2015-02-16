@@ -5,8 +5,11 @@
 	}
 }
 .image-preview-wrapper {
-	padding: 50px;
+	padding: 20px 50px;
 	text-align: center;
+	@media (max-width: 960px) {
+		padding: 50px 10px 0;
+	};
 	img {
 		width: 100%;
 	}

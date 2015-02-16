@@ -26,7 +26,6 @@
 .brick-inside {
     display: block;
     transition: $transform-animation;
-    background: #ffffff;
     &:hover {
         transform: scale(1.02);
     }

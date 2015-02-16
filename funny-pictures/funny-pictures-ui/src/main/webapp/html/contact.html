@@ -1,9 +1,9 @@
-<md-content class="md-padding contact-us" layout="row">
-    <md-card class="contact-form" flex="66">
+<md-content class="md-padding contact-us" layout="column" layout-gt-md="row">
+    <md-card class="contact-form" flex="100" flex-gt-md="50">
         <h2>{{'CONTACT_HEADER' | translate}}</h2>
         <md-card-content>
             <form name="contactForm">
-                <div layout layout="column">
+                <div layout="column" layout-gt-md="row">
                     <md-input-container flex>
                         <label>{{'NAME_LABEL' | translate}}</label>
                         <input ng-model="feedback.name" name="name" required>
@@ -27,7 +27,8 @@
             </form>
         </md-card-content>
     </md-card>
-    <div class="contact-details" flex="33">
+
+    <div class="contact-details" flex="100" flex-gt-md="50">
         <h3>{{'OUR_CONTACTS_LABEL' | translate}}</h3>
         <span>{{'ADDRESS' | translate}}</span>
         <span>{{'CITY' | translate}}</span>
@@ -35,4 +36,3 @@
         <a href="mailto:ask@optigra-soft.com" title="Send email">ask@optigra-soft.com</a>
     </div>
 </md-content>
-

@@ -1,5 +1,5 @@
-<md-content class="md-padding create-piture" layout="row">
-    <div flex="50">
+<md-content class="md-padding create-piture" layout="column" layout-gt-md="row">
+    <div flex="100" flex-gt-md="50">
         <md-card class="create-piture-form">
             <h2>{{'UPLOAD_PICTURE_HEADER' | translate}}</h2>
             <md-card-content>
@@ -30,7 +30,12 @@
             </md-card-content>
         </md-card>
     </div>
-    <div class="image-preview-wrapper" flex="50">
+    <div class="image-preview-wrapper" flex="100" flex-gt-md="50">
         <img id="image-preview" ng-class="{hidden: !pictureUrl && !myFile}" ng-src="{{pictureUrl}}" alt="{{myFile.name}}" title="{{myFile.name}}" />
     </div>
 </md-content>
+
+<div class="loading" ng-show="progress">
+    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+</div>
+

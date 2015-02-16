@@ -7069,8 +7069,11 @@ md-tooltip[width-32="8"].md-show .md-background {
 .flaticon-googleplus:before {
   content: "\e001"; }
 
-.flaticon-twitter:before {
+.flaticon-menu:before {
   content: "\e002"; }
+
+.flaticon-twitter:before {
+  content: "\e003"; }
 
 a {
   color: #2196F3;
@@ -7083,6 +7086,9 @@ img {
   max-width: 100%;
   vertical-align: middle;
   border: 0; }
+
+.center-content {
+  margin: 0 auto; }
 
 .pagination {
   margin-top: 3em; }
@@ -7118,6 +7124,9 @@ md-input-container label {
         -ms-transform: translate(-50%, -50%);
             transform: translate(-50%, -50%); }
 
+.header .logo {
+  margin: 0 auto;
+  text-align: center; }
 .header .lang {
   color: #c5cae9;
   font-size: 0.7em;
@@ -7128,9 +7137,35 @@ md-input-container label {
 .header .divider {
   margin: 0 5px; }
 
+md-sidenav {
+  position: fixed; }
+
 .comments {
-  margin-top: 2.5em;
+  margin: 2.5em auto 0;
   padding: 0 25px; }
+
+.side-menu, .bottom-side-menu {
+  list-style: none;
+  padding: 0; }
+  .side-menu .menu-item, .bottom-side-menu .menu-item {
+    display: block;
+    border-radius: 0;
+    color: inherit;
+    cursor: pointer;
+    line-height: 50px;
+    max-height: 50px;
+    overflow: hidden;
+    padding: 0px 16px;
+    text-align: left;
+    white-space: normal;
+    width: 100%; }
+    .side-menu .menu-item.active, .bottom-side-menu .menu-item.active {
+      color: #3F51B5; }
+
+.bottom-side-menu {
+  bottom: 0;
+  position: fixed;
+  width: 100%; }
 
 .flow-img {
   overflow: hidden;
@@ -7174,8 +7209,7 @@ md-input-container label {
 .brick-inside {
   display: block;
   transition: -webkit-transform 0.15s ease-in-out;
-  transition: transform 0.15s ease-in-out;
-  background: #ffffff; }
+  transition: transform 0.15s ease-in-out; }
   .brick-inside:hover {
     -webkit-transform: scale(1.02);
         -ms-transform: scale(1.02);
@@ -7187,8 +7221,11 @@ md-input-container label {
     padding: 0 10px 20px; }
 
 .image-preview-wrapper {
-  padding: 50px;
+  padding: 20px 50px;
   text-align: center; }
+  @media (max-width: 960px) {
+    .image-preview-wrapper {
+      padding: 50px 10px 0; } }
   .image-preview-wrapper img {
     width: 100%; }
 

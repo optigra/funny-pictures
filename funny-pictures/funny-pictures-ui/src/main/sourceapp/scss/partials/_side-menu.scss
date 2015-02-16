@@ -1,0 +1,26 @@
+.side-menu {
+    list-style: none;
+    padding: 0;
+    .menu-item {
+        display: block;
+        border-radius: 0;
+        color: inherit;
+        cursor: pointer;
+        line-height: 50px;
+        max-height: 50px;
+        overflow: hidden;
+        padding: 0px 16px;
+        text-align: left;
+        white-space: normal;
+        width: 100%;
+        &.active {
+        	color: #3F51B5;	
+        }
+    }
+}
+.bottom-side-menu {
+	@extend .side-menu;
+	bottom: 0;
+	position: fixed;
+	width: 100%;
+}

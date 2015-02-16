@@ -128,9 +128,10 @@ funnyPicturesApp.factory("Pictures", [ "$resource", "apiUrl", function($resource
 
 var funnyControllers = angular.module("funnyControllers", [ "pascalprecht.translate" ]);
 
-funnyControllers.controller("TemplatesController", [ "$scope", "$location", "$mdToast", "PicturesThumbnails", "Funnies", "apiUrl", function($scope, $location, $mdToast, PicturesThumbnails) {
+funnyControllers.controller("TemplatesController", [ "$scope", "$window", "$location", "$mdToast", "PicturesThumbnails", "Funnies", "apiUrl", function($scope, $window, $location, $mdToast, PicturesThumbnails) {
     $scope.headerText = "", $scope.footerText = "", $scope.currentPage = 1, $scope.totalItems = 0, 
-    $scope.itemsPerPage = 15, $scope.thumbnailType = "MEDIUM", PicturesThumbnails.query({
+    $scope.itemsPerPage = 30, $scope.thumbnailType = "MEDIUM", $window.innerWidth < 992 ? $scope.itemsPerPage = 25 : $window.innerWidth < 992 ? $scope.itemsPerPage = 20 : $window.innerWidth < 767 && ($scope.itemsPerPage = 15), 
+    PicturesThumbnails.query({
         offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
         limit: $scope.itemsPerPage,
         thumbnailType: $scope.thumbnailType
@@ -155,18 +156,20 @@ funnyControllers.controller("TemplatesController", [ "$scope", "$location", "$md
     }, $scope.go = function(path) {
         $location.path(path);
     };
-} ]), funnyControllers.controller("HeaderController", [ "$scope", "$location", "$translate", function($scope, $location, $translate) {
+} ]), funnyControllers.controller("HeaderController", [ "$scope", "$location", "$mdSidenav", "$translate", function($scope, $location, $mdSidenav, $translate) {
     $scope.isActive = function(viewLocation) {
         return viewLocation === $location.path();
     }, $scope.changeLanguage = function(langKey) {
         $translate.use(langKey);
     }, $scope.getCurrentLanguage = function() {
         return $translate.use();
+    }, $scope.toggleMenu = function() {
+        $mdSidenav("left").toggle();
     }, $scope.go = function(path) {
         $location.path(path);
     };
 } ]), funnyControllers.controller("FunniesController", [ "$scope", "$mdToast", "FunnyPicturesThumbnails", function($scope, $mdToast, FunnyPicturesThumbnails) {
-    $scope.funniesThumbnails = {}, $scope.currentPage = 1, $scope.totalItems = 0, $scope.itemsPerPage = 15, 
+    $scope.funniesThumbnails = {}, $scope.currentPage = 1, $scope.totalItems = 0, $scope.itemsPerPage = 20, 
     $scope.thumbnailType = "MEDIUM", FunnyPicturesThumbnails.query({
         offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
         limit: $scope.itemsPerPage,
@@ -240,9 +243,10 @@ funnyControllers.controller("TemplatesController", [ "$scope", "$location", "$md
         return $scope.totalItems > $scope.itemsPerPage;
     };
 } ]), funnyControllers.controller("CreatePictureController", [ "$scope", "$location", "$window", "$mdToast", "FileUpload", "apiUrl", "Pictures", function($scope, $location, $window, $mdToast, FileUpload, apiUrl, Pictures) {
-    $scope.pictureTitle = "", $scope.pictureUrl = "", $scope.uploadFile = function() {
+    $scope.pictureTitle = "", $scope.pictureUrl = "", $scope.progress = !1, $scope.loaded = !1, 
+    $scope.uploadFile = function() {
         var uploadUrl = apiUrl + "/content", file = $scope.myFile, urlToFile = $scope.pictureUrl;
-        if (file || urlToFile) {
+        if ($scope.progress = !0, file || urlToFile) {
             var promiseFile = {};
             file ? promiseFile = FileUpload.uploadFileToUrl(file, uploadUrl) : urlToFile && (promiseFile = FileUpload.uploadFileUrlToUrl(urlToFile, uploadUrl)), 
             promiseFile.then(function(data) {
@@ -251,13 +255,13 @@ funnyControllers.controller("TemplatesController", [ "$scope", "$location", "$md
                     url: data.path
                 };
                 Pictures.save(pictureObject, function(data) {
-                    $mdToast.show($mdToast.simple().content("File " + data.name + " uploaded to server!").position("bottom left").hideDelay(5e3)), 
-                    $location.path("/home");
+                    $scope.progress = !1, $scope.loaded = !0, $mdToast.show($mdToast.simple().content("File " + data.name + " uploaded to server!").position("bottom left").hideDelay(5e3)), 
+                    $location.path("/createFunnyPicture/" + data.id);
                 }, function(error) {
-                    $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
+                    $scope.progress = !1, $mdToast.show($mdToast.simple().content("Error " + error.message).position("bottom left").hideDelay(5e3));
                 });
             });
-        } else $mdToast.show($mdToast.simple().content("Please select the image!").position("bottom left").hideDelay(5e3));
+        } else $scope.progress = !1, $mdToast.show($mdToast.simple().content("Please select the image!").position("bottom left").hideDelay(5e3));
     }, $scope.isButtonDisabled = function() {
         return !$scope.templateInputForm.$valid;
     }, $scope.callUpload = function() {

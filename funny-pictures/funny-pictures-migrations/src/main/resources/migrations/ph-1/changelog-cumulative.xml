@@ -194,7 +194,6 @@
 			<column name="last_name" type="varchar(100)">
 				<constraints nullable="false" />
 			</column>
-			
 			<column name="password" type="varchar(255)">
 				<constraints nullable="false" />
 			</column>
@@ -203,6 +202,12 @@
 			</column>
 			<column name="sign_in_provider" type="varchar(255)">
 				<constraints nullable="false"/>
+			</column>
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
 			</column>
 		</createTable>
 	</changeSet>

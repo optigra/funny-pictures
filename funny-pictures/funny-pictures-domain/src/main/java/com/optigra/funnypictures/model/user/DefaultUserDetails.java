@@ -133,56 +133,28 @@ public class DefaultUserDetails extends SocialUser implements Serializable {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public String getFirstName() {
 		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
 	}
 
 	public String getLastName() {
 		return lastName;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
 	public Role getRole() {
 		return role;
-	}
-
-	public void setRole(Role role) {
-		this.role = role;
 	}
 
 	public SocialMediaService getSocialSignInProvider() {
 		return socialSignInProvider;
 	}
 
-	public void setSocialSignInProvider(SocialMediaService socialSignInProvider) {
-		this.socialSignInProvider = socialSignInProvider;
-	}
-
 	public Date getCreateDate() {
 		return createDate;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
 	public Date getUpdateDate() {
 		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
 	}
 
 	public static Builder getBuilder() {

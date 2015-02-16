@@ -1,5 +1,5 @@
-<md-content class="md-padding create-piture" layout="row">
-    <div flex="50">
+<md-content class="md-padding create-piture" layout="column" layout-gt-md="row">
+    <div flex-gt-md="50">
         <md-card class="create-piture-form">
             <img ng-src="{{funnyPicture.url}}" ng-show="funnyPicture.url">
             <meta itemprop="image" content="{{funnyPicture.url}}">
@@ -32,8 +32,8 @@
             </noscript>
         </div>
     </div>
-    <div class="image-preview-wrapper" flex="50">
-        <div masonry>
+    <div class="image-preview-wrapper" flex-gt-md="50">
+        <div masonry="{ 'isFitWidth': true }" class="masonry">
             <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyByTemplate in funniesByTemplate">
                 <a ng-click="swapFunnyPicture(funnyByTemplate)">
                     <img ng-src="{{funnyByTemplate.url}}" alt="">

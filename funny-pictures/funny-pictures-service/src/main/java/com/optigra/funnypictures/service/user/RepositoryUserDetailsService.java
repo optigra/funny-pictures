@@ -13,6 +13,10 @@ import com.optigra.funnypictures.model.user.User;
 public class RepositoryUserDetailsService implements UserDetailsService {
 	@Resource(name = "userDao")
 	private UserDao userDao;
+	
+	public RepositoryUserDetailsService(UserDao userDao) {
+        this.userDao = userDao;
+    }
  
     @Override	
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -5,19 +5,28 @@ var funnyControllers = angular.module('funnyControllers', ['pascalprecht.transla
 
 funnyControllers.controller('TemplatesController', [
     '$scope',
+    '$window',
     '$location',
     '$mdToast',
     'PicturesThumbnails',
     'Funnies',
     'apiUrl',
-    function($scope, $location, $mdToast, PicturesThumbnails, Funnies,
+    function($scope, $window, $location, $mdToast, PicturesThumbnails, Funnies,
         apiUrl) {
         $scope.headerText = "";
         $scope.footerText = "";
         $scope.currentPage = 1;
         $scope.totalItems = 0;
-        $scope.itemsPerPage = 15;
+        $scope.itemsPerPage = 30;
         $scope.thumbnailType = "MEDIUM";
+
+        if ($window.innerWidth < 992) {
+            $scope.itemsPerPage = 25;
+        } else if ($window.innerWidth < 992) {
+            $scope.itemsPerPage = 20;
+        } else if ($window.innerWidth < 767) {
+            $scope.itemsPerPage = 15;
+        }
 
         PicturesThumbnails.query({
             offset: ($scope.currentPage - 1) * $scope.itemsPerPage,
@@ -70,8 +79,8 @@ funnyControllers.controller('TemplatesController', [
     }
 ]);
 
-funnyControllers.controller('HeaderController', ['$scope', '$location', '$translate',
-    function($scope, $location, $translate) {
+funnyControllers.controller('HeaderController', ['$scope', '$location', '$mdSidenav', '$translate',
+    function($scope, $location, $mdSidenav, $translate) {
         $scope.isActive = function(viewLocation) {
             return viewLocation === $location.path();
         };
@@ -80,6 +89,9 @@ funnyControllers.controller('HeaderController', ['$scope', '$location', '$transl
         };
         $scope.getCurrentLanguage = function() {
             return $translate.use();
+        };
+        $scope.toggleMenu = function() {
+            $mdSidenav('left').toggle();
         };
         $scope.go = function(path) {
             $location.path(path);
@@ -93,7 +105,7 @@ funnyControllers.controller('FunniesController', ['$scope', '$mdToast',
         $scope.funniesThumbnails = {};
         $scope.currentPage = 1;
         $scope.totalItems = 0;
-        $scope.itemsPerPage = 15;
+        $scope.itemsPerPage = 20;
         $scope.thumbnailType = "MEDIUM";
 
         FunnyPicturesThumbnails.query({
@@ -252,10 +264,15 @@ funnyControllers.controller('CreatePictureController', [
         Pictures) {
         $scope.pictureTitle = "";
         $scope.pictureUrl = "";
+        $scope.progress = false;
+        $scope.loaded = false;
+
         $scope.uploadFile = function() {
             var uploadUrl = apiUrl + "/content";
             var file = $scope.myFile;
             var urlToFile = $scope.pictureUrl;
+            $scope.progress = true;
+
             if (file || urlToFile) {
                 var promiseFile = {};
                 if (file) {
@@ -270,15 +287,19 @@ funnyControllers.controller('CreatePictureController', [
                             url: data.path
                         };
                         Pictures.save(pictureObject, function(data) {
+                                $scope.progress = false;
+                                $scope.loaded = true;
                                 $mdToast.show(
                                     $mdToast.simple()
                                     .content('File ' + data.name + ' uploaded to server!')
                                     .position('bottom left')
                                     .hideDelay(5000)
                                 );
-                                $location.path('/home');
+                                $location.path('/createFunnyPicture/' + data.id);
+
                             },
                             function(error) {
+                                $scope.progress = false;
                                 $mdToast.show(
                                     $mdToast.simple()
                                     .content('Error ' + error.message)
@@ -290,6 +311,7 @@ funnyControllers.controller('CreatePictureController', [
                     }
                 );
             } else {
+                $scope.progress = false;
                 $mdToast.show(
                     $mdToast.simple()
                     .content('Please select the image!')
