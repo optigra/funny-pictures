@@ -7,8 +7,11 @@ target
 *.jar
 *.war
 *.ear
+*.iml
 .metadata
 .idea
+.idea/
+out/
 /target
 node_modules/
 bower_components/

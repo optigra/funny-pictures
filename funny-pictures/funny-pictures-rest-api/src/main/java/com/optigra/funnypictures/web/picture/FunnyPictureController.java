@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.optigra.funnypictures.facade.facade.funny.FunnyPictureFacade;
+import com.optigra.funnypictures.facade.facade.thumbnail.funny.FunnyPictureThumbnailFacade;
 import com.optigra.funnypictures.facade.resources.message.MessageResource;
 import com.optigra.funnypictures.facade.resources.message.MessageType;
 import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.web.BaseController;
 
 /**
@@ -34,6 +37,9 @@ public class FunnyPictureController extends BaseController {
 	
 	@Resource(name = "funnyPictureFacade")
 	private FunnyPictureFacade funnyPictureFacade;
+	
+	@Resource(name = "funnyPictureThumbnailFacade")
+	private FunnyPictureThumbnailFacade funnyPictureThumbnailFacade;
 
 	/**
 	 * Controller method for getting paged result of funny pictures. Requested
@@ -68,6 +74,46 @@ public class FunnyPictureController extends BaseController {
 	public FunnyPictureResource getFunnyPicture(@PathVariable("id") final Long id) {
 		LOG.info("Getting Funny Picture resource with id: {}", id);
 		return funnyPictureFacade.getFunnyPicture(id);
+	}
+	
+	/**
+	 * API for getting funnies for picture.
+	 * 
+	 * @param id Picture identifier.
+	 * @return PagedResultResource with funnies for picture.
+	 */
+	@RequestMapping(value = "/{id}/funnies", method = RequestMethod.GET)
+	public PagedResultResource<FunnyPictureResource> getFunniesForPicture(@PathVariable("id") final Long id, 
+			@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
+			@RequestParam(value = "limit", defaultValue = "20") final Integer limit) {
+		LOG.info("Getting Funnies for Picture resource with id: {}", id);
+		
+		PagedRequest pagedRequest = new PagedRequest(offset, limit);
+		
+		return funnyPictureFacade.getFunniesForPicture(id , pagedRequest);
+		
+	}
+	
+	/**
+	 * API for getting funnies for picture.
+	 * 
+	 * @param id Picture identifier.
+	 * @return PagedResultResource with funnies thumbnails for picture.
+	 */
+	@RequestMapping(value = "/{id}/funniesThumb", method = RequestMethod.GET)
+	public PagedResultResource<FunnyPictureThumbnailResource> getFunniesThumbnailsForPicture(
+			@PathVariable("id") final Long id, 
+			@RequestParam(value = "offset", defaultValue = "0") final Integer offset,
+			@RequestParam(value = "limit", defaultValue = "20") final Integer limit,
+			@RequestParam(value = "thumbnailType", defaultValue = "MEDIUM") final String thumbnailType) {
+		LOG.info("Getting Funnies Thumbnails for Picture resource with id: {}", id);
+		
+		FunnyPictureThumbnailResource resource = new FunnyPictureThumbnailResource();
+		resource.setThumbnailType(ThumbnailType.valueOf(thumbnailType));
+		
+		PagedRequest pagedRequest = new PagedRequest(resource, offset, limit);
+		
+		return funnyPictureThumbnailFacade.getFunniesThumbnailForPicture(id, pagedRequest);
 	}
 
 	/**

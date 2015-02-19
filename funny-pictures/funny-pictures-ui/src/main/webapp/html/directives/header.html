@@ -1,31 +1,31 @@
-<div ng-controller="HeaderController">
+<div ng-controller="HeaderController as vm">
     <md-toolbar class="md-whiteframe-z1 header">
         <div class="md-toolbar-tools" layout="column" layout-gt-md="column" layout-align="space-between center" layout-align-gt-md="center">
-            <i class="flaticon-menu" ng-click="toggleMenu()" hide-gt-md></i>
+            <i class="flaticon-menu" ng-click="vm.toggleMenu()" hide-gt-md></i>
 
             <div class="logo" flex flex-gt-md="20" layout-gt-md="row" layout-align="center center">
                 <a class="navbar-brand" href="#home">Funny pictures</a>
             </div>
 
             <md-tabs flex hide-sm hide-md>
-                <md-tab id="tab1" aria-controls="tab3-content" ng-click="go('/home')" md-active="isActive('/home')">
+                <md-tab id="tab1" aria-controls="tab3-content" click-link="/home" md-active="vm.isActive('/home')">
                     {{'HOME_HEADER' |translate}}
                 </md-tab>
-                <md-tab id="tab2" aria-controls="tab1-content" ng-click="go('/templates')" md-active="isActive('/templates')">
+                <md-tab id="tab2" aria-controls="tab1-content" click-link="/templates" md-active="vm.isActive('/templates')">
                     {{'TEMPLATES_HEADER' |translate}}
                 </md-tab>
-                <md-tab id="tab3" aria-controls="tab2-content" ng-click="go('/createTemplate')" md-active="isActive('/createTemplate')">
+                <md-tab id="tab3" aria-controls="tab2-content" click-link="/createTemplate" md-active="vm.isActive('/createTemplate')">
                     {{'CREATE_TEMPLATE_HEADER' |translate}}
                 </md-tab>
-                <md-tab id="tab4" aria-controls="tab3-content" ng-click="go('/contact')" md-active="isActive('/contact')">
+                <md-tab id="tab4" aria-controls="tab3-content" click-link="/contact" md-active="vm.isActive('/contact')">
                     {{'CONTACT_US_HEADER' |translate}}
                 </md-tab>
             </md-tabs>
 
             <div layout="row" layout-align="center center" flex="10" hide-sm hide-md>
-                <span class="lang" ng-class="{current: getCurrentLanguage() == 'uk'}" ng-click="getCurrentLanguage() != 'uk' && changeLanguage('uk')">UA</span>
-                <span class="divider">|{{ use() }}</span>
-                <span class="lang" ng-class="{current: getCurrentLanguage() == 'en_US'}" ng-click="getCurrentLanguage() != 'en_US' && changeLanguage('en_US')">EN</span>
+                <span class="lang" ng-class="{current: vm.getCurrentLanguage() == 'uk'}" ng-click="vm.getCurrentLanguage() != 'uk' && vm.changeLanguage('uk')">UA</span>
+                <span class="divider">|</span>
+                <span class="lang" ng-class="{current: vm.getCurrentLanguage() == 'en_US'}" ng-click="vm.getCurrentLanguage() != 'en_US' && vm.changeLanguage('en_US')">EN</span>
             </div>
         </div>
     </md-toolbar>
@@ -37,40 +37,40 @@
         <md-content>
             <ul class="side-menu">
                 <li>
-                    <menu-link class="menu-item md-button md-default-theme" ng-class="{'active' : isActive('/home')}" ng-click="go('/home')">
+                    <menu-link class="menu-item md-button md-default-theme" ng-class="{'active' : vm.isActive('/home')}" click-link="/home">
                         {{'HOME_HEADER' |translate}}
                     </menu-link>
                 </li>
                 <li>
                     <menu-link>
-                        <span class="menu-item md-button md-default-theme" ng-class="{'active' : isActive('/templates')}" ng-click="go('/templates')">
+                        <span class="menu-item md-button md-default-theme" ng-class="{'active' : vm.isActive('/templates')}" click-link="/templates">
                         {{'TEMPLATES_HEADER' |translate}}
                     </span>
                     </menu-link>
                 </li>
                 <li>
                     <menu-link>
-                        <span class="menu-item md-button md-default-theme" ng-class="{'active' : isActive('/createTemplate')}" ng-click="go('/createTemplate')">
+                        <span class="menu-item md-button md-default-theme" ng-class="{'active' : vm.isActive('/createTemplate')}" click-link="/createTemplate">
                         {{'CREATE_TEMPLATE_HEADER' |translate}}
                     </span>
                     </menu-link>
                 </li>
                 <li>
                     <menu-link>
-                        <span class="menu-item md-button md-default-theme" ng-class="{'active' : isActive('/contact')}" ng-click="go('/contact')">
+                        <span class="menu-item md-button md-default-theme" ng-class="{'active' : vm.isActive('/contact')}" click-link="/contact">
                         {{'CONTACT_US_HEADER' |translate}}
                     </span>
                     </menu-link>
                 </li>
             </ul>
             <ul class="bottom-side-menu">
-                <li ng-hide="getCurrentLanguage() == 'uk'">
-                    <menu-link class="menu-item md-button md-default-theme" ng-click="getCurrentLanguage() != 'uk' && changeLanguage('uk')">
+                <li ng-hide="vm.getCurrentLanguage() == 'uk'">
+                    <menu-link class="menu-item md-button md-default-theme" ng-click="vm.getCurrentLanguage() != 'uk' && vm.changeLanguage('uk')">
                         Українська версія
                     </menu-link>
                 </li>
-                <li ng-hide="getCurrentLanguage() == 'en_US'">
-                    <menu-link class="menu-item md-button md-default-theme" ng-click="getCurrentLanguage() != 'en_US' && changeLanguage('en_US')">
+                <li ng-hide="vm.getCurrentLanguage() == 'en_US'">
+                    <menu-link class="menu-item md-button md-default-theme" ng-click="vm.getCurrentLanguage() != 'en_US' && vm.changeLanguage('en_US')">
                         English version
                     </menu-link>
                 </li>

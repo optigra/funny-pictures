@@ -1,26 +1,26 @@
 <md-content class="md-padding create-piture" layout="column" layout-gt-md="row">
     <div flex-gt-md="50">
         <md-card class="create-piture-form">
-            <img ng-src="{{template.url}}" ng-show="template.url && !loaded">
-            <img ng-src="{{funnyPicture.url}}" ng-show="funnyPicture.url && loaded">
+            <img ng-src="{{vm.picture.url}}" ng-show="vm.picture.url && !vm.loaded">
+            <img ng-src="{{vm.funnyPicture.url}}" ng-show="vm.funnyPicture.url && vm.loaded">
             <md-card-content>
-                <form name="funnyPictureText" ng-hide="loaded">
+                <form name="vm.funnyPictureText" ng-hide="vm.loaded">
                     <md-input-container flex>
                         <label>{{'HEADER_TEXT_LABEL' | translate}}</label>
-                        <input ng-model="headerText" name="headerText" required>
+                        <input ng-model="vm.headerText" name="vm.headerText" required>
                     </md-input-container>
                     <md-input-container flex>
                         <label>{{'FOOTER_TEXT_LABEL' | translate}}</label>
-                        <input ng-model="footerText" name="footerText" required>
+                        <input ng-model="vm.footerText" name="vm.footerText" required>
                     </md-input-container>
                     <div layout="row" layout-align="end center">
-                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="createFunnyPicture()" ng-disabled="isButtonDisabled()">{{'CREATE_FUNNY_BUTTON' | translate}}</md-button>
+                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.createFunnyPicture()" ng-disabled="vm.isButtonDisabled()">{{'CREATE_FUNNY_BUTTON' | translate}}</md-button>
                     </div>
                 </form>
-                <div class="action-toolbar" layout="row" layout-align="end center" ng-show="loaded">
-                    <md-button class="md-button" target="_self" ng-href="{{funnyPicture.url}}" download="{{funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
-                    <md-button class="md-warn" ng-click="cancel()">{{'CANCEL_BUTTON' | translate}}</md-button>
-                    <md-button type="submit" class="md-raised md-primary" ng-click="createNew()">{{'CREATE_NEW_BUTTON' | translate}}</md-button>
+                <div class="action-toolbar" layout="row" layout-align="end center" ng-show="vm.loaded">
+                    <md-button class="md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
+                    <md-button class="md-warn" ng-click="vm.cancel()">{{'CANCEL_BUTTON' | translate}}</md-button>
+                    <md-button type="submit" class="md-raised md-primary" ng-click="vm.createNew()">{{'CREATE_NEW_BUTTON' | translate}}</md-button>
                 </div>
             </md-card-content>
         </md-card>
@@ -31,17 +31,17 @@
     </div>
     <div class="image-preview-wrapper" flex-gt-md="50">
         <div masonry="{ 'isFitWidth': true }" class="masonry">
-            <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyByTemplate in funniesByTemplate">
+            <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyByTemplate in vm.funniesByTemplate">
                 <a class="brick-inside" ng-href="#/preview/{{funnyByTemplate.funnyPictureId}}">
                     <img ng-src="{{funnyByTemplate.url}}" alt="">
                 </a>
             </div>
         </div>
-        <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-show="showPagination()"></pagination>
+        <pagination total-items="vm.totalItems" ng-model="vm.currentPage" items-per-page="vm.itemsPerPage" ng-change="vm.pageChanged()" ng-show="vm.showPagination()"></pagination>
     </div>
 </md-content>
 
-<div class="loading" ng-show="progress">
+<div class="loading" ng-show="vm.progress">
     <md-progress-circular md-mode="indeterminate"></md-progress-circular>
 </div>
 

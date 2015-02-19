@@ -1,7 +1,8 @@
 /**
  * Created by rostyslav on 9/29/14.
  */
-var funnyPicturesApp = angular.module('mainModule', ['ngResource', 'ui.bootstrap', 'ngRoute', 'funnyControllers', 'ngMaterial', 'wu.masonry', 'pascalprecht.translate']);
+var funnyPicturesApp = angular.module('mainModule', ['ngResource', 
+    'ui.bootstrap', 'ngRoute', 'funnyControllers', 'ngMaterial', 'wu.masonry', 'pascalprecht.translate']);
 
 funnyPicturesApp.factory('Pictures', ['$resource', 'apiUrl', function($resource, apiUrl) {
     return $resource(apiUrl + '/pictures/:id', {}, {

@@ -1,29 +1,29 @@
 <md-content class="md-padding create-piture" layout="column" layout-gt-md="row">
     <div flex-gt-md="50">
         <md-card class="create-piture-form">
-            <img ng-src="{{funnyPicture.url}}" ng-show="funnyPicture.url">
-            <meta itemprop="image" content="{{funnyPicture.url}}">
-            <meta property="og:url" content="{{currentLocation}}" />
-            <meta property="og:image" content="{{funnyPicture.url}}" />
-            <meta name="twitter:site" content="{{currentLocation}}">
-            <meta name="twitter:image:src" content="{{funnyPicture.url}}">
+            <img ng-src="{{vm.funnyPicture.url}}" ng-show="vm.funnyPicture.url">
+            <meta itemprop="image" content="{{vm.funnyPicture.url}}">
+            <meta property="og:url" content="{{vm.currentLocation}}" />
+            <meta property="og:image" content="{{vm.funnyPicture.url}}" />
+            <meta name="twitter:site" content="{{vm.currentLocation}}">
+            <meta name="twitter:image:src" content="{{vm.funnyPicture.url}}">
             <md-card-content>
                 <div class="action-toolbar" layout="row" layout-align="space-between center">
                     <div>
                         <span>{{'SHARE_LABEL' | translate}}</span>
                         <ul class="social-share">
                             <li>
-                                <a class="social-link flaticon-twitter" href="#" ng-click="shareSocial('https://twitter.com/home?status=',600,250)"></a>
+                                <a class="social-link flaticon-twitter" href="#" ng-click="vm.shareSocial('https://twitter.com/home?status=',600,250)"></a>
                             </li>
                             <li>
-                                <a class="social-link flaticon-facebook" href="#" ng-click="shareSocial('https://www.facebook.com/sharer/sharer.php?u=',600,500)"></a>
+                                <a class="social-link flaticon-facebook" href="#" ng-click="vm.shareSocial('https://www.facebook.com/sharer/sharer.php?u=',600,500)"></a>
                             </li>
                             <li>
-                                <a class="social-link flaticon-googleplus" href="#" ng-click="shareSocial('https://plus.google.com/share?url=',600,500)"></a>
+                                <a class="social-link flaticon-googleplus" href="#" ng-click="vm.shareSocial('https://plus.google.com/share?url=',600,500)"></a>
                             </li>
                         </ul>
                     </div>
-                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{funnyPicture.url}}" download="{{funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
+                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
                 </div>
             </md-card-content>
         </md-card>
@@ -34,13 +34,13 @@
     </div>
     <div class="image-preview-wrapper" flex-gt-md="50">
         <div masonry="{ 'isFitWidth': true }" class="masonry">
-            <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyByTemplate in funniesByTemplate">
-                <a ng-click="swapFunnyPicture(funnyByTemplate)">
+            <div class="masonry-brick md-whiteframe-z1" ng-repeat="funnyByTemplate in vm.funniesByTemplate">
+                <a ng-click="vm.swapFunnyPicture(funnyByTemplate)">
                     <img ng-src="{{funnyByTemplate.url}}" alt="">
                 </a>
             </div>
         </div>
-        <pagination total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage" ng-change="pageChanged()" ng-show="showPagination()"></pagination>
+        <pagination total-items="vm.totalItems" ng-model="vm.currentPage" items-per-page="vm.itemsPerPage" ng-change="vm.pageChanged()" ng-show="vm.showPagination()"></pagination>
     </div>
 </md-content>
 

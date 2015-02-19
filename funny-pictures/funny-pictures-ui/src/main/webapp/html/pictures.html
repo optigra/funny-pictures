@@ -1,0 +1,13 @@
+<div layout="row">
+    <div class="gallery-wrapper" flex="100" flex-gt-lg="80">
+        <div masonry="{ 'isFitWidth': true }" class="masonry">
+            <div class="masonry-brick" ng-repeat="pictureThumbnail in vm.pictureThumbnails">
+                <a class="brick-inside" click-link="/createFunnyPicture/{{pictureThumbnail.pictureId}}">
+                    <img ng-src="{{pictureThumbnail.url}}" alt="">
+                </a>
+            </div>
+        </div>
+        <pagination total-items="vm.totalItems" ng-model="vm.currentPage" items-per-page="vm.itemsPerPage"
+                    ng-change="vm.pageChanged()" ng-show="vm.showPagination()"></pagination>
+    </div>
+</div>
