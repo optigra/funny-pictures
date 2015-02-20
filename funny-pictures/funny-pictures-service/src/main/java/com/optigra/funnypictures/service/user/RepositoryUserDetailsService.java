@@ -18,7 +18,7 @@ public class RepositoryUserDetailsService implements UserDetailsService {
 
     /**
      * Constructor.
-     * @param userDao
+     * @param userDao injected dao for persistence operation
      */
 	public RepositoryUserDetailsService(final UserDao userDao) {
         this.userDao = userDao;
@@ -26,7 +26,7 @@ public class RepositoryUserDetailsService implements UserDetailsService {
 
     /**
      * Find user by given username (email).
-     * @param username
+     * @param username username of User
      * @return UserDetails
      */
     @Override	
@@ -37,7 +37,7 @@ public class RepositoryUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("No user found with username: " + username);
         }
  
-        DefaultUserDetails principal = DefaultUserDetails.getBuilder()
+        return DefaultUserDetails.getBuilder()
                 .id(user.getId())
                 .username(user.getEmail())
                 .firstName(user.getFirstName())
@@ -48,7 +48,5 @@ public class RepositoryUserDetailsService implements UserDetailsService {
                 .createDate(user.getCreateDate())
                 .updateDate(user.getUpdateDate())
                 .build();
- 
-        return principal;
     }
 }

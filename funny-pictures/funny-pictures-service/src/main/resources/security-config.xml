@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <security:http pattern="/sourceapp/**" security="none"/>
+    <security:http use-expressions="true">
+        <security:form-login login-page="/login" login-processing-url="/login/authenticate"
+                             authentication-failure-url="/login?error=bad_credentials" username-parameter="username"
+                             password-parameter="password"/>
+        <security:logout logout-url="/logout" logout-success-url="/login" delete-cookies="JESSIONID"/>
+        <security:intercept-url pattern="/auth/**" access="permitAll"/>
+        <security:intercept-url pattern="/login" access="permitAll"/>
+        <security:intercept-url pattern="/signin/**" access="permitAll"/>
+        <security:intercept-url pattern="/signup/**" access="permitAll"/>
+        <security:intercept-url pattern="/user/register/**" access="permitAll"/>
+
+        <security:intercept-url pattern="/**" access="hasRole('ROLE_USER')"/>
+
+        <!--<security:custom-filter ref="socialAuthenticatiomFilter" before="PRE_AUTH_FILTER"/>-->
+    </security:http>
+
+</beans>

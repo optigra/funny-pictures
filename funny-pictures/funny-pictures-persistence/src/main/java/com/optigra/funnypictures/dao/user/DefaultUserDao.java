@@ -27,11 +27,10 @@ public class DefaultUserDao extends AbstractDao<User, Long> implements UserDao {
 	@Override
 	public User findByEmail(final String email) {
 		Queries query = Queries.GET_USER_BY_EMAIL;
-		Map<String, Object> parameters = new HashMap<String, Object>();
+		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("email", email);
-		Query<User> finalQuery = new Query<User>(getEntityClass(), query.getQuery(), parameters);
-		User user = getPersistenceManager().executeSingleResultQuery(finalQuery);
-		return user;
+		Query<User> finalQuery = new Query<>(getEntityClass(), query.getQuery(), parameters);
+		return getPersistenceManager().executeSingleResultQuery(finalQuery);
 	}
 	
 	
