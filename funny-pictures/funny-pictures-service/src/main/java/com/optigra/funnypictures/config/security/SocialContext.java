@@ -1,7 +1,5 @@
 package com.optigra.funnypictures.config.security;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,38 +16,48 @@ import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ConnectController;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
- 
+
+import javax.sql.DataSource;
+
+/**
+ * @author oleh.zasadnyy
+ */
 @Configuration
 @EnableSocial
 public class SocialContext implements SocialConfigurer {
- 
+
     @Autowired
     private DataSource dataSource;
- 
+
     @Override
-    public void addConnectionFactories(ConnectionFactoryConfigurer cfConfig, Environment env) {
+    public void addConnectionFactories(final ConnectionFactoryConfigurer cfConfig, final Environment env) {
         cfConfig.addConnectionFactory(new FacebookConnectionFactory(
                 env.getProperty("facebook.app.id"),
                 env.getProperty("facebook.app.secret")
         ));
     }
- 
+
     @Override
     public UserIdSource getUserIdSource() {
         return new AuthenticationNameUserIdSource();
     }
- 
+
     @Override
-    public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
+    public UsersConnectionRepository getUsersConnectionRepository(final ConnectionFactoryLocator connectionFactoryLocator) {
         return new JdbcUsersConnectionRepository(
                 dataSource,
                 connectionFactoryLocator,
                 Encryptors.noOpText()
         );
     }
- 
+
+    /**
+     * @param connectionFactoryLocator
+     * @param connectionRepository
+     * @return ConnectController
+     */
     @Bean
-    public ConnectController connectController(ConnectionFactoryLocator connectionFactoryLocator, ConnectionRepository connectionRepository) {
+    public ConnectController connectController(final ConnectionFactoryLocator connectionFactoryLocator, final ConnectionRepository connectionRepository) {
         return new ConnectController(connectionFactoryLocator, connectionRepository);
     }
 }

@@ -1,7 +1,12 @@
 package com.optigra.funnypictures.web.picture;
 
-import javax.annotation.Resource;
-
+import com.optigra.funnypictures.facade.facade.picture.PictureFacade;
+import com.optigra.funnypictures.facade.resources.message.MessageResource;
+import com.optigra.funnypictures.facade.resources.message.MessageType;
+import com.optigra.funnypictures.facade.resources.picture.PictureResource;
+import com.optigra.funnypictures.facade.resources.search.PagedRequest;
+import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
+import com.optigra.funnypictures.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -13,18 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optigra.funnypictures.facade.facade.funny.FunnyPictureFacade;
-import com.optigra.funnypictures.facade.facade.picture.PictureFacade;
-import com.optigra.funnypictures.facade.facade.thumbnail.funny.FunnyPictureThumbnailFacade;
-import com.optigra.funnypictures.facade.resources.message.MessageResource;
-import com.optigra.funnypictures.facade.resources.message.MessageType;
-import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
-import com.optigra.funnypictures.facade.resources.picture.PictureResource;
-import com.optigra.funnypictures.facade.resources.search.PagedRequest;
-import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
-import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
-import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
-import com.optigra.funnypictures.web.BaseController;
+import javax.annotation.Resource;
 
 /**
  * Controller for all pictures API's.
@@ -39,9 +33,6 @@ public class PictureController extends BaseController {
 	
 	@Resource(name = "pictureFacade")
 	private PictureFacade pictureFacade;
-	
-	@Resource(name = "funnyPictureFacade")
-	private FunnyPictureFacade funnyPictureFacade;
 
 	/** 
 	 * API for Retrieving paged result for all pictures @see com.optigra.funnypictures.facade.resource.PictureResource.

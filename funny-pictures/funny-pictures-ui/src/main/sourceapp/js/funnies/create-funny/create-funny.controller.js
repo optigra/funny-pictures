@@ -8,13 +8,14 @@
     CreateFunnyController
         .$inject = [
         '$routeParams',
+        'logger',
         'values',
         'PicturesFactory',
         'FunniesFactory',
         'FunnyThumbnailsByPicture'
     ];
 
-    function CreateFunnyController($routeParams, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
+    function CreateFunnyController($routeParams, values, logger, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
         var vm = this;
 
         vm.picture = {};
@@ -43,8 +44,6 @@
             }, function (picture) {
                 vm.picture = picture;
                 pageChanged();
-            }, function (error) {
-                // ToDo
             });
         }
 
@@ -57,8 +56,6 @@
             }, function (data) {
                 vm.funniesByTemplate = data.entities;
                 vm.totalItems = data.count;
-            }, function (error) {
-                // ToDo
             });
         }
 
@@ -75,9 +72,6 @@
                 vm.progress = false;
                 vm.loaded = true;
                 pageChanged();
-            }, function (error) {
-                vm.progress = false;
-                // ToDo
             });
         }
 
@@ -95,8 +89,7 @@
                 vm.loaded = false;
                 vm.funnyPicture = {};
                 vm.pageChanged();
-            }, function (error) {
-                // ToDo
+                logger.info('Deleted Funny picture');
             });
         }
 

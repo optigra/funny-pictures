@@ -9,7 +9,11 @@
             'ngMaterial',
             'pascalprecht.translate',
             'wu.masonry',
-            'ui.bootstrap'
+            'ui.bootstrap',
+
+            'blocks.exception',
+            'blocks.logger',
+            'blocks.router'
         ]);
 
 })();

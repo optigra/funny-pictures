@@ -97,7 +97,7 @@ module.exports = function(grunt) {
                         '<%= app.dist %>/js/app.js': [
                             '<%= app.source %>/js/app.module.js',
 
-                            '<%= app.source %>/js/core/app.core.js',
+                            '<%= app.source %>/js/core/core.modules.js',
                             '<%= app.source %>/js/core/core.route.js',
                             '<%= app.source %>/js/core/core.values.js',
                             '<%= app.source %>/js/core/properties/development.constants.js',
@@ -161,7 +161,7 @@ module.exports = function(grunt) {
                         '<%= app.dist %>/js/app.js': [
                             '<%= app.source %>/js/app.module.js',
 
-                            '<%= app.source %>/js/core/app.core.js',
+                            '<%= app.source %>/js/core/core.modules.js',
                             '<%= app.source %>/js/core/core.route.js',
                             '<%= app.source %>/js/core/core.values.js',
                             '<%= app.source %>/js/core/properties/production.constants.js',

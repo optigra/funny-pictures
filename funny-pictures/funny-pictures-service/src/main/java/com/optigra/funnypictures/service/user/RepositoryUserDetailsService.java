@@ -1,25 +1,36 @@
 package com.optigra.funnypictures.service.user;
 
-import javax.annotation.Resource;
-
+import com.optigra.funnypictures.dao.user.UserDao;
+import com.optigra.funnypictures.model.user.DefaultUserDetails;
+import com.optigra.funnypictures.model.user.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import com.optigra.funnypictures.dao.user.UserDao;
-import com.optigra.funnypictures.model.user.DefaultUserDetails;
-import com.optigra.funnypictures.model.user.User;
+import javax.annotation.Resource;
 
+/**
+ * @author oleh.zasadnyy
+ */
 public class RepositoryUserDetailsService implements UserDetailsService {
 	@Resource(name = "userDao")
 	private UserDao userDao;
-	
-	public RepositoryUserDetailsService(UserDao userDao) {
+
+    /**
+     * Constructor.
+     * @param userDao
+     */
+	public RepositoryUserDetailsService(final UserDao userDao) {
         this.userDao = userDao;
     }
- 
+
+    /**
+     * Find user by given username (email).
+     * @param username
+     * @return UserDetails
+     */
     @Override	
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String username) {
         User user = userDao.findByEmail(username);
  
         if (user == null) {

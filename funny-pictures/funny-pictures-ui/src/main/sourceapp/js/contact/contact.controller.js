@@ -7,11 +7,11 @@
 
     ContactController
         .$inject = [
-            '$mdToast',
+            'logger',
             'FeedbacksFactory'
         ];
 
-    function ContactController($mdToast, FeedbacksFactory) {
+    function ContactController(logger, FeedbacksFactory) {
         var vm = this;
 
         vm.feedback = {};
@@ -22,15 +22,7 @@
         function sendFeedback() {
             FeedbacksFactory.save(vm.feedback,
                 function() {
-                    $mdToast.show(
-                        $mdToast.simple()
-                        .content('Thank you ' + vm.feedback.name + ', your feedback was sent.')
-                        .position('bottom left')
-                        .hideDelay(5000)
-                    );
-                },
-                function(error) {
-                    // ToDo
+                    logger.success('Thank you ' + vm.feedback.name + ', your feedback was sent.');
                 }
             );
         }

@@ -32,8 +32,6 @@
             }, function(data) {
                 vm.funnyThumbnails = data.entities;
                 vm.totalItems = data.count;
-            }, function(error) {
-                // ToDo
             });
         }
 

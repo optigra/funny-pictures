@@ -18,6 +18,9 @@ import org.springframework.social.security.SpringSocialConfigurer;
 
 import javax.annotation.Resource;
 
+/**
+ * @author oleh.zasadnyy
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityContext extends WebSecurityConfigurerAdapter {
@@ -25,16 +28,24 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
     @Resource(name = "userDao")
     private UserDao userDao;
 
-
-    public void configure(WebSecurity web) throws Exception {
+    /**
+     * Configuration for ignoring requests to static resources.
+     * @param web
+     * @throws Exception spring exeption
+     */
+    public void configure(final WebSecurity web) throws Exception {
         web
                 // Spring Security ignores request to static resources such as CSS or JS
                 // files.
                 .ignoring().antMatchers("/static/**");
     }
 
-
-    protected void configure(HttpSecurity http) throws Exception {
+    /**
+     * Configuration of login page.
+     * @param http
+     * @throws Exception http
+     */
+    protected void configure(final HttpSecurity http) throws Exception {
         http
                 // Configures form login
                 .formLogin()
@@ -60,24 +71,39 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                 .and().apply(new SpringSocialConfigurer());
     }
 
-
-    protected void configure(AuthenticationManagerBuilder auth)
+    /**
+     *
+     * @param auth
+     * @throws Exception auth
+     */
+    protected void configure(final AuthenticationManagerBuilder auth)
             throws Exception {
         auth.userDetailsService(userDetailsService()).passwordEncoder(
                 passwordEncoder());
     }
 
+    /**
+     *
+     * @return PasswordEncoder Bean
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 
+    /**
+     *
+     * @return SocialUserDetailsService Bean
+     */
     @Bean
     public SocialUserDetailsService socialUserDetailsService() {
         return new DefaultSocialUserDetailsService(userDetailsService());
     }
 
-
+    /**
+     *
+     * @return UserDetailsService Bean
+     */
     @Bean
     public UserDetailsService userDetailsService() {
         return new RepositoryUserDetailsService(userDao);

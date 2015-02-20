@@ -39,8 +39,6 @@
             }, function(funnyPicture) {
                 vm.funnyPicture = funnyPicture;
                 pageChanged();
-            }, function(error) {
-                // ToDo
             });
         }
 
@@ -53,8 +51,6 @@
             }, function(data) {
                 vm.funniesByTemplate = data.entities;
                 vm.totalItems = data.count;
-            }, function(error) {
-                // ToDo
             });
         }
 
@@ -70,8 +66,6 @@
                 id: funnyThumbnail.funnyPictureId
             }, function(funnyPicture) {
                 vm.funnyPicture = funnyPicture;
-            }, function(error) {
-                // ToDo
             });
         }
 

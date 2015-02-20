@@ -1,19 +1,14 @@
 package com.optigra.funnypictures.web.picture;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Arrays;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.optigra.funnypictures.facade.facade.funny.FunnyPictureFacade;
+import com.optigra.funnypictures.facade.facade.picture.PictureFacade;
+import com.optigra.funnypictures.facade.resources.message.MessageResource;
+import com.optigra.funnypictures.facade.resources.message.MessageType;
+import com.optigra.funnypictures.facade.resources.picture.PictureResource;
+import com.optigra.funnypictures.facade.resources.search.PagedRequest;
+import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
+import com.optigra.funnypictures.web.AbstractControllerTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,19 +19,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.optigra.funnypictures.facade.facade.funny.FunnyPictureFacade;
-import com.optigra.funnypictures.facade.facade.picture.PictureFacade;
-import com.optigra.funnypictures.facade.facade.thumbnail.funny.FunnyPictureThumbnailFacade;
-import com.optigra.funnypictures.facade.resources.message.MessageResource;
-import com.optigra.funnypictures.facade.resources.message.MessageType;
-import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
-import com.optigra.funnypictures.facade.resources.picture.PictureResource;
-import com.optigra.funnypictures.facade.resources.search.PagedRequest;
-import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
-import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
-import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
-import com.optigra.funnypictures.web.AbstractControllerTest;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PictureControllerTest extends AbstractControllerTest {
@@ -49,9 +40,6 @@ public class PictureControllerTest extends AbstractControllerTest {
 	
 	@Mock
 	private FunnyPictureFacade funnyPictureFacade;
-	
-	@Mock
-	private FunnyPictureThumbnailFacade funnyPictureThumbnailFacade;
 	
 	private MockMvc mockMvc;
 	
@@ -198,80 +186,5 @@ public class PictureControllerTest extends AbstractControllerTest {
     			.andExpect(content().string(expectedResponse));
     	verify(pictureFacade).deletePicture(id);
     }
-    
-    @Test
-	public void testGetFunnyPicturesByPicture() throws Exception {
-		// Given
-		Long id = 1L;
-    	long count = 100;
-    	int limit = 25;
-    	Integer offset = 10;
-    	String uri = "/pictures";
-    	
-    	FunnyPictureResource resource = new FunnyPictureResource();
-    	resource.setId(id);
-    	resource.setName("Picture1");
-    	resource.setUrl("url");
-    	
-		List<FunnyPictureResource> entities = Arrays.asList(resource);
-    	PagedResultResource<FunnyPictureResource> expectedResource = new PagedResultResource<>();
-		expectedResource.setCount(count);
-		expectedResource.setLimit(limit);
-		expectedResource.setOffset(offset);
-		expectedResource.setUri(uri);
-		expectedResource.setEntities(entities);
-    	
-		PagedRequest pagedRequest = new PagedRequest(offset, limit);
-		
-		// When
-    	String expectedResponse = objectMapper.writeValueAsString(expectedResource);
-    	when(funnyPictureFacade.getFunniesForPicture(anyLong(), any(PagedRequest.class))).thenReturn(expectedResource);
-    	
-		// Then
-    	mockMvc.perform(get("/pictures/{id}/funnies", id)
-    			.param("offset", String.valueOf(offset))
-    			.param("limit", String.valueOf(limit)))
-    		.andExpect(status().isOk())
-    		.andExpect(content().string(expectedResponse));
-    	
-    	verify(funnyPictureFacade).getFunniesForPicture(id, pagedRequest);
-	}
-    
-    @Test
-   	public void testGetFunnyPictureThumbnailsByPicture() throws Exception {
-   		// Given
-   		Long id = 1L;
-       	long count = 100;
-       	int limit = 25;
-       	Integer offset = 10;
-       	String uri = "/pictures";
-       	ThumbnailType thumbnailType = ThumbnailType.MEDIUM;
-       	
-       	FunnyPictureThumbnailResource resource = new FunnyPictureThumbnailResource();
-       	resource.setThumbnailType(thumbnailType);;
-       	
-   		List<FunnyPictureThumbnailResource> entities = Arrays.asList(resource);
-       	PagedResultResource<FunnyPictureThumbnailResource> expectedResource = new PagedResultResource<>();
-   		expectedResource.setCount(count);
-   		expectedResource.setLimit(limit);
-   		expectedResource.setOffset(offset);
-   		expectedResource.setUri(uri);
-   		expectedResource.setEntities(entities);
-       	
-   		PagedRequest pagedRequest = new PagedRequest(resource, offset, limit);
-   		
-   		// When
-       	String expectedResponse = objectMapper.writeValueAsString(expectedResource);
-       	when(funnyPictureThumbnailFacade.getFunniesThumbnailForPicture(anyLong(), any(PagedRequest.class))).thenReturn(expectedResource);
-       	
-   		// Then
-       	mockMvc.perform(get("/pictures/{id}/funniesThumb", id)
-       			.param("offset", String.valueOf(offset))
-       			.param("limit", String.valueOf(limit))
-       			.param("type", thumbnailType.name()))
-       		.andExpect(status().isOk())
-       		.andExpect(content().string(expectedResponse));
-       	
-       	verify(funnyPictureThumbnailFacade).getFunniesThumbnailForPicture(id, pagedRequest);
-   	}
+
 }
