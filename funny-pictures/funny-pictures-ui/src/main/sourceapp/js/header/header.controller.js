@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.header')
         .controller('HeaderController', HeaderController);
 
     HeaderController
@@ -22,16 +22,16 @@
 
         function isActive(viewLocation) {
             return viewLocation === $location.path();
-        };
+        }
         function changeLanguage(langKey) {
             $translate.use(langKey);
-        };
+        }
         function getCurrentLanguage() {
             return $translate.use();
-        };
+        }
         function toggleMenu() {
             $mdSidenav('left').toggle();
-        };
+        }
     }
 
 })();

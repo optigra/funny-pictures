@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.contact')
         .factory('FeedbacksFactory', FeedbacksFactory);
 
     FeedbacksFactory

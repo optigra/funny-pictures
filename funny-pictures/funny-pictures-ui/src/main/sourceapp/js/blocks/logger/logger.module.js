@@ -1,5 +1,7 @@
 (function() {
     'use strict';
 
-    angular.module('blocks.logger', []);
+    angular.module('blocks.logger', [
+        'ngMaterial'
+    ]);
 })();

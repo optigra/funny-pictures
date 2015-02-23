@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.pictures')
         .factory('PicturesFactory', PicturesFactory);
 
     PicturesFactory

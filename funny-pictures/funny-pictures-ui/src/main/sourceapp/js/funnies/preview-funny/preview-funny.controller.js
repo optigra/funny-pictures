@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.funnies')
         .controller('PreviewFunnyController', PreviewFunnyController);
 
     PreviewFunnyController
@@ -10,12 +10,13 @@
             '$window',
             '$location',
             '$routeParams',
+            '$exceptionHandler',
             'values',
             'FunniesFactory',
             'FunnyThumbnailsByPicture'
         ];
 
-    function PreviewFunnyController($window, $location, $routeParams, values, FunniesFactory, FunnyThumbnailsByPicture) {
+    function PreviewFunnyController($window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
         var vm = this;
         var currentUrl = $location.absUrl().split('#')[0] + '#/preview/';
 
@@ -39,6 +40,8 @@
             }, function(funnyPicture) {
                 vm.funnyPicture = funnyPicture;
                 pageChanged();
+            }, function (e) {
+                $exceptionHandler(e);
             });
         }
 
@@ -51,6 +54,8 @@
             }, function(data) {
                 vm.funniesByTemplate = data.entities;
                 vm.totalItems = data.count;
+            }, function (e) {
+                $exceptionHandler(e);
             });
         }
 
@@ -66,6 +71,8 @@
                 id: funnyThumbnail.funnyPictureId
             }, function(funnyPicture) {
                 vm.funnyPicture = funnyPicture;
+            }, function (e) {
+                $exceptionHandler(e);
             });
         }
 

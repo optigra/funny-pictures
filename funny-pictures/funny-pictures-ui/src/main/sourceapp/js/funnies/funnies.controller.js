@@ -2,22 +2,23 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.funnies')
         .controller('FunniesController', FunniesController);
 
     FunniesController
         .$inject = [
+            '$exceptionHandler',
             'values',
             'FunnyThumbnailsFactory'
         ];
 
-    function FunniesController(values, FunnyThumbnailsFactory) {
+    function FunniesController($exceptionHandler, values, FunnyThumbnailsFactory) {
         var vm = this;
 
         vm.funnyThumbnails = {};
         vm.totalItems = 0;
         vm.currentPage = 1;
-        vm.itemsPerPage = values.itemsPerPage
+        vm.itemsPerPage = values.itemsPerPage;
 
         vm.pageChanged = pageChanged;
         vm.showPagination = showPagination;
@@ -32,6 +33,8 @@
             }, function(data) {
                 vm.funnyThumbnails = data.entities;
                 vm.totalItems = data.count;
+            }, function (e) {
+                $exceptionHandler(e);
             });
         }
 

@@ -1,9 +1,9 @@
 !function() {
     "use strict";
-    angular.module("app", [ "app.core" ]);
+    angular.module("app", [ "app.core", "app.contact", "app.funnies", "app.pictures", "app.header" ]);
 }(), function() {
     "use strict";
-    angular.module("app.core", [ "ngResource", "ngRoute", "ngMaterial", "pascalprecht.translate", "wu.masonry", "ui.bootstrap" ]);
+    angular.module("app.core", [ "ngResource", "ngRoute", "ngMaterial", "pascalprecht.translate", "wu.masonry", "ui.bootstrap", "blocks.exception", "blocks.logger" ]);
 }(), function() {
     "use strict";
     function config($routeProvider) {
@@ -52,6 +52,52 @@
     angular.module("app.core").constant("constants", {
         apiUrl: "http://localhost:8080/funny-pictures-rest-api/api"
     });
+}(), function() {
+    "use strict";
+    angular.module("blocks.exception", [ "blocks.logger", "ngMaterial" ]);
+}(), function() {
+    "use strict";
+    function extendExceptionHandler($injector) {
+        return function(exception) {
+            var logger = $injector.get("logger");
+            logger.error(exception.statusText);
+        };
+    }
+    angular.module("blocks.exception").factory("$exceptionHandler", extendExceptionHandler), 
+    extendExceptionHandler.$inject = [ "$injector" ];
+}(), function() {
+    "use strict";
+    angular.module("blocks.logger", [ "ngMaterial" ]);
+}(), function() {
+    "use strict";
+    function logger($log, $mdToast) {
+        function error(message, data) {
+            $mdToast.show($mdToast.simple().content("Error: " + message).position(position).hideDelay(hideDelay)), 
+            $log.error("Error: " + message, data);
+        }
+        function info(message, data) {
+            $mdToast.show($mdToast.simple().content("Info: " + message).position(position).hideDelay(hideDelay)), 
+            $log.info("Info: " + message, data);
+        }
+        function success(message, data) {
+            $mdToast.show($mdToast.simple().content("Success: " + message).position(position).hideDelay(hideDelay)), 
+            $log.info("Success: " + message, data);
+        }
+        function warning(message, data) {
+            $mdToast.show($mdToast.simple().content("Warning: " + message).position(position).hideDelay(hideDelay)), 
+            $log.warn("Warning: " + message, data);
+        }
+        var position = "bottom left", hideDelay = 5e3, service = {
+            showToasts: !0,
+            error: error,
+            info: info,
+            success: success,
+            warning: warning,
+            log: $log.log
+        };
+        return service;
+    }
+    angular.module("blocks.logger").factory("logger", logger), logger.$inject = [ "$log", "$mdToast" ];
 }(), function() {
     "use strict";
     function clickLink($location) {
@@ -113,13 +159,16 @@
     angular.module("app").directive("footer", footer);
 }(), function() {
     "use strict";
+    angular.module("app.header", [ "app.core" ]);
+}(), function() {
+    "use strict";
     function header() {
         return {
             restrict: "E",
             templateUrl: "html/directives/header.html"
         };
     }
-    angular.module("app").directive("header", header);
+    angular.module("app.header").directive("header", header);
 }(), function() {
     "use strict";
     function HeaderController($location, $mdSidenav, $translate) {
@@ -139,7 +188,10 @@
         vm.isActive = isActive, vm.changeLanguage = changeLanguage, vm.getCurrentLanguage = getCurrentLanguage, 
         vm.toggleMenu = toggleMenu;
     }
-    angular.module("app").controller("HeaderController", HeaderController), HeaderController.$inject = [ "$location", "$mdSidenav", "$translate" ];
+    angular.module("app.header").controller("HeaderController", HeaderController), HeaderController.$inject = [ "$location", "$mdSidenav", "$translate" ];
+}(), function() {
+    "use strict";
+    angular.module("app.funnies", [ "app.core" ]);
 }(), function() {
     "use strict";
     function FunniesFactory($resource, constants) {
@@ -150,7 +202,7 @@
             }
         });
     }
-    angular.module("app").factory("FunniesFactory", FunniesFactory), FunniesFactory.$inject = [ "$resource", "constants" ];
+    angular.module("app.funnies").factory("FunniesFactory", FunniesFactory), FunniesFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
     function FunnyThumbnailsFactory($resource, constants) {
@@ -161,7 +213,7 @@
             }
         });
     }
-    angular.module("app").factory("FunnyThumbnailsFactory", FunnyThumbnailsFactory), 
+    angular.module("app.funnies").factory("FunnyThumbnailsFactory", FunnyThumbnailsFactory), 
     FunnyThumbnailsFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
@@ -173,11 +225,11 @@
             }
         });
     }
-    angular.module("app").factory("FunnyThumbnailsByPicture", FunnyThumbnailsByPicture), 
+    angular.module("app.funnies").factory("FunnyThumbnailsByPicture", FunnyThumbnailsByPicture), 
     FunnyThumbnailsByPicture.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
-    function FunniesController(values, FunnyThumbnailsFactory) {
+    function FunniesController($exceptionHandler, values, FunnyThumbnailsFactory) {
         function pageChanged() {
             FunnyThumbnailsFactory.query({
                 offset: (vm.currentPage - 1) * vm.itemsPerPage,
@@ -185,7 +237,9 @@
                 thumbnailType: values.thumbnailType
             }, function(data) {
                 vm.funnyThumbnails = data.entities, vm.totalItems = data.count;
-            }, function() {});
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function showPagination() {
             return vm.totalItems > vm.itemsPerPage;
@@ -194,16 +248,19 @@
         vm.funnyThumbnails = {}, vm.totalItems = 0, vm.currentPage = 1, vm.itemsPerPage = values.itemsPerPage, 
         vm.pageChanged = pageChanged, vm.showPagination = showPagination, pageChanged();
     }
-    angular.module("app").controller("FunniesController", FunniesController), FunniesController.$inject = [ "values", "FunnyThumbnailsFactory" ];
+    angular.module("app.funnies").controller("FunniesController", FunniesController), 
+    FunniesController.$inject = [ "$exceptionHandler", "values", "FunnyThumbnailsFactory" ];
 }(), function() {
     "use strict";
-    function CreateFunnyController($routeParams, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
+    function CreateFunnyController($routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
         function activate() {
             PicturesFactory.get({
                 id: $routeParams.pictureId
             }, function(picture) {
                 vm.picture = picture, pageChanged();
-            }, function() {});
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function pageChanged() {
             FunnyThumbnailsByPicture.query({
@@ -213,7 +270,9 @@
                 thumbnailType: values.thumbnailType
             }, function(data) {
                 vm.funniesByTemplate = data.entities, vm.totalItems = data.count;
-            }, function() {});
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function createFunnyPicture() {
             vm.progress = !0;
@@ -221,8 +280,8 @@
             postObject.name = vm.picture.name, postObject.header = vm.headerText, postObject.footer = vm.footerText, 
             postObject.template = {}, postObject.template.id = vm.picture.id, FunniesFactory.save(postObject, function(data) {
                 vm.funnyPicture = data, vm.progress = !1, vm.loaded = !0, pageChanged();
-            }, function() {
-                vm.progress = !1;
+            }, function(e) {
+                $exceptionHandler(e);
             });
         }
         function createNew() {
@@ -232,8 +291,10 @@
             FunniesFactory["delete"]({
                 id: vm.funnyPicture.id
             }, function() {
-                vm.loaded = !1, vm.funnyPicture = {}, vm.pageChanged();
-            }, function() {});
+                vm.loaded = !1, vm.funnyPicture = {}, vm.pageChanged(), logger.info("Deleted Funny picture");
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function showPagination() {
             return vm.totalItems > vm.itemsPerPage;
@@ -248,17 +309,19 @@
         vm.createNew = createNew, vm.cancel = cancel, vm.isButtonDisabled = isButtonDisabled, 
         activate();
     }
-    angular.module("app").controller("CreateFunnyController", CreateFunnyController), 
-    CreateFunnyController.$inject = [ "$routeParams", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPicture" ];
+    angular.module("app.funnies").controller("CreateFunnyController", CreateFunnyController), 
+    CreateFunnyController.$inject = [ "$routeParams", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPicture" ];
 }(), function() {
     "use strict";
-    function PreviewFunnyController($window, $location, $routeParams, values, FunniesFactory, FunnyThumbnailsByPicture) {
+    function PreviewFunnyController($window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
         function activate() {
             FunniesFactory.get({
                 id: $routeParams.funnyPictureId
             }, function(funnyPicture) {
                 vm.funnyPicture = funnyPicture, pageChanged();
-            }, function() {});
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function pageChanged() {
             FunnyThumbnailsByPicture.query({
@@ -268,7 +331,9 @@
                 thumbnailType: values.thumbnailType
             }, function(data) {
                 vm.funniesByTemplate = data.entities, vm.totalItems = data.count;
-            }, function() {});
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function showPagination() {
             return vm.totalItems > vm.itemsPerPage;
@@ -279,7 +344,9 @@
                 id: funnyThumbnail.funnyPictureId
             }, function(funnyPicture) {
                 vm.funnyPicture = funnyPicture;
-            }, function() {});
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function shareSocial(baseUrl, width, height) {
             var url = baseUrl + encodeURIComponent(vm.currentLocation);
@@ -291,8 +358,11 @@
         vm.pageChanged = pageChanged, vm.showPagination = showPagination, vm.swapFunnyPicture = swapFunnyPicture, 
         vm.shareSocial = shareSocial, activate();
     }
-    angular.module("app").controller("PreviewFunnyController", PreviewFunnyController), 
-    PreviewFunnyController.$inject = [ "$window", "$location", "$routeParams", "values", "FunniesFactory", "FunnyThumbnailsByPicture" ];
+    angular.module("app.funnies").controller("PreviewFunnyController", PreviewFunnyController), 
+    PreviewFunnyController.$inject = [ "$window", "$location", "$routeParams", "$exceptionHandler", "values", "FunniesFactory", "FunnyThumbnailsByPicture" ];
+}(), function() {
+    "use strict";
+    angular.module("app.pictures", [ "app.core" ]);
 }(), function() {
     "use strict";
     function PicturesFactory($resource, constants) {
@@ -303,7 +373,7 @@
             }
         });
     }
-    angular.module("app").factory("PicturesFactory", PicturesFactory), PicturesFactory.$inject = [ "$resource", "constants" ];
+    angular.module("app.pictures").factory("PicturesFactory", PicturesFactory), PicturesFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
     function PictureThumbnailsFactory($resource, constants) {
@@ -314,7 +384,7 @@
             }
         });
     }
-    angular.module("app").factory("PictureThumbnailsFactory", PictureThumbnailsFactory), 
+    angular.module("app.pictures").factory("PictureThumbnailsFactory", PictureThumbnailsFactory), 
     PictureThumbnailsFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
@@ -342,10 +412,11 @@
             });
         };
     }
-    angular.module("app").service("FileUploadService", FileUploadService), FileUploadService.$inject = [ "$http", "constants" ];
+    angular.module("app.pictures").service("FileUploadService", FileUploadService), 
+    FileUploadService.$inject = [ "$http", "constants" ];
 }(), function() {
     "use strict";
-    function PicturesController(values, PictureThumbnailsFactory) {
+    function PicturesController($exceptionHandler, values, PictureThumbnailsFactory) {
         function pageChanged() {
             PictureThumbnailsFactory.query({
                 offset: (vm.currentPage - 1) * vm.itemsPerPage,
@@ -353,7 +424,9 @@
                 thumbnailType: values.thumbnailType
             }, function(data) {
                 vm.pictureThumbnails = data.entities, vm.totalItems = data.count;
-            }, function() {});
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function showPagination() {
             return vm.totalItems > vm.itemsPerPage;
@@ -362,10 +435,11 @@
         vm.pictureThumbnails = {}, vm.totalItems = 0, vm.currentPage = 1, vm.itemsPerPage = values.itemsPerPage, 
         vm.pageChanged = pageChanged, vm.showPagination = showPagination, pageChanged();
     }
-    angular.module("app").controller("PicturesController", PicturesController), PicturesController.$inject = [ "values", "PictureThumbnailsFactory" ];
+    angular.module("app.pictures").controller("PicturesController", PicturesController), 
+    PicturesController.$inject = [ "$exceptionHandler", "values", "PictureThumbnailsFactory" ];
 }(), function() {
     "use strict";
-    function CreatePictureController($location, $mdToast, FileUploadService, PicturesFactory) {
+    function CreatePictureController($location, $exceptionHandler, logger, FileUploadService, PicturesFactory) {
         function uploadFile() {
             var file = vm.myFile, urlToFile = vm.pictureUrl;
             if (vm.progress = !0, file || urlToFile) {
@@ -377,13 +451,13 @@
                         url: response.data.path
                     };
                     PicturesFactory.save(pictureObject, function(data) {
-                        vm.progress = !1, vm.loaded = !0, $mdToast.show($mdToast.simple().content("File " + data.name + " uploaded to server!").position("bottom left").hideDelay(5e3)), 
+                        vm.progress = !1, vm.loaded = !0, logger.success("File " + data.name + " uploaded to server."), 
                         $location.path("/createFunnyPicture/" + data.id);
-                    }, function() {
-                        vm.progress = !1;
+                    }, function(e) {
+                        vm.progress = !1, $exceptionHandler(e);
                     });
                 });
-            } else vm.progress = !1;
+            } else vm.progress = !1, $exceptionHandler("Bad url or file");
         }
         function isButtonDisabled() {
             return !vm.templateInputForm.$valid;
@@ -392,8 +466,11 @@
         vm.pictureTitle = "", vm.pictureUrl = "", vm.progress = !1, vm.loaded = !1, vm.isButtonDisabled = isButtonDisabled, 
         vm.uploadFile = uploadFile;
     }
-    angular.module("app").controller("CreatePictureController", CreatePictureController), 
-    CreatePictureController.$inject = [ "$location", "$mdToast", "FileUploadService", "PicturesFactory" ];
+    angular.module("app.pictures").controller("CreatePictureController", CreatePictureController), 
+    CreatePictureController.$inject = [ "$location", "$exceptionHandler", "logger", "FileUploadService", "PicturesFactory" ];
+}(), function() {
+    "use strict";
+    angular.module("app.contact", [ "app.core" ]);
 }(), function() {
     "use strict";
     function FeedbacksFactory($resource, constants) {
@@ -404,14 +481,16 @@
             }
         });
     }
-    angular.module("app").factory("FeedbacksFactory", FeedbacksFactory), FeedbacksFactory.$inject = [ "$resource", "constants" ];
+    angular.module("app.contact").factory("FeedbacksFactory", FeedbacksFactory), FeedbacksFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
-    function ContactController($mdToast, FeedbacksFactory) {
+    function ContactController($exceptionHandler, logger, FeedbacksFactory) {
         function sendFeedback() {
             FeedbacksFactory.save(vm.feedback, function() {
-                $mdToast.show($mdToast.simple().content("Thank you " + vm.feedback.name + ", your feedback was sent.").position("bottom left").hideDelay(5e3));
-            }, function() {});
+                vm.contactForm.$rollbackViewValue(), logger.success("Thank you " + vm.feedback.name + ", your feedback was sent.");
+            }, function(e) {
+                $exceptionHandler(e);
+            });
         }
         function isButtonDisabled() {
             return !vm.contactForm.$valid;
@@ -419,7 +498,8 @@
         var vm = this;
         vm.feedback = {}, vm.sendFeedback = sendFeedback, vm.isButtonDisabled = isButtonDisabled;
     }
-    angular.module("app").controller("ContactController", ContactController), ContactController.$inject = [ "$mdToast", "FeedbacksFactory" ];
+    angular.module("app.contact").controller("ContactController", ContactController), 
+    ContactController.$inject = [ "$exceptionHandler", "logger", "FeedbacksFactory" ];
 }(), function() {
     "use strict";
     function translation($translateProvider) {

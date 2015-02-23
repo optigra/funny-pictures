@@ -1,1 +1,0 @@
-funnyPicturesApp.constant('apiUrl', 'http://localhost:8080/funny-pictures-rest-api/api');

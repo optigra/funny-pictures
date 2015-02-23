@@ -1,13 +1,16 @@
-(function() {
+(function () {
     'use strict';
 
     angular
         .module('blocks.logger')
         .factory('logger', logger);
 
-    logger.$inject = ['$log', '$mdToast'];
+    logger
+        .$inject = [
+            '$log',
+            '$mdToast'
+        ];
 
-    /* @ngInject */
     function logger($log, $mdToast) {
         var position = 'bottom left',
             hideDelay = 5000;
@@ -15,19 +18,19 @@
         var service = {
             showToasts: true,
 
-            error   : error,
-            info    : info,
-            success : success,
-            warning : warning,
+            error: error,
+            info: info,
+            success: success,
+            warning: warning,
 
             // straight to console; bypass $mdToast
-            log     : $log.log
+            log: $log.log
         };
 
         return service;
         /////////////////////
 
-        function error(message, data, title) {
+        function error(message, data) {
             $mdToast.show(
                 $mdToast.simple()
                     .content('Error: ' + message)
@@ -37,7 +40,7 @@
             $log.error('Error: ' + message, data);
         }
 
-        function info(message, data, title) {
+        function info(message, data) {
             $mdToast.show(
                 $mdToast.simple()
                     .content('Info: ' + message)
@@ -47,7 +50,7 @@
             $log.info('Info: ' + message, data);
         }
 
-        function success(message, data, title) {
+        function success(message, data) {
             $mdToast.show(
                 $mdToast.simple()
                     .content('Success: ' + message)
@@ -57,7 +60,7 @@
             $log.info('Success: ' + message, data);
         }
 
-        function warning(message, data, title) {
+        function warning(message, data) {
             $mdToast.show(
                 $mdToast.simple()
                     .content('Warning: ' + message)
@@ -67,4 +70,5 @@
             $log.warn('Warning: ' + message, data);
         }
     }
+
 }());

@@ -2,22 +2,23 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.pictures')
         .controller('PicturesController', PicturesController);
 
     PicturesController
         .$inject = [
+            '$exceptionHandler',
             'values',
             'PictureThumbnailsFactory'
         ];
 
-    function PicturesController(values, PictureThumbnailsFactory) {
+    function PicturesController($exceptionHandler, values, PictureThumbnailsFactory) {
         var vm = this;
 
         vm.pictureThumbnails = {};
         vm.totalItems = 0;
         vm.currentPage = 1;
-        vm.itemsPerPage = values.itemsPerPage
+        vm.itemsPerPage = values.itemsPerPage;
 
         vm.pageChanged = pageChanged;
         vm.showPagination = showPagination;
@@ -32,8 +33,8 @@
             }, function(data) {
                 vm.pictureThumbnails = data.entities;
                 vm.totalItems = data.count;
-            }, function(error) {
-                // ToDo
+            }, function(e) {
+                $exceptionHandler(e);
             });
         }
 

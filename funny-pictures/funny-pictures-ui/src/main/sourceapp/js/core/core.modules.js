@@ -12,8 +12,7 @@
             'ui.bootstrap',
 
             'blocks.exception',
-            'blocks.logger',
-            'blocks.router'
+            'blocks.logger'
         ]);
 
 })();

@@ -2,18 +2,19 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.pictures')
         .controller('CreatePictureController', CreatePictureController);
 
     CreatePictureController
         .$inject = [
         '$location',
-        '$mdToast',
+        '$exceptionHandler',
+        'logger',
         'FileUploadService',
         'PicturesFactory'
     ];
 
-    function CreatePictureController($location, $mdToast, FileUploadService, PicturesFactory) {
+    function CreatePictureController($location, $exceptionHandler, logger, FileUploadService, PicturesFactory) {
         var vm = this;
 
         vm.pictureTitle = "";
@@ -46,24 +47,19 @@
                             function (data) {
                                 vm.progress = false;
                                 vm.loaded = true;
-                                $mdToast.show(
-                                    $mdToast.simple()
-                                        .content('File ' + data.name + ' uploaded to server!')
-                                        .position('bottom left')
-                                        .hideDelay(5000)
-                                );
+                                logger.success('File ' + data.name + ' uploaded to server.');
                                 $location.path('/createFunnyPicture/' + data.id);
                             },
-                            function (error) {
+                            function (e) {
                                 vm.progress = false;
-                                // ToDo
+                                $exceptionHandler(e);
                             }
                         );
                     }
                 );
             } else {
                 vm.progress = false;
-                // ToDo
+                $exceptionHandler("Bad url or file");
             }
         }
 

@@ -1,1 +1,0 @@
-funnyPicturesApp.constant('apiUrl', 'http://drawmeme.com/api');

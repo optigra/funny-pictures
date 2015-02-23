@@ -2,12 +2,13 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.funnies')
         .controller('CreateFunnyController', CreateFunnyController);
 
     CreateFunnyController
         .$inject = [
         '$routeParams',
+        '$exceptionHandler',
         'logger',
         'values',
         'PicturesFactory',
@@ -15,7 +16,7 @@
         'FunnyThumbnailsByPicture'
     ];
 
-    function CreateFunnyController($routeParams, values, logger, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
+    function CreateFunnyController($routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
         var vm = this;
 
         vm.picture = {};
@@ -44,6 +45,8 @@
             }, function (picture) {
                 vm.picture = picture;
                 pageChanged();
+            }, function (e) {
+                $exceptionHandler(e);
             });
         }
 
@@ -56,6 +59,8 @@
             }, function (data) {
                 vm.funniesByTemplate = data.entities;
                 vm.totalItems = data.count;
+            }, function (e) {
+                $exceptionHandler(e);
             });
         }
 
@@ -67,12 +72,15 @@
             postObject.footer = vm.footerText;
             postObject.template = {};
             postObject.template.id = vm.picture.id;
-            FunniesFactory.save(postObject, function (data) {
-                vm.funnyPicture = data;
-                vm.progress = false;
-                vm.loaded = true;
-                pageChanged();
-            });
+            FunniesFactory.save(postObject,
+                function (data) {
+                    vm.funnyPicture = data;
+                    vm.progress = false;
+                    vm.loaded = true;
+                    pageChanged();
+                }, function (e) {
+                    $exceptionHandler(e);
+                });
         }
 
         function createNew() {
@@ -90,6 +98,8 @@
                 vm.funnyPicture = {};
                 vm.pageChanged();
                 logger.info('Deleted Funny picture');
+            }, function (e) {
+                $exceptionHandler(e);
             });
         }
 

@@ -1,14 +1,14 @@
-(function() {
+(function () {
     'use strict';
 
     angular
         .module('app', [
             'app.core',
-            // 'app.config',
-            // 'app.constants',
-            // 'app.values',
 
-            // 'app.templates'
+            'app.contact',
+            'app.funnies',
+            'app.pictures',
+            'app.header'
         ]);
 
 })();

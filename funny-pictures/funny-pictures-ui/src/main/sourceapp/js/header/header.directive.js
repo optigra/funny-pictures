@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.header')
         .directive('header', header);
 
     function header() {
