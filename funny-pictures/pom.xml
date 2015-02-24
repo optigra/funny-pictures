@@ -4,7 +4,7 @@
 
     <groupId>funny-pictures</groupId>
     <artifactId>funny-pictures</artifactId>
-    <version>0.1.5-SNAPSHOT</version>
+    <version>0.1.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>funny-pictures</name>
@@ -35,7 +35,7 @@
     </modules>
 
     <properties>
-        <java-version>1.7</java-version>
+        <java-version>1.8</java-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Release properties -->

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.optigra.funnypictures.generator.api.ImageAccessException;
 import org.im4java.core.CompareCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
@@ -16,6 +15,8 @@ import org.im4java.process.ArrayListErrorConsumer;
 import org.im4java.process.ArrayListOutputConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.optigra.funnypictures.generator.api.ImageAccessException;
 
 /**
  * A class that contains routines for getting metainformation about images.
@@ -87,9 +88,7 @@ public class ImageInformationExtractor {
 	 * @param imageA image to compare
 	 * @param imageB another image to compare
 	 * @return normalized RMSE value (between 0 and 1)
-	 * @link 
-	 *       https://en.wikipedia.org/wiki/Root-mean-square_deviation#Normalized_root
-	 *       -mean-square_deviation
+	 * @see <a href="https://en.wikipedia.org/wiki/Root-mean-square_deviation#Normalized_root-mean-square_deviation">Wikipedia article</a>
 	 */
 	public double calculateNormalizedRmseDifference(final Path imageA, final Path imageB) {
 		

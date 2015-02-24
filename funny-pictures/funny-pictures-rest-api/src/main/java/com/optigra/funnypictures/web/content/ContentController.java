@@ -42,7 +42,7 @@ public class ContentController extends BaseController {
 	 * @param response HttpServletResponse, that is needed because of direct write 
 	 * to response. 
 	 * @param contentPath path of that content.
-	 * @throws Exception All exception handling is being done in {@link BaseController.handleException} 
+	 * @throws Exception any exception. All exceptions are handled by BaseController.
 	 */
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(method = RequestMethod.GET)
@@ -62,7 +62,7 @@ public class ContentController extends BaseController {
 	 * Method for storing file content.
 	 * @param file appropriate file
 	 * @return ContentResource(all information about stored content)
-	 * @throws Exception All exception handling is being done in {@link BaseController.handleException} 
+	 * @throws Exception any exception. All exceptions are handled by BaseController.
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
 	@RequestMapping(method = RequestMethod.POST, headers = { "content=file" })
@@ -83,7 +83,7 @@ public class ContentController extends BaseController {
 	 * Method for storing file content from given URL.
 	 * @param url appropriate file url
 	 * @return ContentResource(all information about stored content)
-	 * @throws Exception All exception handling is being done in {@link BaseController.handleException} 
+	 * @throws Exception any exception. All exceptions are handled by BaseController.
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
 	@RequestMapping(method = RequestMethod.POST, headers = { "content=url" })

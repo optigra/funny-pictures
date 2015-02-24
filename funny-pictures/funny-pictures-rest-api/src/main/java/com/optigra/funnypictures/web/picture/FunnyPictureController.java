@@ -49,6 +49,7 @@ public class FunnyPictureController extends BaseController {
 	 *            starting position of paged result
 	 * @param limit
 	 *            count of entities in result.
+	 * @param resource TODO ADD DESC
 	 * @return PagedResultResource with limit count of entities.
 	 */
 	@ResponseStatus(HttpStatus.OK)
@@ -78,8 +79,9 @@ public class FunnyPictureController extends BaseController {
 	
 	/**
 	 * API for getting funnies for picture.
-	 * 
 	 * @param id Picture identifier.
+	 * @param offset starting position of paged result
+	 * @param limit count of entities in result.
 	 * @return PagedResultResource with funnies for picture.
 	 */
 	@RequestMapping(value = "/{id}/funnies", method = RequestMethod.GET)
@@ -93,11 +95,13 @@ public class FunnyPictureController extends BaseController {
 		return funnyPictureFacade.getFunniesForPicture(id , pagedRequest);
 		
 	}
-	
+		
 	/**
-	 * API for getting funnies for picture.
-	 * 
+	 * API for getting funnies thumbnails for picture.
 	 * @param id Picture identifier.
+	 * @param offset starting position of paged result
+	 * @param limit count of entities in result
+	 * @param thumbnailType type of thumbnails to fetch
 	 * @return PagedResultResource with funnies thumbnails for picture.
 	 */
 	@RequestMapping(value = "/{id}/funniesThumb", method = RequestMethod.GET)

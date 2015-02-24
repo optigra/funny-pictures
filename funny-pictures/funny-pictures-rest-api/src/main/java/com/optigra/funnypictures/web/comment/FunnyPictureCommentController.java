@@ -33,9 +33,9 @@ public class FunnyPictureCommentController extends BaseController {
 
 	/**
 	 * Method for getting comments.
-	 * @param offset
-	 * @param limit
-	 * @param resource
+	 * @param offset TODO ADD DESC
+	 * @param limit TODO ADD DESC
+	 * @param resource TODO ADD DESC
 	 * @return paged result.
 	 */
 	@ResponseStatus(HttpStatus.OK)
@@ -53,7 +53,7 @@ public class FunnyPictureCommentController extends BaseController {
 
 	/**
 	 * Method for creating comment.
-	 * @param funnyPictureCommentResource
+	 * @param funnyPictureCommentResource TODO ADD DESC
 	 * @return resource.
 	 */
 	@ResponseStatus(HttpStatus.CREATED)
