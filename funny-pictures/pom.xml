@@ -4,7 +4,7 @@
 
     <groupId>funny-pictures</groupId>
     <artifactId>funny-pictures</artifactId>
-    <version>0.1.6-SNAPSHOT</version>
+    <version>0.1.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>funny-pictures</name>
@@ -294,7 +294,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.3.3</version>
+                <version>3.0.0</version>
                 <configuration>
                     <includeFilterFile>${findBugsDir}/findbugs-include.xml</includeFilterFile>
                     <xmlOutput>true</xmlOutput>
