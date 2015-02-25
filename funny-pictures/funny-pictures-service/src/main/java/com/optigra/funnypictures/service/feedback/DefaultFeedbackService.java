@@ -1,13 +1,12 @@
 package com.optigra.funnypictures.service.feedback;
 
-import javax.annotation.Resource;
-
+import com.optigra.funnypictures.dao.feedback.FeedbackDao;
+import com.optigra.funnypictures.model.feedback.Feedback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.optigra.funnypictures.dao.feedback.FeedbackDao;
-import com.optigra.funnypictures.model.feedback.Feedback;
+import javax.annotation.Resource;
 
 /**
  * Default implementation of feedback service layer.
@@ -25,6 +24,11 @@ public class DefaultFeedbackService implements FeedbackService {
 	public void createFeedback(final Feedback feedback) {
 		LOG.info("Creating feedback entity: {}", feedback);
 		feedbackDao.save(feedback);
+	}
+
+	@Override
+	public void sendFeedback(final Feedback feedback) {
+
 	}
 
 }

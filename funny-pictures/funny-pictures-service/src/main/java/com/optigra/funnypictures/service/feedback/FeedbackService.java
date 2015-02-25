@@ -16,4 +16,10 @@ public interface FeedbackService {
 	 */
 	void createFeedback(Feedback feedback);
 
+	/**
+	 * Method for sending feedback to support email.
+	 * @param feedback feedback
+	 */
+	void sendFeedback(Feedback feedback);
+
 }

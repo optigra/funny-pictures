@@ -53,6 +53,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <fasterxml.version>2.4.2</fasterxml.version>
+        <java.mail.verion>1.4.7</java.mail.verion>
 
         <migrations.location>src/main/resources/migrations/db.changelog.xml</migrations.location>
 
@@ -171,6 +172,13 @@
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-facebook</artifactId>
             <version>${spring.facebook.version}</version>
+        </dependency>
+
+        <!-- Java mail-->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${java.mail.verion}</version>
         </dependency>
 
 
