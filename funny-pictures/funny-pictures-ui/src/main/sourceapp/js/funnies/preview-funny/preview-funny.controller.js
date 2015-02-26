@@ -7,6 +7,7 @@
 
     PreviewFunnyController
         .$inject = [
+            '$scope',
             '$window',
             '$location',
             '$routeParams',
@@ -16,7 +17,7 @@
             'FunnyThumbnailsByPicture'
         ];
 
-    function PreviewFunnyController($window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
+    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
         var vm = this;
         var currentUrl = $location.absUrl().split('#')[0] + '#/preview/';
 
@@ -25,7 +26,7 @@
         vm.totalItems = 0;
         vm.currentPage = 1;
         vm.itemsPerPage = 6; // Move to values
-        vm.currentLocation = vm.currentUrl + $routeParams.funnyPictureId;
+        vm.currentLocation = currentUrl + $routeParams.funnyPictureId;
 
         vm.pageChanged = pageChanged;
         vm.showPagination = showPagination;
@@ -39,7 +40,9 @@
                 id: $routeParams.funnyPictureId
             }, function(funnyPicture) {
                 vm.funnyPicture = funnyPicture;
+                reset(vm.funnyPicture.id, vm.currentLocation);
                 pageChanged();
+                $scope.$broadcast('dataloaded');
             }, function (e) {
                 $exceptionHandler(e);
             });
@@ -74,12 +77,17 @@
             }, function (e) {
                 $exceptionHandler(e);
             });
+
         }
 
         function shareSocial(baseUrl, width, height) {
             var url = baseUrl + encodeURIComponent(vm.currentLocation);
             event.preventDefault();
             $window.open(url, "_blank", "width=" + width + ",height=" + height);
+        }
+
+        function reset (newIdentifier, newUrl) {
+
         }
     }
 

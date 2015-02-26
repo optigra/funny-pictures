@@ -15,7 +15,8 @@
     function extendExceptionHandler($injector) {
         return function (exception) {
             var logger = $injector.get('logger');
-            logger.error(exception.statusText);
+            logger.error(exception.statusText, exception.stack);
+
         };
     }
 

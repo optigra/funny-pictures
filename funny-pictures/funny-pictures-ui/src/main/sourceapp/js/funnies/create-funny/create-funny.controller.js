@@ -7,6 +7,7 @@
 
     CreateFunnyController
         .$inject = [
+        '$scope',
         '$routeParams',
         '$exceptionHandler',
         'logger',
@@ -16,7 +17,7 @@
         'FunnyThumbnailsByPicture'
     ];
 
-    function CreateFunnyController($routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
+    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
         var vm = this;
 
         vm.picture = {};
@@ -59,6 +60,7 @@
             }, function (data) {
                 vm.funniesByTemplate = data.entities;
                 vm.totalItems = data.count;
+                $scope.$broadcast('dataloaded');
             }, function (e) {
                 $exceptionHandler(e);
             });

@@ -60,7 +60,7 @@
     function extendExceptionHandler($injector) {
         return function(exception) {
             var logger = $injector.get("logger");
-            logger.error(exception.statusText);
+            logger.error(exception.statusText, exception.stack);
         };
     }
     angular.module("blocks.exception").factory("$exceptionHandler", extendExceptionHandler), 
@@ -159,6 +159,25 @@
     angular.module("app").directive("footer", footer);
 }(), function() {
     "use strict";
+    function reloadDisqus($timeout, $location) {
+        return {
+            link: function($scope, element, attrs) {
+                $scope.$on("dataloaded", function() {
+                    $timeout(function() {
+                        DISQUS.reset({
+                            reload: !0,
+                            config: function() {
+                                this.page.identifier = attrs.reloadDisqus, this.page.url = $location.absUrl();
+                            }
+                        });
+                    }, 0, !1);
+                });
+            }
+        };
+    }
+    angular.module("app").directive("reloadDisqus", reloadDisqus), reloadDisqus.$inject = [ "$timeout", "$location" ];
+}(), function() {
+    "use strict";
     angular.module("app.header", [ "app.core" ]);
 }(), function() {
     "use strict";
@@ -252,7 +271,7 @@
     FunniesController.$inject = [ "$exceptionHandler", "values", "FunnyThumbnailsFactory" ];
 }(), function() {
     "use strict";
-    function CreateFunnyController($routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
+    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
         function activate() {
             PicturesFactory.get({
                 id: $routeParams.pictureId
@@ -269,7 +288,7 @@
                 limit: vm.itemsPerPage,
                 thumbnailType: values.thumbnailType
             }, function(data) {
-                vm.funniesByTemplate = data.entities, vm.totalItems = data.count;
+                vm.funniesByTemplate = data.entities, vm.totalItems = data.count, $scope.$broadcast("dataloaded");
             }, function(e) {
                 $exceptionHandler(e);
             });
@@ -310,15 +329,16 @@
         activate();
     }
     angular.module("app.funnies").controller("CreateFunnyController", CreateFunnyController), 
-    CreateFunnyController.$inject = [ "$routeParams", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPicture" ];
+    CreateFunnyController.$inject = [ "$scope", "$routeParams", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPicture" ];
 }(), function() {
     "use strict";
-    function PreviewFunnyController($window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
+    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
         function activate() {
             FunniesFactory.get({
                 id: $routeParams.funnyPictureId
             }, function(funnyPicture) {
-                vm.funnyPicture = funnyPicture, pageChanged();
+                vm.funnyPicture = funnyPicture, reset(vm.funnyPicture.id, vm.currentLocation), pageChanged(), 
+                $scope.$broadcast("dataloaded");
             }, function(e) {
                 $exceptionHandler(e);
             });
@@ -352,14 +372,15 @@
             var url = baseUrl + encodeURIComponent(vm.currentLocation);
             event.preventDefault(), $window.open(url, "_blank", "width=" + width + ",height=" + height);
         }
+        function reset() {}
         var vm = this, currentUrl = $location.absUrl().split("#")[0] + "#/preview/";
         vm.funnyPicture = {}, vm.funniesByTemplate = {}, vm.totalItems = 0, vm.currentPage = 1, 
-        vm.itemsPerPage = 6, vm.currentLocation = vm.currentUrl + $routeParams.funnyPictureId, 
+        vm.itemsPerPage = 6, vm.currentLocation = currentUrl + $routeParams.funnyPictureId, 
         vm.pageChanged = pageChanged, vm.showPagination = showPagination, vm.swapFunnyPicture = swapFunnyPicture, 
         vm.shareSocial = shareSocial, activate();
     }
     angular.module("app.funnies").controller("PreviewFunnyController", PreviewFunnyController), 
-    PreviewFunnyController.$inject = [ "$window", "$location", "$routeParams", "$exceptionHandler", "values", "FunniesFactory", "FunnyThumbnailsByPicture" ];
+    PreviewFunnyController.$inject = [ "$scope", "$window", "$location", "$routeParams", "$exceptionHandler", "values", "FunniesFactory", "FunnyThumbnailsByPicture" ];
 }(), function() {
     "use strict";
     angular.module("app.pictures", [ "app.core" ]);
@@ -486,17 +507,18 @@
     "use strict";
     function ContactController($exceptionHandler, logger, FeedbacksFactory) {
         function sendFeedback() {
-            FeedbacksFactory.save(vm.feedback, function() {
-                vm.contactForm.$rollbackViewValue(), logger.success("Thank you " + vm.feedback.name + ", your feedback was sent.");
+            vm.progress = !0, FeedbacksFactory.save(vm.feedback, function() {
+                vm.progress = !1, logger.success("Thank you " + vm.feedback.name + ", your feedback was sent."), 
+                vm.feedback = {};
             }, function(e) {
-                $exceptionHandler(e);
+                vm.progress = !1, $exceptionHandler(e);
             });
         }
         function isButtonDisabled() {
             return !vm.contactForm.$valid;
         }
         var vm = this;
-        vm.feedback = {}, vm.sendFeedback = sendFeedback, vm.isButtonDisabled = isButtonDisabled;
+        vm.feedback = {}, vm.progress = !1, vm.sendFeedback = sendFeedback, vm.isButtonDisabled = isButtonDisabled;
     }
     angular.module("app.contact").controller("ContactController", ContactController), 
     ContactController.$inject = [ "$exceptionHandler", "logger", "FeedbacksFactory" ];

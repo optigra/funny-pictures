@@ -16,17 +16,21 @@
         var vm = this;
 
         vm.feedback = {};
+        vm.progress = false;
 
         vm.sendFeedback = sendFeedback;
         vm.isButtonDisabled = isButtonDisabled;
 
         function sendFeedback() {
+            vm.progress = true;
             FeedbacksFactory.save(vm.feedback,
                 function() {
-                    vm.contactForm.$rollbackViewValue();
+                    vm.progress = false;
                     logger.success('Thank you ' + vm.feedback.name + ', your feedback was sent.');
+                    vm.feedback = {};
                 },
                 function(e) {
+                    vm.progress = false;
                     $exceptionHandler(e);
                 }
             );

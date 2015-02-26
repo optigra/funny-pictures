@@ -122,6 +122,7 @@ module.exports = function(grunt) {
                             '<%= app.source %>/js/directives/click-selector.directive.js',
                             '<%= app.source %>/js/directives/file-model.directive.js',
                             '<%= app.source %>/js/directives/footer.directive.js',
+                            '<%= app.source %>/js/directives/reload-disqus.directive.js',
 
                             '<%= app.source %>/js/header/header.modules.js',
                             '<%= app.source %>/js/header/header.directive.js',
@@ -193,6 +194,7 @@ module.exports = function(grunt) {
                             '<%= app.source %>/js/directives/click-selector.directive.js',
                             '<%= app.source %>/js/directives/file-model.directive.js',
                             '<%= app.source %>/js/directives/footer.directive.js',
+                            '<%= app.source %>/js/directives/reload-disqus.directive.js',
 
                             '<%= app.source %>/js/header/header.modules.js',
                             '<%= app.source %>/js/header/header.directive.js',
