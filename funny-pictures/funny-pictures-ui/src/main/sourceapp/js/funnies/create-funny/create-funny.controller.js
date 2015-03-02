@@ -14,10 +14,10 @@
         'values',
         'PicturesFactory',
         'FunniesFactory',
-        'FunnyThumbnailsByPicture'
+        'FunnyThumbnailsByPictureFactory'
     ];
 
-    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
+    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
         var vm = this;
 
         vm.picture = {};
@@ -52,7 +52,7 @@
         }
 
         function pageChanged() {
-            FunnyThumbnailsByPicture.query({
+            FunnyThumbnailsByPictureFactory.query({
                 id: vm.picture.id,
                 offset: (vm.currentPage - 1) * vm.itemsPerPage,
                 limit: vm.itemsPerPage,

@@ -130,6 +130,7 @@ module.exports = function(grunt) {
 
                             '<%= app.source %>/js/funnies/funnies.modules.js',
                             '<%= app.source %>/js/funnies/funnies.factory.js',
+                            '<%= app.source %>/js/funnies/funny-thumbnail-by-funny-picture.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnails.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnails-by-picture.factory.js',
                             '<%= app.source %>/js/funnies/funnies.controller.js',
@@ -202,6 +203,7 @@ module.exports = function(grunt) {
 
                             '<%= app.source %>/js/funnies/funnies.modules.js',
                             '<%= app.source %>/js/funnies/funnies.factory.js',
+                            '<%= app.source %>/js/funnies/funny-thumbnail-by-funny-picture.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnails.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnails-by-picture.factory.js',
                             '<%= app.source %>/js/funnies/funnies.controller.js',

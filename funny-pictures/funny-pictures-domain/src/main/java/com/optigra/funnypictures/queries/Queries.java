@@ -39,6 +39,9 @@ public class Queries {
 	public static final String GET_USER_BY_EMAIL_QUERY_NAME = "User.findByEmail";
 	public static final String GET_USER_BY_EMAIL_QUERY = "SELECT u FROM User u WHERE u.email = :email";
 
+	private static final String FIND_FUNNY_PICTURE_THUMBNAIL_BY_FUNNY_PICTURE_QUERY_NAME = "FunnyPictureThumbnails.findThumbnailsByPicture";
+	private static final String FIND_FUNNY_PICTURE_THUMBNAIL_BY_FUNNY_PICTURE_QUERY = "SELECT t FROM FunnyPictureThumbnail t "
+			+ "WHERE t.funnyPicture.id = :funnyPictureId AND t.thumbnailType = :type";
 	
 	
 	public static final Queries FIND_PICTURES = new Queries(FIND_PICTURES_QUERY_NAME, FIND_PICTURES_QUERY);
@@ -49,6 +52,8 @@ public class Queries {
 	public static final Queries GET_FUNNY_PICTURE_THUMBNAILS = new Queries(GET_FUNNY_PICTURE_THUMBNAILS_QUERY_NAME, GET_FUNNY_PICTURE_THUMBNAILS_QUERY);
 	public static final Queries FIND_FUNNY_PICTURE_THUMBNAILS_BY_PICTURE = new Queries(FIND_FUNNY_PICTURE_THUMBNAILS_BY_PIC_QUERY_NAME, 
 			FIND_FUNNY_PICTURE_THUMBNAILS_BY_PIC_QUERY);
+	public static final Queries FIND_FUNNY_PICTURE_THUMBNAILS_BY_FUNNY_PICTURE = new Queries(FIND_FUNNY_PICTURE_THUMBNAIL_BY_FUNNY_PICTURE_QUERY_NAME,
+			FIND_FUNNY_PICTURE_THUMBNAIL_BY_FUNNY_PICTURE_QUERY);
 	public static final Queries GET_RANDOM_PICTURE_THUMBNAILS = new Queries(GET_RANDOM_PICTURE_THUMBNAILS_QUERY_NAME, GET_RANDOM_PICTURE_THUMBNAILS_QUERY);
 	public static final Queries GET_USER_BY_EMAIL = new Queries(GET_USER_BY_EMAIL_QUERY_NAME, GET_USER_BY_EMAIL_QUERY);
 	

@@ -1,6 +1,7 @@
 package com.optigra.funnypictures.service.thumbnail.funny;
 
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 
@@ -37,6 +38,14 @@ public interface FunnyPictureThumbnailService {
 	 * @param id of Picture
 	 * @return a section of the result list
 	 */
-	PagedResult<FunnyPictureThumbnail> getFunnyPictureThumbnailsByPicture(PagedSearch<FunnyPictureThumbnail> pagedSearch, final Long id);
+	PagedResult<FunnyPictureThumbnail> getFunnyPictureThumbnailsByPicture(PagedSearch<FunnyPictureThumbnail> pagedSearch, Long id);
 
+
+	/**
+	 * Get's funny picture thumbnail by funny picture identity and thumbnail type.
+	 * @param id funny picture identity.
+	 * @param thumbnailType ThumbnailType.
+	 * @return Picture entity.
+	 */
+	FunnyPictureThumbnail getFunnyThumbnailForFunnyPicture(Long id, ThumbnailType thumbnailType);
 }

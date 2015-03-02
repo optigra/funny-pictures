@@ -1,12 +1,16 @@
 package com.optigra.funnypictures.dao.thumbnail.funny;
 
-import org.springframework.stereotype.Repository;
-
 import com.optigra.funnypictures.dao.AbstractDao;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.queries.Queries;
+import com.optigra.funnypictures.queries.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default implementation of funny picture thumbnail dao.
@@ -45,6 +49,16 @@ public class DefaultFunnyPictureThumbnailDao extends AbstractDao<FunnyPictureThu
 		pagedSearch.setQuery(query);
 
 		return search(pagedSearch);
+	}
+
+	@Override
+	public FunnyPictureThumbnail getThumbnailForFunnyPicture(final Long funnyPictureId, final ThumbnailType thumbnailType) {
+		Queries query = Queries.FIND_FUNNY_PICTURE_THUMBNAILS_BY_FUNNY_PICTURE;
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put("funnyPictureId", funnyPictureId);
+		parameters.put("type", thumbnailType);
+		Query<FunnyPictureThumbnail> finalQuery = new Query<>(getEntityClass(), query.getQuery(), parameters);
+		return getPersistenceManager().executeSingleResultQuery(finalQuery);
 	}
 
 }

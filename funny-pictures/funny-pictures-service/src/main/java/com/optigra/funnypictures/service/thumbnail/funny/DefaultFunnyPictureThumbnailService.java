@@ -1,18 +1,17 @@
 package com.optigra.funnypictures.service.thumbnail.funny;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
 import com.optigra.funnypictures.dao.picture.PictureDao;
 import com.optigra.funnypictures.dao.thumbnail.funny.FunnyPictureThumbnailDao;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default implementation of funny picture thumbnail service.
@@ -59,6 +58,11 @@ public class DefaultFunnyPictureThumbnailService implements FunnyPictureThumbnai
 		pagedSearchWithParameter.setParameters(parameters);
 		
 		return funnyPictureThumbnailDao.getThumbnailsByPicture(pagedSearchWithParameter);
+	}
+
+	@Override
+	public FunnyPictureThumbnail getFunnyThumbnailForFunnyPicture(final Long id, final ThumbnailType thumbnailType) {
+		return funnyPictureThumbnailDao.getThumbnailForFunnyPicture(id, thumbnailType);
 	}
 
 }

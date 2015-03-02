@@ -1,7 +1,11 @@
 package com.optigra.funnypictures.web.thumbnail;
 
-import javax.annotation.Resource;
-
+import com.optigra.funnypictures.facade.facade.thumbnail.funny.FunnyPictureThumbnailFacade;
+import com.optigra.funnypictures.facade.resources.search.PagedRequest;
+import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
+import com.optigra.funnypictures.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,12 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optigra.funnypictures.facade.facade.thumbnail.funny.FunnyPictureThumbnailFacade;
-import com.optigra.funnypictures.facade.resources.search.PagedRequest;
-import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
-import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
-import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
-import com.optigra.funnypictures.web.BaseController;
+import javax.annotation.Resource;
 
 /**
  * Controller for funny picture thumbnails.
@@ -59,7 +58,7 @@ private static final Logger LOG = LoggerFactory.getLogger(FunnyPictureThumbnailC
 	}
 	
 	/**
-	 * API for getting information about PictureThumbnail by it's identifier.
+	 * API for getting information about FunnyPictureThumbnail by it's identifier.
 	 * 
 	 * @param id FunnyPictureThumbnail Identifier.
 	 * @return Serialized Funny Picture Resource with all required fields.

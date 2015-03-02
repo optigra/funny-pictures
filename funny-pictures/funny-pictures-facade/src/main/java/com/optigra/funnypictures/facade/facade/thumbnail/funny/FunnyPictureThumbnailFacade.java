@@ -3,6 +3,7 @@ package com.optigra.funnypictures.facade.facade.thumbnail.funny;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 
 /**
  * Facade for funny picture.
@@ -24,18 +25,26 @@ public interface FunnyPictureThumbnailFacade {
 	/**
 	 * Get funny picture thumbnail by identifier.
 	 * 
-	 * @param id FunnyPicture identifier
-	 *            funny picture to create.
+	 * @param id FunnyPictureThumbnail identifier
 	 * @return FunnyPictureThumbnailResource.
 	 */
 	FunnyPictureThumbnailResource getFunnyPictureThumbnail(Long id);
 	
 	/**
-	 * Get funnies thumbnail for picture.
+	 * Get funnies thumbnails for picture.
 	 * 
 	 * @param id Picture identifier.
 	 * @param pagedRequest Paged request.
 	 * @return Paged result of funnies.
 	 */
-	PagedResultResource<FunnyPictureThumbnailResource> getFunniesThumbnailForPicture(Long id, PagedRequest<FunnyPictureThumbnailResource> pagedRequest);
+	PagedResultResource<FunnyPictureThumbnailResource> getFunniesThumbnailsForPicture(Long id, PagedRequest<FunnyPictureThumbnailResource> pagedRequest);
+
+	/**
+	 * Get funny thumbnail for funny picture.
+	 *
+	 * @param id Picture identifier.
+	 * @param thumbnailType ThumbnailType.
+	 * @return FunnyPictureThumbnailResource.
+	 */
+	FunnyPictureThumbnailResource getFunnyThumbnailForFunnyPicture(Long id, ThumbnailType thumbnailType);
 }

@@ -2,6 +2,7 @@ package com.optigra.funnypictures.dao.thumbnail.funny;
 
 import com.optigra.funnypictures.dao.Dao;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 
@@ -27,4 +28,12 @@ public interface FunnyPictureThumbnailDao extends Dao<FunnyPictureThumbnail, Lon
 	 * @return a list of funny picture thumbnails.
 	 */
 	PagedResult<FunnyPictureThumbnail> getThumbnailsByPicture(PagedSearch<FunnyPictureThumbnail> pagedSearch);
+
+	/**
+	 * Retrieves a thumbnail for funny picture.
+	 * @param id Funny Picture identifier
+	 * @param thumbnailType
+	 * @return FunnyPictureThumbnail.
+	 */
+	FunnyPictureThumbnail getThumbnailForFunnyPicture(Long id, ThumbnailType thumbnailType);
 }

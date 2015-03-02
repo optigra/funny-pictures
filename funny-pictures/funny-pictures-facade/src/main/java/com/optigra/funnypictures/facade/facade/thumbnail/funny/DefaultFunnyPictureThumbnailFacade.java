@@ -1,21 +1,20 @@
 package com.optigra.funnypictures.facade.facade.thumbnail.funny;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.resources.ApiResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
 import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
 import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import com.optigra.funnypictures.model.thumbnail.ThumbnailType;
 import com.optigra.funnypictures.pagination.PagedResult;
 import com.optigra.funnypictures.pagination.PagedSearch;
 import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Default facade for funny pictures thumbnails.
@@ -79,7 +78,7 @@ public class DefaultFunnyPictureThumbnailFacade implements
 	}
 
 	@Override
-	public PagedResultResource<FunnyPictureThumbnailResource> getFunniesThumbnailForPicture(
+	public PagedResultResource<FunnyPictureThumbnailResource> getFunniesThumbnailsForPicture(
 			final Long id, final PagedRequest<FunnyPictureThumbnailResource> pagedRequest) {
 		
 		PagedSearch<FunnyPictureThumbnail> pagedSearch = pagedRequestConverter
@@ -95,6 +94,13 @@ public class DefaultFunnyPictureThumbnailFacade implements
 		pagedResultConverter.convert(pagedResult, pagedResultResource);
 		
 		return pagedResultResource;
+	}
+
+	@Override
+	public FunnyPictureThumbnailResource getFunnyThumbnailForFunnyPicture(final Long id, final ThumbnailType thumbnailType) {
+		FunnyPictureThumbnail funnyPictureThumbnail = funnyPictureThumbnailService
+				.getFunnyThumbnailForFunnyPicture(id, thumbnailType);
+		return funnyPictureThumbnailConverter.convert(funnyPictureThumbnail);
 	}
 
 }

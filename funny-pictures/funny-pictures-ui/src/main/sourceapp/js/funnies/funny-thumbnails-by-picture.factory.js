@@ -3,16 +3,16 @@
 
     angular
         .module('app.funnies')
-        .factory('FunnyThumbnailsByPicture', FunnyThumbnailsByPicture);
+        .factory('FunnyThumbnailsByPictureFactory', FunnyThumbnailsByPictureFactory);
 
-    FunnyThumbnailsByPicture
+    FunnyThumbnailsByPictureFactory
         .$inject = [
             '$resource',
             'constants'
         ];
 
-    function FunnyThumbnailsByPicture($resource, constants) {
-        return $resource(constants.apiUrl + '/funnies/:id/funniesThumb', {}, {
+    function FunnyThumbnailsByPictureFactory($resource, constants) {
+        return $resource(constants.apiUrl + '/funnies/:id/funniesThumbs', {}, {
             'query': {
                 method: 'GET',
                 isArray: false

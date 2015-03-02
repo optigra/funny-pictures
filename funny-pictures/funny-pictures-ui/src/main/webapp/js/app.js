@@ -224,6 +224,18 @@
     angular.module("app.funnies").factory("FunniesFactory", FunniesFactory), FunniesFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
+    function FunnyThumbnailByFunnyPictureFactory($resource, constants) {
+        return $resource(constants.apiUrl + "/funnies/:id/funnyThumb", {}, {
+            query: {
+                method: "GET",
+                isArray: !1
+            }
+        });
+    }
+    angular.module("app.funnies").factory("FunnyThumbnailByFunnyPictureFactory", FunnyThumbnailByFunnyPictureFactory), 
+    FunnyThumbnailByFunnyPictureFactory.$inject = [ "$resource", "constants" ];
+}(), function() {
+    "use strict";
     function FunnyThumbnailsFactory($resource, constants) {
         return $resource(constants.apiUrl + "/funniesthumb/:id", {}, {
             query: {
@@ -236,16 +248,16 @@
     FunnyThumbnailsFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
-    function FunnyThumbnailsByPicture($resource, constants) {
-        return $resource(constants.apiUrl + "/funnies/:id/funniesThumb", {}, {
+    function FunnyThumbnailsByPictureFactory($resource, constants) {
+        return $resource(constants.apiUrl + "/funnies/:id/funniesThumbs", {}, {
             query: {
                 method: "GET",
                 isArray: !1
             }
         });
     }
-    angular.module("app.funnies").factory("FunnyThumbnailsByPicture", FunnyThumbnailsByPicture), 
-    FunnyThumbnailsByPicture.$inject = [ "$resource", "constants" ];
+    angular.module("app.funnies").factory("FunnyThumbnailsByPictureFactory", FunnyThumbnailsByPictureFactory), 
+    FunnyThumbnailsByPictureFactory.$inject = [ "$resource", "constants" ];
 }(), function() {
     "use strict";
     function FunniesController($exceptionHandler, values, FunnyThumbnailsFactory) {
@@ -271,7 +283,7 @@
     FunniesController.$inject = [ "$exceptionHandler", "values", "FunnyThumbnailsFactory" ];
 }(), function() {
     "use strict";
-    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPicture) {
+    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
         function activate() {
             PicturesFactory.get({
                 id: $routeParams.pictureId
@@ -282,7 +294,7 @@
             });
         }
         function pageChanged() {
-            FunnyThumbnailsByPicture.query({
+            FunnyThumbnailsByPictureFactory.query({
                 id: vm.picture.id,
                 offset: (vm.currentPage - 1) * vm.itemsPerPage,
                 limit: vm.itemsPerPage,
@@ -329,28 +341,34 @@
         activate();
     }
     angular.module("app.funnies").controller("CreateFunnyController", CreateFunnyController), 
-    CreateFunnyController.$inject = [ "$scope", "$routeParams", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPicture" ];
+    CreateFunnyController.$inject = [ "$scope", "$routeParams", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPictureFactory" ];
 }(), function() {
     "use strict";
-    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
+    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailByFunnyPictureFactory, FunnyThumbnailsByPictureFactory) {
         function activate() {
-            FunniesFactory.get({
-                id: $routeParams.funnyPictureId
-            }, function(funnyPicture) {
-                vm.funnyPicture = funnyPicture, reset(vm.funnyPicture.id, vm.currentLocation), pageChanged(), 
-                $scope.$broadcast("dataloaded");
+            FunnyThumbnailByFunnyPictureFactory.query({
+                id: $routeParams.funnyPictureId,
+                thumbnailType: thumbnailType
+            }, function(funnyThumbnail) {
+                vm.funnyThumbnail = funnyThumbnail, pageChanged(), $scope.$broadcast("dataloaded");
             }, function(e) {
                 $exceptionHandler(e);
             });
         }
         function pageChanged() {
-            FunnyThumbnailsByPicture.query({
-                id: vm.funnyPicture.template.id,
-                offset: (vm.currentPage - 1) * vm.itemsPerPage,
-                limit: vm.itemsPerPage,
-                thumbnailType: values.thumbnailType
+            FunniesFactory.get({
+                id: $routeParams.funnyPictureId
             }, function(data) {
-                vm.funniesByTemplate = data.entities, vm.totalItems = data.count;
+                vm.funnyPicture = data, FunnyThumbnailsByPictureFactory.query({
+                    id: vm.funnyPicture.template.id,
+                    offset: (vm.currentPage - 1) * vm.itemsPerPage,
+                    limit: vm.itemsPerPage,
+                    thumbnailType: values.thumbnailType
+                }, function(data) {
+                    vm.funniesByTemplate = data.entities, vm.totalItems = data.count;
+                }, function(e) {
+                    $exceptionHandler(e);
+                });
             }, function(e) {
                 $exceptionHandler(e);
             });
@@ -360,10 +378,11 @@
         }
         function swapFunnyPicture(funnyThumbnail) {
             $location.path("/preview/" + funnyThumbnail.funnyPictureId, !1), vm.currentLocation = currentUrl + funnyThumbnail.funnyPictureId, 
-            FunniesFactory.get({
-                id: funnyThumbnail.funnyPictureId
-            }, function(funnyPicture) {
-                vm.funnyPicture = funnyPicture;
+            FunnyThumbnailByFunnyPictureFactory.query({
+                id: $routeParams.funnyPictureId,
+                thumbnailType: thumbnailType
+            }, function(funnyThumbnail) {
+                vm.funnyThumbnail = funnyThumbnail;
             }, function(e) {
                 $exceptionHandler(e);
             });
@@ -372,15 +391,14 @@
             var url = baseUrl + encodeURIComponent(vm.currentLocation);
             event.preventDefault(), $window.open(url, "_blank", "width=" + width + ",height=" + height);
         }
-        function reset() {}
-        var vm = this, currentUrl = $location.absUrl().split("#")[0] + "#/preview/";
-        vm.funnyPicture = {}, vm.funniesByTemplate = {}, vm.totalItems = 0, vm.currentPage = 1, 
-        vm.itemsPerPage = 6, vm.currentLocation = currentUrl + $routeParams.funnyPictureId, 
+        var vm = this, currentUrl = $location.absUrl().split("#")[0] + "#/preview/", thumbnailType = "BIG";
+        vm.funnyPicture = {}, vm.funnyThumbnail = {}, vm.funniesByTemplate = {}, vm.totalItems = 0, 
+        vm.currentPage = 1, vm.itemsPerPage = 6, vm.currentLocation = currentUrl + $routeParams.funnyPictureId, 
         vm.pageChanged = pageChanged, vm.showPagination = showPagination, vm.swapFunnyPicture = swapFunnyPicture, 
         vm.shareSocial = shareSocial, activate();
     }
     angular.module("app.funnies").controller("PreviewFunnyController", PreviewFunnyController), 
-    PreviewFunnyController.$inject = [ "$scope", "$window", "$location", "$routeParams", "$exceptionHandler", "values", "FunniesFactory", "FunnyThumbnailsByPicture" ];
+    PreviewFunnyController.$inject = [ "$scope", "$window", "$location", "$routeParams", "$exceptionHandler", "values", "FunniesFactory", "FunnyThumbnailByFunnyPictureFactory", "FunnyThumbnailsByPictureFactory" ];
 }(), function() {
     "use strict";
     angular.module("app.pictures", [ "app.core" ]);

@@ -23,8 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -201,7 +200,7 @@ public class FunnyPictureControllerTest extends AbstractControllerTest {
         ThumbnailType thumbnailType = ThumbnailType.MEDIUM;
 
         FunnyPictureThumbnailResource resource = new FunnyPictureThumbnailResource();
-        resource.setThumbnailType(thumbnailType);;
+        resource.setThumbnailType(thumbnailType);
 
         List<FunnyPictureThumbnailResource> entities = Arrays.asList(resource);
         PagedResultResource<FunnyPictureThumbnailResource> expectedResource = new PagedResultResource<>();
@@ -215,16 +214,40 @@ public class FunnyPictureControllerTest extends AbstractControllerTest {
 
         // When
         String expectedResponse = objectMapper.writeValueAsString(expectedResource);
-        when(funnyPictureThumbnailFacade.getFunniesThumbnailForPicture(anyLong(), any(PagedRequest.class))).thenReturn(expectedResource);
+        when(funnyPictureThumbnailFacade.getFunniesThumbnailsForPicture(anyLong(), any(PagedRequest.class))).thenReturn(expectedResource);
 
         // Then
-        mockMvc.perform(get("/funnies/{id}/funniesThumb", id)
+        mockMvc.perform(get("/funnies/{id}/funniesThumbs", id)
                 .param("offset", String.valueOf(offset))
                 .param("limit", String.valueOf(limit))
                 .param("type", thumbnailType.name()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(expectedResponse));
 
-        verify(funnyPictureThumbnailFacade).getFunniesThumbnailForPicture(id, pagedRequest);
+        verify(funnyPictureThumbnailFacade).getFunniesThumbnailsForPicture(id, pagedRequest);
+    }
+
+    @Test
+    public void testGetFunnyPictureThumbnailsByFunnyPicture() throws Exception {
+        Long id = 1L;
+        ThumbnailType thumbnailType = ThumbnailType.MEDIUM;
+
+        FunnyPictureThumbnailResource funnyPictureThumbnailResource = new FunnyPictureThumbnailResource();
+        funnyPictureThumbnailResource.setId(id);
+        funnyPictureThumbnailResource.setThumbnailType(thumbnailType);
+        funnyPictureThumbnailResource.setUrl("url");
+
+        String expectedResponse = getJson(funnyPictureThumbnailResource, false);
+
+        // When
+        when(funnyPictureThumbnailFacade.getFunnyThumbnailForFunnyPicture(anyLong(), any(ThumbnailType.class))).thenReturn(funnyPictureThumbnailResource);
+
+        // Then
+        mockMvc.perform(get("/funnies/{id}/funnyThumb", id)
+                .param("type", thumbnailType.name()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedResponse));
+
+        verify(funnyPictureThumbnailFacade).getFunnyThumbnailForFunnyPicture(id, thumbnailType);
     }
 }

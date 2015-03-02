@@ -7,11 +7,11 @@
                 <form name="vm.funnyPictureText" ng-hide="vm.loaded">
                     <md-input-container flex>
                         <label>{{'HEADER_TEXT_LABEL' | translate}}</label>
-                        <input ng-model="vm.headerText" name="vm.headerText" required>
+                        <input ng-model="vm.headerText" name="vm.headerText" ng-required="!(vm.headerText || vm.footerText)">
                     </md-input-container>
                     <md-input-container flex>
                         <label>{{'FOOTER_TEXT_LABEL' | translate}}</label>
-                        <input ng-model="vm.footerText" name="vm.footerText" required>
+                        <input ng-model="vm.footerText" name="vm.footerText" ng-required="!(vm.headerText || vm.footerText)">
                     </md-input-container>
                     <div layout="row" layout-align="end center">
                         <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.createFunnyPicture()" ng-disabled="vm.isButtonDisabled()">{{'CREATE_FUNNY_BUTTON' | translate}}</md-button>

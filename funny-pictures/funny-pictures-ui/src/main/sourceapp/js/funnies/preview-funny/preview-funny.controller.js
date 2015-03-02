@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular
@@ -7,21 +7,24 @@
 
     PreviewFunnyController
         .$inject = [
-            '$scope',
-            '$window',
-            '$location',
-            '$routeParams',
-            '$exceptionHandler',
-            'values',
-            'FunniesFactory',
-            'FunnyThumbnailsByPicture'
-        ];
+        '$scope',
+        '$window',
+        '$location',
+        '$routeParams',
+        '$exceptionHandler',
+        'values',
+        'FunniesFactory',
+        'FunnyThumbnailByFunnyPictureFactory',
+        'FunnyThumbnailsByPictureFactory'
+    ];
 
-    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailsByPicture) {
+    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailByFunnyPictureFactory, FunnyThumbnailsByPictureFactory) {
         var vm = this;
         var currentUrl = $location.absUrl().split('#')[0] + '#/preview/';
+        var thumbnailType = "BIG";
 
         vm.funnyPicture = {};
+        vm.funnyThumbnail = {};
         vm.funniesByTemplate = {};
         vm.totalItems = 0;
         vm.currentPage = 1;
@@ -36,11 +39,11 @@
         activate();
 
         function activate() {
-            FunniesFactory.get({
-                id: $routeParams.funnyPictureId
-            }, function(funnyPicture) {
-                vm.funnyPicture = funnyPicture;
-                reset(vm.funnyPicture.id, vm.currentLocation);
+            FunnyThumbnailByFunnyPictureFactory.query({
+                id: $routeParams.funnyPictureId,
+                thumbnailType: thumbnailType
+            }, function (funnyThumbnail) {
+                vm.funnyThumbnail = funnyThumbnail;
                 pageChanged();
                 $scope.$broadcast('dataloaded');
             }, function (e) {
@@ -49,17 +52,26 @@
         }
 
         function pageChanged() {
-            FunnyThumbnailsByPicture.query({
-                id: vm.funnyPicture.template.id,
-                offset: (vm.currentPage - 1) * vm.itemsPerPage,
-                limit: vm.itemsPerPage,
-                thumbnailType: values.thumbnailType
-            }, function(data) {
-                vm.funniesByTemplate = data.entities;
-                vm.totalItems = data.count;
+
+            FunniesFactory.get({
+                id: $routeParams.funnyPictureId
+            }, function (data) {
+                vm.funnyPicture = data;
+                FunnyThumbnailsByPictureFactory.query({
+                    id: vm.funnyPicture.template.id,
+                    offset: (vm.currentPage - 1) * vm.itemsPerPage,
+                    limit: vm.itemsPerPage,
+                    thumbnailType: values.thumbnailType
+                }, function (data) {
+                    vm.funniesByTemplate = data.entities;
+                    vm.totalItems = data.count;
+                }, function (e) {
+                    $exceptionHandler(e);
+                });
             }, function (e) {
                 $exceptionHandler(e);
             });
+
         }
 
         function showPagination() {
@@ -70,10 +82,11 @@
             $location.path('/preview/' + funnyThumbnail.funnyPictureId, false);
             vm.currentLocation = currentUrl + funnyThumbnail.funnyPictureId;
 
-            FunniesFactory.get({
-                id: funnyThumbnail.funnyPictureId
-            }, function(funnyPicture) {
-                vm.funnyPicture = funnyPicture;
+            FunnyThumbnailByFunnyPictureFactory.query({
+                id: $routeParams.funnyPictureId,
+                thumbnailType: thumbnailType
+            }, function (funnyThumbnail) {
+                vm.funnyThumbnail = funnyThumbnail;
             }, function (e) {
                 $exceptionHandler(e);
             });
@@ -84,10 +97,6 @@
             var url = baseUrl + encodeURIComponent(vm.currentLocation);
             event.preventDefault();
             $window.open(url, "_blank", "width=" + width + ",height=" + height);
-        }
-
-        function reset (newIdentifier, newUrl) {
-
         }
     }
 
