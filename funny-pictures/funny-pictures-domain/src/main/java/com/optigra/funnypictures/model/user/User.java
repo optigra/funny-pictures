@@ -10,6 +10,7 @@ import com.optigra.funnypictures.model.Model;
 
 /**
  * Entity for User.
+ * @author oleh.zasadnyy
  */
 @Entity
 @Table(name = "user_accounts")
@@ -155,6 +156,5 @@ public class User extends Model {
                 + ", lastName=" + lastName + ", password=" + password
                 + ", role=" + role + ", signInProvider=" + signInProvider + "]";
     }
-
 
 }

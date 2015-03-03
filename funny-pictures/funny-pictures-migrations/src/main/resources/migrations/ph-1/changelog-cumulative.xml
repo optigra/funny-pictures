@@ -203,12 +203,6 @@
 			<column name="sign_in_provider" type="varchar(255)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="update_date" type="TIMESTAMP">
-				<constraints nullable="false" />
-			</column>
-			<column name="create_date" type="TIMESTAMP">
-				<constraints nullable="false" />
-			</column>
 		</createTable>
 	</changeSet>
 	
@@ -239,5 +233,29 @@
 				JOIN (SELECT *, trunc(random() * 2) AS random_value FROM (SELECT DISTINCT picture_id FROM picture_thumbnail) dd) ran 
 				  ON ran.picture_id = pt.picture_id AND pt.type = CASE ran.random_value WHEN 0 THEN 'SMALL' WHEN 1 THEN 'MEDIUM' end		
 		</createView>
+	</changeSet>
+
+	<changeSet id="updateUser" author="Oleh Zasadnyy">
+		<addColumn catalogName="optigra-funnypictures"
+				   schemaName="public"
+				   tableName="user_accounts">
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+		<addColumn catalogName="optigra-funnypictures"
+				   schemaName="public"
+				   tableName="user_accounts">
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="dropUserTable" author="Oleh Zasadnyy">
+		<dropTable cascadeConstraints="true"
+				   catalogName="optigra-funnypictures"
+				   schemaName="public"
+				   tableName="c_user"/>
 	</changeSet>
 </databaseChangeLog>
