@@ -34,6 +34,8 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseAdviceMemeGenerator.class);
 	
 	private float captionHeightRatio = 0.2f;
+	
+	private int captionHorizontalPadding = 10;
 
 	public static final MimeType DEFAULT_OUTPUT_FORMAT = MimeType.IMAGE_PNG_PNG;
 
@@ -126,7 +128,7 @@ public class BaseAdviceMemeGenerator implements AdviceMemeGenerator {
 		
 		op.addImage();
 		op.openOperation();
-		op.size(width, height);
+		op.size(width - 2 * captionHorizontalPadding, height);
 		op.fill("white");
 		op.stroke("black");
 		op.strokewidth(height / 80 + 1);

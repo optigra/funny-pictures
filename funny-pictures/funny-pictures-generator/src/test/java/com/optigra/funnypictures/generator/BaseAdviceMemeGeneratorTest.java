@@ -74,10 +74,10 @@ public class BaseAdviceMemeGeneratorTest {
 		
 		String expectedConvertCommand = "?img? ?img? ";
 		
-		String expectedConvertTopCommand = "?img? ( -size 400x80 -fill white -stroke black -strokewidth 2 " +
+		String expectedConvertTopCommand = "?img? ( -size 380x80 -fill white -stroke black -strokewidth 2 " +
 				"-background none -gravity Center -font Impact-Regular caption:Top caption ( +clone -shadow 100x10.0+0+0 ) " + 
 				"+swap -layers merge ) -gravity North -composite ?img? ";
-		String expectedConvertBottomCommand = "?img? ( -size 400x80 -fill white -stroke black -strokewidth 2 " + 
+		String expectedConvertBottomCommand = "?img? ( -size 380x80 -fill white -stroke black -strokewidth 2 " + 
 				"-background none -gravity Center -font Impact-Regular caption:Bottom caption ( +clone -shadow 100x10.0+0+0 ) " + 
 				"+swap -layers merge ) -gravity South -composite ?img? ";
 		
