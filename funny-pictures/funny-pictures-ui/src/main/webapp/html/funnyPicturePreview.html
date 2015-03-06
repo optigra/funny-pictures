@@ -10,7 +10,7 @@
             <md-card-content>
                 <div class="action-toolbar" layout="row" layout-align="space-between center">
                     <div>
-                        <span>{{'SHARE_LABEL' | translate}}</span>
+                        <span translate="SHARE_LABEL"></span>
                         <ul class="social-share">
                             <li>
                                 <a class="social-link flaticon-twitter" href="#" ng-click="vm.shareSocial('https://twitter.com/home?status=',600,250)"></a>
@@ -23,13 +23,28 @@
                             </li>
                         </ul>
                     </div>
-                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
+                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}" translate="DOWNLOAD_LABEL"></md-button>
+                </div>
+                <div class="clip-copy" layout="column" layout-align="start left">
+                    <div layout="row" layout-align="space-between center">
+                        <md-input-container flex>
+                            <label translate="LINK_TO_IMAGE"></label>
+                            <input ng-model="vm.funnyPicture.url" disabled>
+                        </md-input-container>
+                        <md-button clip-copy="vm.funnyPicture.url" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-input-container flex>
+                            <label translate="LINK_TO_PREVIEW"></label>
+                            <input ng-model="vm.currentLocation" disabled>
+                        </md-input-container>
+                        <md-button clip-copy="vm.currentLocation" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                    </div>
                 </div>
             </md-card-content>
         </md-card>
         <div id="disqus_thread" class="comments">
-            <noscript>{{'COMMENTS_FALLBACK_1' | translate}} <a href="https://disqus.com/?ref_noscript">{{'COMMENTS_FALLBACK_2' | translate}}</a>
-            </noscript>
+            <noscript translate="COMMENTS_FALLBACK_1"> <a href="https://disqus.com/?ref_noscript" translate="COMMENTS_FALLBACK_2"></a></noscript>
         </div>
     </div>
     <div class="image-preview-wrapper" flex-gt-md="50">

@@ -1,38 +1,38 @@
 <md-content class="md-padding contact-us" layout="column" layout-gt-md="row">
     <md-card class="contact-form" flex="100" flex-gt-md="50">
-        <h2>{{'CONTACT_HEADER' | translate}}</h2>
+        <h2 translate="CONTACT_HEADER"></h2>
         <md-card-content>
             <form name="vm.contactForm">
                 <div layout="column" layout-gt-md="row">
                     <md-input-container flex>
-                        <label>{{'NAME_LABEL' | translate}}</label>
+                        <label translate="NAME_LABEL"></label>
                         <input ng-model="vm.feedback.name" name="name" required>
                     </md-input-container>
                     <md-input-container flex>
-                        <label>{{'EMAIL_LABEL' | translate}}</label>
+                        <label translate="EMAIL_LABEL"></label>
                         <input ng-model="vm.feedback.email" name="email" type="email" required>
                     </md-input-container>
                 </div>
                 <md-input-container flex>
-                    <label>{{'SUBJECT_LABEL' | translate}}</label>
+                    <label translate="SUBJECT_LABEL"></label>
                     <input ng-model="vm.feedback.subject" name="subject" required>
                 </md-input-container>
                 <md-input-container flex>
-                    <label>{{'MESSAGE_LABEL' | translate}}</label>
+                    <label translate="MESSAGE_LABEL"></label>
                     <textarea ng-model="vm.feedback.text" columns="1" rows="4" name="message" required></textarea>
                 </md-input-container>
                 <div layout="row" layout-align="end center">
-                    <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.sendFeedback()" ng-disabled="vm.isButtonDisabled()">{{'SEND_MESSAGE_BUTTON' | translate}}</md-button>
+                    <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.sendFeedback()" ng-disabled="vm.isButtonDisabled()" translate="SEND_MESSAGE_BUTTON"></md-button>
                 </div>
             </form>
         </md-card-content>
     </md-card>
 
     <div class="contact-details" flex="100" flex-gt-md="50">
-        <h3>{{'OUR_CONTACTS_LABEL' | translate}}</h3>
-        <span>{{'ADDRESS' | translate}}</span>
-        <span>{{'CITY' | translate}}</span>
-        <strong>{{'EMAIL' | translate}}:</strong>
+        <h3 translate="OUR_CONTACTS_LABEL"></h3>
+        <span translate="ADDRESS"></span>
+        <span translate="CITY"></span>
+        <strong translate="EMAIL_LABEL">:</strong>
         <a href="mailto:ask@optigra-soft.com" title="Send email">ask@optigra-soft.com</a>
     </div>
 </md-content>

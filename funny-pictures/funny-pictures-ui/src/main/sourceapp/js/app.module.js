@@ -9,6 +9,6 @@
             'app.funnies',
             'app.pictures',
             'app.header'
-        ]);
+        ])
 
 })();

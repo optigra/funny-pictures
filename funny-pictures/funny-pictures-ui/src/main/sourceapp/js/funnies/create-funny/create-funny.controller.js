@@ -8,7 +8,9 @@
     CreateFunnyController
         .$inject = [
         '$scope',
+        '$window',
         '$routeParams',
+        '$location',
         '$exceptionHandler',
         'logger',
         'values',
@@ -17,8 +19,9 @@
         'FunnyThumbnailsByPictureFactory'
     ];
 
-    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
+    function CreateFunnyController($scope, $window, $routeParams, $location, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
         var vm = this;
+        var currentUrl = $location.absUrl().split('#')[0] + '#/preview/';
 
         vm.picture = {};
         vm.headerText = '';
@@ -30,6 +33,7 @@
         vm.itemsPerPage = 6; // Move to values
         vm.progress = false;
         vm.loaded = false;
+        vm.currentFunnyLocation = currentUrl;
 
         vm.pageChanged = pageChanged;
         vm.showPagination = showPagination;
@@ -37,6 +41,8 @@
         vm.createNew = createNew;
         vm.cancel = cancel;
         vm.isButtonDisabled = isButtonDisabled;
+        vm.shareSocial = shareSocial;
+        vm.clipCopyMessage = clipCopyMessage;
 
         activate();
 
@@ -79,6 +85,7 @@
                     vm.funnyPicture = data;
                     vm.progress = false;
                     vm.loaded = true;
+                    vm.currentFunnyLocation = currentUrl + vm.funnyPicture.id;
                     pageChanged();
                 }, function (e) {
                     $exceptionHandler(e);
@@ -111,6 +118,16 @@
 
         function isButtonDisabled() {
             return !vm.funnyPictureText.$valid;
+        }
+
+        function shareSocial(baseUrl, width, height) {
+            var url = baseUrl + encodeURIComponent(vm.currentFunnyLocation);
+            event.preventDefault();
+            $window.open(url, "_blank", "width=" + width + ",height=" + height);
+        }
+
+        function clipCopyMessage() {
+            logger.info("Link is copied to clipboard")
         }
     }
 

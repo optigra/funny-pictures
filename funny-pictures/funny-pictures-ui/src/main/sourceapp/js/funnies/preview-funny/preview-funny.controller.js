@@ -11,6 +11,7 @@
         '$window',
         '$location',
         '$routeParams',
+        'logger',
         '$exceptionHandler',
         'values',
         'FunniesFactory',
@@ -18,7 +19,7 @@
         'FunnyThumbnailsByPictureFactory'
     ];
 
-    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailByFunnyPictureFactory, FunnyThumbnailsByPictureFactory) {
+    function PreviewFunnyController($scope, $window, $location, $routeParams, logger, $exceptionHandler, values, FunniesFactory, FunnyThumbnailByFunnyPictureFactory, FunnyThumbnailsByPictureFactory) {
         var vm = this;
         var currentUrl = $location.absUrl().split('#')[0] + '#/preview/';
         var thumbnailType = "BIG";
@@ -35,6 +36,7 @@
         vm.showPagination = showPagination;
         vm.swapFunnyPicture = swapFunnyPicture;
         vm.shareSocial = shareSocial;
+        vm.clipCopyMessage = clipCopyMessage;
 
         activate();
 
@@ -52,7 +54,6 @@
         }
 
         function pageChanged() {
-
             FunniesFactory.get({
                 id: $routeParams.funnyPictureId
             }, function (data) {
@@ -97,6 +98,10 @@
             var url = baseUrl + encodeURIComponent(vm.currentLocation);
             event.preventDefault();
             $window.open(url, "_blank", "width=" + width + ",height=" + height);
+        }
+
+        function clipCopyMessage() {
+            logger.info("Link is copied to clipboard")
         }
     }
 

@@ -6,27 +6,58 @@
             <md-card-content>
                 <form name="vm.funnyPictureText" ng-hide="vm.loaded">
                     <md-input-container flex>
-                        <label>{{'HEADER_TEXT_LABEL' | translate}}</label>
+                        <label translate="HEADER_TEXT_LABEL"></label>
                         <input ng-model="vm.headerText" name="vm.headerText" ng-required="!(vm.headerText || vm.footerText)">
                     </md-input-container>
                     <md-input-container flex>
-                        <label>{{'FOOTER_TEXT_LABEL' | translate}}</label>
+                        <label translate="FOOTER_TEXT_LABEL"></label>
                         <input ng-model="vm.footerText" name="vm.footerText" ng-required="!(vm.headerText || vm.footerText)">
                     </md-input-container>
                     <div layout="row" layout-align="end center">
-                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.createFunnyPicture()" ng-disabled="vm.isButtonDisabled()">{{'CREATE_FUNNY_BUTTON' | translate}}</md-button>
+                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.createFunnyPicture()" ng-disabled="vm.isButtonDisabled()" translate="CREATE_FUNNY_BUTTON"></md-button>
                     </div>
                 </form>
-                <div class="action-toolbar" layout="row" layout-align="end center" ng-show="vm.loaded">
-                    <md-button class="md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}">{{'DOWNLOAD_LABEL' | translate}}</md-button>
-                    <md-button class="md-warn" ng-click="vm.cancel()">{{'CANCEL_BUTTON' | translate}}</md-button>
-                    <md-button type="submit" class="md-raised md-primary" ng-click="vm.createNew()">{{'CREATE_NEW_BUTTON' | translate}}</md-button>
+                <div class="action-toolbar" layout="row" layout-align="space-between center" ng-show="vm.loaded">
+                    <div>
+                        <span translate="SHARE_LABEL"></span>
+                        <ul class="social-share">
+                            <li>
+                                <a class="social-link flaticon-twitter" href="#" ng-click="vm.shareSocial('https://twitter.com/home?status=',600,250)"></a>
+                            </li>
+                            <li>
+                                <a class="social-link flaticon-facebook" href="#" ng-click="vm.shareSocial('https://www.facebook.com/sharer/sharer.php?u=',600,500)"></a>
+                            </li>
+                            <li>
+                                <a class="social-link flaticon-googleplus" href="#" ng-click="vm.shareSocial('https://plus.google.com/share?url=',600,500)"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <md-button class="md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}" translate="DOWNLOAD_LABEL"></md-button>
+                        <md-button class="md-warn" ng-click="vm.cancel()" translate="CANCEL_BUTTON"></md-button>
+                        <md-button type="submit" class="md-raised md-primary" ng-click="vm.createNew()" translate="CREATE_NEW_BUTTON"></md-button>
+                    </div>
+                </div>
+                <div class="clip-copy" layout="column" layout-align="start left" ng-show="vm.loaded">
+                    <div layout="row" layout-align="space-between center">
+                        <md-input-container flex>
+                            <label translate="LINK_TO_IMAGE"></label>
+                            <input ng-model="vm.funnyPicture.url" disabled>
+                        </md-input-container>
+                        <md-button clip-copy="vm.funnyPicture.url" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-input-container flex>
+                            <label translate="LINK_TO_PREVIEW"></label>
+                            <input ng-model="vm.currentFunnyLocation" disabled>
+                        </md-input-container>
+                        <md-button clip-copy="vm.currentFunnyLocation" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                    </div>
                 </div>
             </md-card-content>
         </md-card>
         <div id="disqus_thread" class="comments">
-            <noscript>{{'COMMENTS_FALLBACK_1' | translate}} <a href="https://disqus.com/?ref_noscript">{{'COMMENTS_FALLBACK_2' | translate}}</a>
-            </noscript>
+            <noscript translate="COMMENTS_FALLBACK_1"> <a href="https://disqus.com/?ref_noscript" translate="COMMENTS_FALLBACK_2"></a></noscript>
         </div>
     </div>
     <div class="image-preview-wrapper" flex-gt-md="50">

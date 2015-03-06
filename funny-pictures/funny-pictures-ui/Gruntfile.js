@@ -33,6 +33,14 @@ module.exports = function(grunt) {
                             return dest + "_" + src.substring(0, src.indexOf('.')) + '.scss';
                         }
                     }]
+                },
+                zeroclipboard: {
+                    files: [{
+                        expand: true,
+                        cwd: 'bower_components/zeroclipboard/dist/',
+                        src: 'ZeroClipboard.swf',
+                        dest: '<%= app.dist %>/js'
+                    }]
                 }
             },
             sass: {
@@ -101,6 +109,8 @@ module.exports = function(grunt) {
                             'bower_components/angular-material/angular-material.js',
                             'bower_components/angular-masonry/angular-masonry.js',
                             'bower_components/angular-translate/angular-translate.js',
+                            'bower_components/zeroclipboard/dist/ZeroClipboard.js',
+                            'bower_components/ng-clip/src/ngClip.js',
                             '<%= app.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
                         ],
 
@@ -174,6 +184,8 @@ module.exports = function(grunt) {
                             'bower_components/angular-material/angular-material.js',
                             'bower_components/angular-masonry/angular-masonry.js',
                             'bower_components/angular-translate/angular-translate.js',
+                            'bower_components/zeroclipboard/dist/ZeroClipboard.js',
+                            'bower_components/ng-clip/src/ngClip.js',
                             '<%= app.source %>/js/vendor/ui-bootstrap-custom-tpls-0.12.0.js'
                         ],
                         
@@ -229,10 +241,10 @@ module.exports = function(grunt) {
         });
 
 
-    grunt.registerTask('serve', ['clean', 'copy:css', 'sass:server',
+    grunt.registerTask('serve', ['clean', 'copy', 'sass:server',
         'autoprefixer', 'uglify:server'
     ]);
-    grunt.registerTask('build', ['clean', 'copy:css', 'sass:dist',
+    grunt.registerTask('build', ['clean', 'copy', 'sass:dist',
         'autoprefixer', 'uglify:dist'
     ]);
 

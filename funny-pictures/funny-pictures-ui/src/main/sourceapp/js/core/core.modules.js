@@ -7,6 +7,7 @@
             'ngRoute',
 
             'ngMaterial',
+            'ngClipboard',
             'pascalprecht.translate',
             'wu.masonry',
             'ui.bootstrap',

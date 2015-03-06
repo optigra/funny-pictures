@@ -3,7 +3,7 @@
     angular.module("app", [ "app.core", "app.contact", "app.funnies", "app.pictures", "app.header" ]);
 }(), function() {
     "use strict";
-    angular.module("app.core", [ "ngResource", "ngRoute", "ngMaterial", "pascalprecht.translate", "wu.masonry", "ui.bootstrap", "blocks.exception", "blocks.logger" ]);
+    angular.module("app.core", [ "ngResource", "ngRoute", "ngMaterial", "ngClipboard", "pascalprecht.translate", "wu.masonry", "ui.bootstrap", "blocks.exception", "blocks.logger" ]);
 }(), function() {
     "use strict";
     function config($routeProvider) {
@@ -283,7 +283,7 @@
     FunniesController.$inject = [ "$exceptionHandler", "values", "FunnyThumbnailsFactory" ];
 }(), function() {
     "use strict";
-    function CreateFunnyController($scope, $routeParams, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
+    function CreateFunnyController($scope, $window, $routeParams, $location, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
         function activate() {
             PicturesFactory.get({
                 id: $routeParams.pictureId
@@ -310,7 +310,8 @@
             var postObject = new Object();
             postObject.name = vm.picture.name, postObject.header = vm.headerText, postObject.footer = vm.footerText, 
             postObject.template = {}, postObject.template.id = vm.picture.id, FunniesFactory.save(postObject, function(data) {
-                vm.funnyPicture = data, vm.progress = !1, vm.loaded = !0, pageChanged();
+                vm.funnyPicture = data, vm.progress = !1, vm.loaded = !0, vm.currentFunnyLocation = currentUrl + vm.funnyPicture.id, 
+                pageChanged();
             }, function(e) {
                 $exceptionHandler(e);
             });
@@ -333,18 +334,26 @@
         function isButtonDisabled() {
             return !vm.funnyPictureText.$valid;
         }
-        var vm = this;
+        function shareSocial(baseUrl, width, height) {
+            var url = baseUrl + encodeURIComponent(vm.currentFunnyLocation);
+            event.preventDefault(), $window.open(url, "_blank", "width=" + width + ",height=" + height);
+        }
+        function clipCopyMessage() {
+            logger.info("Link is copied to clipboard");
+        }
+        var vm = this, currentUrl = $location.absUrl().split("#")[0] + "#/preview/";
         vm.picture = {}, vm.headerText = "", vm.footerText = "", vm.funnyPicture = {}, vm.funniesByTemplate = {}, 
         vm.totalItems = 0, vm.currentPage = 1, vm.itemsPerPage = 6, vm.progress = !1, vm.loaded = !1, 
-        vm.pageChanged = pageChanged, vm.showPagination = showPagination, vm.createFunnyPicture = createFunnyPicture, 
-        vm.createNew = createNew, vm.cancel = cancel, vm.isButtonDisabled = isButtonDisabled, 
+        vm.currentFunnyLocation = currentUrl, vm.pageChanged = pageChanged, vm.showPagination = showPagination, 
+        vm.createFunnyPicture = createFunnyPicture, vm.createNew = createNew, vm.cancel = cancel, 
+        vm.isButtonDisabled = isButtonDisabled, vm.shareSocial = shareSocial, vm.clipCopyMessage = clipCopyMessage, 
         activate();
     }
     angular.module("app.funnies").controller("CreateFunnyController", CreateFunnyController), 
-    CreateFunnyController.$inject = [ "$scope", "$routeParams", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPictureFactory" ];
+    CreateFunnyController.$inject = [ "$scope", "$window", "$routeParams", "$location", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPictureFactory" ];
 }(), function() {
     "use strict";
-    function PreviewFunnyController($scope, $window, $location, $routeParams, $exceptionHandler, values, FunniesFactory, FunnyThumbnailByFunnyPictureFactory, FunnyThumbnailsByPictureFactory) {
+    function PreviewFunnyController($scope, $window, $location, $routeParams, logger, $exceptionHandler, values, FunniesFactory, FunnyThumbnailByFunnyPictureFactory, FunnyThumbnailsByPictureFactory) {
         function activate() {
             FunnyThumbnailByFunnyPictureFactory.query({
                 id: $routeParams.funnyPictureId,
@@ -391,14 +400,17 @@
             var url = baseUrl + encodeURIComponent(vm.currentLocation);
             event.preventDefault(), $window.open(url, "_blank", "width=" + width + ",height=" + height);
         }
+        function clipCopyMessage() {
+            logger.info("Link is copied to clipboard");
+        }
         var vm = this, currentUrl = $location.absUrl().split("#")[0] + "#/preview/", thumbnailType = "BIG";
         vm.funnyPicture = {}, vm.funnyThumbnail = {}, vm.funniesByTemplate = {}, vm.totalItems = 0, 
         vm.currentPage = 1, vm.itemsPerPage = 6, vm.currentLocation = currentUrl + $routeParams.funnyPictureId, 
         vm.pageChanged = pageChanged, vm.showPagination = showPagination, vm.swapFunnyPicture = swapFunnyPicture, 
-        vm.shareSocial = shareSocial, activate();
+        vm.shareSocial = shareSocial, vm.clipCopyMessage = clipCopyMessage, activate();
     }
     angular.module("app.funnies").controller("PreviewFunnyController", PreviewFunnyController), 
-    PreviewFunnyController.$inject = [ "$scope", "$window", "$location", "$routeParams", "$exceptionHandler", "values", "FunniesFactory", "FunnyThumbnailByFunnyPictureFactory", "FunnyThumbnailsByPictureFactory" ];
+    PreviewFunnyController.$inject = [ "$scope", "$window", "$location", "$routeParams", "logger", "$exceptionHandler", "values", "FunniesFactory", "FunnyThumbnailByFunnyPictureFactory", "FunnyThumbnailsByPictureFactory" ];
 }(), function() {
     "use strict";
     angular.module("app.pictures", [ "app.core" ]);
@@ -574,11 +586,14 @@
             COMMENTS_FALLBACK_1: "Please enable JavaScript to view the",
             COMMENTS_FALLBACK_2: "comments powered by Disqus.",
             PREVIOUS_LABEL: "Previous",
-            NEXT_LABEL: "Next"
+            NEXT_LABEL: "Next",
+            LINK_TO_IMAGE: "Direct link to image",
+            LINK_TO_PREVIEW: "Link to preview",
+            COPY_LABEL: "Copy"
         }), $translateProvider.translations("uk", {
             CONTACT_HEADER: "Зв'яжіться з нами",
             NAME_LABEL: "Ім'я",
-            EMAIL_LABEL: "Email",
+            EMAIL_LABEL: "Електронна пошта",
             SUBJECT_LABEL: "Тема",
             MESSAGE_LABEL: "Повідомлення",
             SEND_MESSAGE_BUTTON: "Відслати",
@@ -606,7 +621,10 @@
             COMMENTS_FALLBACK_1: "Будь ласка, включіть JavaScript для перегляду",
             COMMENTS_FALLBACK_2: "Disqus коментарів.",
             PREVIOUS_LABEL: "Попередня",
-            NEXT_LABEL: "Наступна"
+            NEXT_LABEL: "Наступна",
+            LINK_TO_IMAGE: "Пряме посилання на картинку",
+            LINK_TO_PREVIEW: "Посилання на попередній перегляд",
+            COPY_LABEL: "Копіювати"
         }), $translateProvider.determinePreferredLanguage(), $translateProvider.fallbackLanguage("en_US");
     }
     angular.module("app").config(translation), translation.$inject = [ "$translateProvider" ];

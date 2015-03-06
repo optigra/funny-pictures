@@ -1,27 +1,3 @@
-function mdMediaFactory($mdConstant, $rootScope, $window) {
-    function $mdMedia(query) {
-        var validated = queries[query];
-        angular.isUndefined(validated) && (validated = queries[query] = validate(query));
-        var result = results[validated];
-        return angular.isUndefined(result) && (result = add(validated)), result;
-    }
-    function validate(query) {
-        return $mdConstant.MEDIA[query] || ("(" !== query.charAt(0) ? "(" + query + ")" : query);
-    }
-    function add(query) {
-        var result = $window.matchMedia(query);
-        return result.addListener(onQueryChange), results[result.media] = !!result.matches;
-    }
-    function onQueryChange() {
-        var query = this;
-        $rootScope.$evalAsync(function() {
-            results[query.media] = !!query.matches;
-        });
-    }
-    var queries = {}, results = {};
-    return $mdMedia;
-}
-
 !function(global, factory) {
     "object" == typeof module && "object" == typeof module.exports ? module.exports = global.document ? factory(global, !0) : function(w) {
         if (!w.document) throw new Error("jQuery requires a window with a document");
@@ -4785,7 +4761,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             for (message = prefix + template.replace(/\{\d+\}/g, function(match) {
                 var index = +match.slice(1, -1);
                 return index + 2 < templateArgs.length ? toDebugString(templateArgs[index + 2]) : match;
-            }), message = message + "\nhttp://errors.angularjs.org/1.3.13/" + (module ? module + "/" : "") + code, 
+            }), message = message + "\nhttp://errors.angularjs.org/1.3.14/" + (module ? module + "/" : "") + code, 
             i = 2; i < arguments.length; i++) message = message + (2 == i ? "?" : "&") + "p" + (i - 2) + "=" + encodeURIComponent(toDebugString(arguments[i]));
             return new ErrorConstructor(message);
         };
@@ -8484,7 +8460,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
                 value = value.toString();
             }
             return value;
-        }), attr.min || attr.ngMin) {
+        }), isDefined(attr.min) || attr.ngMin) {
             var minVal;
             ctrl.$validators.min = function(value) {
                 return ctrl.$isEmpty(value) || isUndefined(minVal) || value >= minVal;
@@ -8493,7 +8469,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
                 ctrl.$validate();
             });
         }
-        if (attr.max || attr.ngMax) {
+        if (isDefined(attr.max) || attr.ngMax) {
             var maxVal;
             ctrl.$validators.max = function(value) {
                 return ctrl.$isEmpty(value) || isUndefined(maxVal) || maxVal >= value;
@@ -8685,11 +8661,11 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
         }
         return csp.isActive_ = active;
     }, ngAttrPrefixes = [ "ng-", "data-ng-", "ng:", "x-ng-" ], SNAKE_CASE_REGEXP = /[A-Z]/g, bindJQueryFired = !1, NODE_TYPE_ELEMENT = 1, NODE_TYPE_TEXT = 3, NODE_TYPE_COMMENT = 8, NODE_TYPE_DOCUMENT = 9, NODE_TYPE_DOCUMENT_FRAGMENT = 11, version = {
-        full: "1.3.13",
+        full: "1.3.14",
         major: 1,
         minor: 3,
-        dot: 13,
-        codeName: "meticulous-riffleshuffle"
+        dot: 14,
+        codeName: "instantaneous-browserification"
     };
     JQLite.expando = "ng339";
     var jqCache = JQLite.cache = {}, jqId = 1, addEventListenerFn = function(element, type, fn) {
@@ -9932,7 +9908,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
         this.$viewChangeListeners = [], this.$untouched = !0, this.$touched = !1, this.$pristine = !0, 
         this.$dirty = !1, this.$valid = !0, this.$invalid = !1, this.$error = {}, this.$$success = {}, 
         this.$pending = undefined, this.$name = $interpolate($attr.name || "", !1)($scope);
-        var parsedNgModel = $parse($attr.ngModel), parsedNgModelAssign = parsedNgModel.assign, ngModelGet = parsedNgModel, ngModelSet = parsedNgModelAssign, pendingDebounce = null, ctrl = this;
+        var parserValid, parsedNgModel = $parse($attr.ngModel), parsedNgModelAssign = parsedNgModel.assign, ngModelGet = parsedNgModel, ngModelSet = parsedNgModelAssign, pendingDebounce = null, ctrl = this;
         this.$$setOptions = function(options) {
             if (ctrl.$options = options, options && options.getterSetter) {
                 var invokeModelGetter = $parse($attr.ngModel + "()"), invokeModelSetter = $parse($attr.ngModel + "($$$p)");
@@ -9975,22 +9951,21 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             ctrl.$render();
         }, this.$validate = function() {
             if (!isNumber(ctrl.$modelValue) || !isNaN(ctrl.$modelValue)) {
-                var viewValue = ctrl.$$lastCommittedViewValue, modelValue = ctrl.$$rawModelValue, parserName = ctrl.$$parserName || "parse", parserValid = ctrl.$error[parserName] ? !1 : undefined, prevValid = ctrl.$valid, prevModelValue = ctrl.$modelValue, allowInvalid = ctrl.$options && ctrl.$options.allowInvalid;
-                ctrl.$$runValidators(parserValid, modelValue, viewValue, function(allValid) {
+                var viewValue = ctrl.$$lastCommittedViewValue, modelValue = ctrl.$$rawModelValue, prevValid = ctrl.$valid, prevModelValue = ctrl.$modelValue, allowInvalid = ctrl.$options && ctrl.$options.allowInvalid;
+                ctrl.$$runValidators(modelValue, viewValue, function(allValid) {
                     allowInvalid || prevValid === allValid || (ctrl.$modelValue = allValid ? modelValue : undefined, 
                     ctrl.$modelValue !== prevModelValue && ctrl.$$writeModelToScope());
                 });
             }
-        }, this.$$runValidators = function(parseValid, modelValue, viewValue, doneCallback) {
-            function processParseErrors(parseValid) {
+        }, this.$$runValidators = function(modelValue, viewValue, doneCallback) {
+            function processParseErrors() {
                 var errorKey = ctrl.$$parserName || "parse";
-                if (parseValid === undefined) setValidity(errorKey, null); else if (setValidity(errorKey, parseValid), 
-                !parseValid) return forEach(ctrl.$validators, function(v, name) {
+                return parserValid !== undefined ? (parserValid || (forEach(ctrl.$validators, function(v, name) {
                     setValidity(name, null);
                 }), forEach(ctrl.$asyncValidators, function(v, name) {
                     setValidity(name, null);
-                }), !1;
-                return !0;
+                })), setValidity(errorKey, parserValid), parserValid) : (setValidity(errorKey, null), 
+                !0);
             }
             function processSyncValidators() {
                 var syncValidatorsValid = !0;
@@ -10023,7 +9998,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             }
             currentValidationRunId++;
             var localValidationRunId = currentValidationRunId;
-            return processParseErrors(parseValid) && processSyncValidators() ? void processAsyncValidators() : void validationDone(!1);
+            return processParseErrors() && processSyncValidators() ? void processAsyncValidators() : void validationDone(!1);
         }, this.$commitViewValue = function() {
             var viewValue = ctrl.$viewValue;
             $timeout.cancel(pendingDebounce), (ctrl.$$lastCommittedViewValue !== viewValue || "" === viewValue && ctrl.$$hasNativeValidators) && (ctrl.$$lastCommittedViewValue = viewValue, 
@@ -10032,8 +10007,8 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             function writeToModelIfNeeded() {
                 ctrl.$modelValue !== prevModelValue && ctrl.$$writeModelToScope();
             }
-            var viewValue = ctrl.$$lastCommittedViewValue, modelValue = viewValue, parserValid = isUndefined(modelValue) ? undefined : !0;
-            if (parserValid) for (var i = 0; i < ctrl.$parsers.length; i++) if (modelValue = ctrl.$parsers[i](modelValue), 
+            var viewValue = ctrl.$$lastCommittedViewValue, modelValue = viewValue;
+            if (parserValid = isUndefined(modelValue) ? undefined : !0) for (var i = 0; i < ctrl.$parsers.length; i++) if (modelValue = ctrl.$parsers[i](modelValue), 
             isUndefined(modelValue)) {
                 parserValid = !1;
                 break;
@@ -10041,7 +10016,7 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
             isNumber(ctrl.$modelValue) && isNaN(ctrl.$modelValue) && (ctrl.$modelValue = ngModelGet($scope));
             var prevModelValue = ctrl.$modelValue, allowInvalid = ctrl.$options && ctrl.$options.allowInvalid;
             ctrl.$$rawModelValue = modelValue, allowInvalid && (ctrl.$modelValue = modelValue, 
-            writeToModelIfNeeded()), ctrl.$$runValidators(parserValid, modelValue, ctrl.$$lastCommittedViewValue, function(allValid) {
+            writeToModelIfNeeded()), ctrl.$$runValidators(modelValue, ctrl.$$lastCommittedViewValue, function(allValid) {
                 allowInvalid || (ctrl.$modelValue = allValid ? modelValue : undefined, writeToModelIfNeeded());
             });
         }, this.$$writeModelToScope = function() {
@@ -10065,10 +10040,10 @@ function mdMediaFactory($mdConstant, $rootScope, $window) {
         }, $scope.$watch(function() {
             var modelValue = ngModelGet($scope);
             if (modelValue !== ctrl.$modelValue) {
-                ctrl.$modelValue = ctrl.$$rawModelValue = modelValue;
+                ctrl.$modelValue = ctrl.$$rawModelValue = modelValue, parserValid = undefined;
                 for (var formatters = ctrl.$formatters, idx = formatters.length, viewValue = modelValue; idx--; ) viewValue = formatters[idx](viewValue);
                 ctrl.$viewValue !== viewValue && (ctrl.$viewValue = ctrl.$$lastCommittedViewValue = viewValue, 
-                ctrl.$render(), ctrl.$$runValidators(undefined, modelValue, viewValue, noop));
+                ctrl.$render(), ctrl.$$runValidators(modelValue, viewValue, noop));
             }
             return modelValue;
         });
@@ -11624,20 +11599,21 @@ function(window, angular, undefined) {
         return {
             restrict: "A",
             require: "?ngModel",
+            priority: 200,
             link: function(scope, elem, attr, ngModel) {
                 function ngAriaWatchModelValue() {
                     return ngModel.$modelValue;
                 }
                 function getRadioReaction() {
-                    return needsTabIndex ? (needsTabIndex = !1, function(newVal) {
-                        var boolVal = newVal === attr.value;
+                    return needsTabIndex ? (needsTabIndex = !1, function() {
+                        var boolVal = attr.value == ngModel.$viewValue;
                         elem.attr("aria-checked", boolVal), elem.attr("tabindex", 0 - !boolVal);
-                    }) : function(newVal) {
-                        elem.attr("aria-checked", newVal === attr.value);
+                    }) : function() {
+                        elem.attr("aria-checked", attr.value == ngModel.$viewValue);
                     };
                 }
-                function ngAriaCheckboxReaction(newVal) {
-                    elem.attr("aria-checked", !!newVal);
+                function ngAriaCheckboxReaction() {
+                    elem.attr("aria-checked", !ngModel.$isEmpty(ngModel.$viewValue));
                 }
                 var shape = getShape(attr, elem), needsTabIndex = shouldAttachAttr("tabindex", "tabindex", elem);
                 switch (shape) {
@@ -11704,7 +11680,7 @@ function(window, angular, undefined) {
             $aria.config("tabindex") && !elem.attr("tabindex") && elem.attr("tabindex", 0);
         };
     } ]);
-}(window, window.angular), angular.module("ngMaterial", [ "ng", "ngAnimate", "ngAria", "material.core", "material.core.theming.palette", "material.core.theming", "material.components.backdrop", "material.components.bottomSheet", "material.components.button", "material.components.card", "material.components.checkbox", "material.components.content", "material.components.dialog", "material.components.divider", "material.components.icon", "material.components.input", "material.components.list", "material.components.progressCircular", "material.components.progressLinear", "material.components.radioButton", "material.components.sidenav", "material.components.slider", "material.components.sticky", "material.components.subheader", "material.components.swipe", "material.components.switch", "material.components.tabs", "material.components.textField", "material.components.toast", "material.components.toolbar", "material.components.tooltip", "material.components.whiteframe" ]), 
+}(window, window.angular), angular.module("ngMaterial", [ "ng", "ngAnimate", "ngAria", "material.core", "material.core.theming.palette", "material.core.theming", "material.components.autocomplete", "material.components.backdrop", "material.components.bottomSheet", "material.components.button", "material.components.card", "material.components.checkbox", "material.components.content", "material.components.dialog", "material.components.divider", "material.components.gridList", "material.components.icon", "material.components.input", "material.components.list", "material.components.progressCircular", "material.components.progressLinear", "material.components.radioButton", "material.components.select", "material.components.sidenav", "material.components.slider", "material.components.sticky", "material.components.subheader", "material.components.swipe", "material.components.switch", "material.components.tabs", "material.components.textField", "material.components.toast", "material.components.toolbar", "material.components.tooltip", "material.components.whiteframe" ]), 
 function() {
     "use strict";
     function MdCoreConfigure($provide, $mdThemingProvider) {
@@ -11738,12 +11714,14 @@ function() {
                 LEFT_ARROW: 37,
                 UP_ARROW: 38,
                 RIGHT_ARROW: 39,
-                DOWN_ARROW: 40
+                DOWN_ARROW: 40,
+                TAB: 9
             },
             CSS: {
                 TRANSITIONEND: "transitionend" + (webkit ? " webkitTransitionEnd" : ""),
                 ANIMATIONEND: "animationend" + (webkit ? " webkitAnimationEnd" : ""),
                 TRANSFORM: vendorProperty("transform"),
+                TRANSFORM_ORIGIN: vendorProperty("transformOrigin"),
                 TRANSITION: vendorProperty("transition"),
                 TRANSITION_DURATION: vendorProperty("transitionDuration"),
                 ANIMATION_PLAY_STATE: vendorProperty("animationPlayState"),
@@ -11759,7 +11737,8 @@ function() {
                 "gt-md": "(min-width: 960px)",
                 lg: "(min-width: 960px) and (max-width: 1200px)",
                 "gt-lg": "(min-width: 1200px)"
-            }
+            },
+            MEDIA_PRIORITY: [ "gt-lg", "lg", "gt-md", "md", "gt-sm", "sm" ]
         };
     }
     angular.module("material.core").factory("$mdConstant", MdConstantFactory), MdConstantFactory.$inject = [ "$$rAF", "$sniffer" ];
@@ -11809,16 +11788,19 @@ function() {
         }
         function findSubsequentItem(backwards, item, validate, limit) {
             validate = validate || trueFn;
-            var curIndex = indexOf(item);
-            if (!inRange(curIndex)) return null;
-            var nextIndex = curIndex + (backwards ? -1 : 1), foundItem = null;
-            return inRange(nextIndex) ? foundItem = _items[nextIndex] : reloop && (foundItem = backwards ? last() : first(), 
-            nextIndex = indexOf(foundItem)), null === foundItem || nextIndex === limit ? null : (angular.isUndefined(limit) && (limit = nextIndex), 
-            validate(foundItem) ? foundItem : findSubsequentItem(backwards, foundItem, validate, limit));
+            for (var curIndex = indexOf(item); ;) {
+                if (!inRange(curIndex)) return null;
+                var nextIndex = curIndex + (backwards ? -1 : 1), foundItem = null;
+                if (inRange(nextIndex) ? foundItem = _items[nextIndex] : reloop && (foundItem = backwards ? last() : first(), 
+                nextIndex = indexOf(foundItem)), null === foundItem || nextIndex === limit) return null;
+                if (validate(foundItem)) return foundItem;
+                angular.isUndefined(limit) && (limit = nextIndex), curIndex = nextIndex;
+            }
         }
         var trueFn = function() {
             return !0;
         };
+        items && !angular.isArray(items) && (items = Array.prototype.slice.call(items)), 
         reloop = !!reloop;
         var _items = items || [];
         return {
@@ -11844,28 +11826,123 @@ function() {
             return $delegate.iterator = Iterator, $delegate;
         } ]);
     } ]);
-}(), angular.module("material.core").factory("$mdMedia", mdMediaFactory), mdMediaFactory.$inject = [ "$mdConstant", "$rootScope", "$window" ], 
-function() {
+}(), function() {
+    function mdMediaFactory($mdConstant, $rootScope, $window) {
+        function $mdMedia(query) {
+            var validated = queries[query];
+            angular.isUndefined(validated) && (validated = queries[query] = validate(query));
+            var result = results[validated];
+            return angular.isUndefined(result) && (result = add(validated)), result;
+        }
+        function validate(query) {
+            return $mdConstant.MEDIA[query] || ("(" !== query.charAt(0) ? "(" + query + ")" : query);
+        }
+        function add(query) {
+            var result = mqls[query] = $window.matchMedia(query);
+            return result.addListener(onQueryChange), results[result.media] = !!result.matches;
+        }
+        function onQueryChange(query) {
+            $rootScope.$evalAsync(function() {
+                results[query.media] = !!query.matches;
+            });
+        }
+        function getQuery(name) {
+            return mqls[name];
+        }
+        function getResponsiveAttribute(attrs, attrName) {
+            for (var i = 0; i < $mdConstant.MEDIA_PRIORITY.length; i++) {
+                var mediaName = $mdConstant.MEDIA_PRIORITY[i];
+                if (mqls[queries[mediaName]].matches) {
+                    var normalizedName = getNormalizedName(attrs, attrName + "-" + mediaName);
+                    if (attrs[normalizedName]) return attrs[normalizedName];
+                }
+            }
+            return attrs[getNormalizedName(attrs, attrName)];
+        }
+        function watchResponsiveAttributes(attrNames, attrs, watchFn) {
+            var unwatchFns = [];
+            return attrNames.forEach(function(attrName) {
+                var normalizedName = getNormalizedName(attrs, attrName);
+                attrs[normalizedName] && unwatchFns.push(attrs.$observe(normalizedName, angular.bind(void 0, watchFn, null)));
+                for (var mediaName in $mdConstant.MEDIA) {
+                    if (normalizedName = getNormalizedName(attrs, attrName + "-" + mediaName), !attrs[normalizedName]) return;
+                    unwatchFns.push(attrs.$observe(normalizedName, angular.bind(void 0, watchFn, mediaName)));
+                }
+            }), function() {
+                unwatchFns.forEach(function(fn) {
+                    fn();
+                });
+            };
+        }
+        function getNormalizedName(attrs, attrName) {
+            return normalizeCache[attrName] || (normalizeCache[attrName] = attrs.$normalize(attrName));
+        }
+        var queries = {}, mqls = {}, results = {}, normalizeCache = {};
+        return $mdMedia.getResponsiveAttribute = getResponsiveAttribute, $mdMedia.getQuery = getQuery, 
+        $mdMedia.watchResponsiveAttributes = watchResponsiveAttributes, $mdMedia;
+    }
+    angular.module("material.core").factory("$mdMedia", mdMediaFactory), mdMediaFactory.$inject = [ "$mdConstant", "$rootScope", "$window" ];
+}(), function() {
     "use strict";
     var nextUniqueId = [ "0", "0", "0" ];
-    angular.module("material.core").factory("$mdUtil", [ "$document", "$timeout", function($document, $timeout) {
+    angular.module("material.core").factory("$mdUtil", [ "$cacheFactory", "$document", "$timeout", "$q", "$window", "$mdConstant", function($cacheFactory, $document, $timeout, $q, $window, $mdConstant) {
+        function getNode(el) {
+            return el[0] || el;
+        }
         var Util;
         return Util = {
             now: window.performance ? angular.bind(window.performance, window.performance.now) : Date.now,
-            elementRect: function(element, offsetParent) {
-                var node = element[0];
-                offsetParent = offsetParent || node.offsetParent || document.body, offsetParent = offsetParent[0] || offsetParent;
-                var nodeRect = node.getBoundingClientRect(), parentRect = offsetParent.getBoundingClientRect();
+            clientRect: function(element, offsetParent, isOffsetRect) {
+                var node = getNode(element);
+                offsetParent = getNode(offsetParent || node.offsetParent || document.body);
+                var nodeRect = node.getBoundingClientRect(), offsetRect = isOffsetRect ? offsetParent.getBoundingClientRect() : {
+                    left: 0,
+                    top: 0,
+                    width: 0,
+                    height: 0
+                };
                 return {
-                    left: nodeRect.left - parentRect.left + offsetParent.scrollLeft,
-                    top: nodeRect.top - parentRect.top + offsetParent.scrollTop,
+                    left: nodeRect.left - offsetRect.left + offsetParent.scrollLeft,
+                    top: nodeRect.top - offsetRect.top + offsetParent.scrollTop,
                     width: nodeRect.width,
                     height: nodeRect.height
                 };
             },
+            offsetRect: function(element, offsetParent) {
+                return Util.clientRect(element, offsetParent, !0);
+            },
+            floatingScrollbars: function() {
+                if (void 0 === this.floatingScrollbars.cached) {
+                    var tempNode = angular.element('<div style="z-index: -1; position: absolute; height: 1px; overflow-y: scroll"><div style="height: 2px;"></div></div>');
+                    $document[0].body.appendChild(tempNode[0]), this.floatingScrollbars.cached = tempNode[0].offsetWidth == tempNode[0].childNodes[0].offsetWidth, 
+                    tempNode.remove();
+                }
+                return this.floatingScrollbars.cached;
+            },
+            forceFocus: function(element) {
+                var node = element[0] || element;
+                document.addEventListener("click", function focusOnClick(ev) {
+                    ev.target === node && ev.$focus && (node.focus(), ev.stopImmediatePropagation(), 
+                    ev.preventDefault(), node.removeEventListener("click", focusOnClick));
+                }, !0);
+                var newEvent = document.createEvent("MouseEvents");
+                newEvent.initMouseEvent("click", !1, !0, window, {}, 0, 0, 0, 0, !1, !1, !1, !1, 0, null), 
+                newEvent.$material = !0, newEvent.$focus = !0, node.dispatchEvent(newEvent);
+            },
+            transitionEndPromise: function(element, opts) {
+                function finished(ev) {
+                    ev && ev.target !== element[0] || (element.off($mdConstant.CSS.TRANSITIONEND, finished), 
+                    deferred.resolve());
+                }
+                opts = opts || {};
+                var deferred = $q.defer();
+                return element.on($mdConstant.CSS.TRANSITIONEND, finished), opts.timeout && $timeout(finished, opts.timeout), 
+                deferred.promise;
+            },
             fakeNgModel: function() {
                 return {
                     $fake: !0,
+                    $setTouched: angular.noop,
                     $setViewValue: function(value) {
                         this.$viewValue = value, this.$render(value), this.$viewChangeListeners.forEach(function(cb) {
                             cb();
@@ -11895,6 +11972,10 @@ function() {
                     var context = this, args = arguments, now = Util.now();
                     (!recent || now - recent > delay) && (func.apply(context, args), recent = now);
                 };
+            },
+            time: function(cb) {
+                var start = Util.now();
+                return cb(), Util.now() - start;
             },
             nextUid: function() {
                 for (var digit, index = nextUniqueId.length; index; ) {
@@ -11937,7 +12018,7 @@ function() {
     function AriaService($$rAF, $log, $window) {
         function expect(element, attrName, defaultValue) {
             var node = element[0];
-            node.hasAttribute(attrName) || childHasAttribute(node, attrName) || (defaultValue = angular.isString(defaultValue) && defaultValue.trim() || "", 
+            node.hasAttribute(attrName) || childHasAttribute(node, attrName) || (defaultValue = angular.isString(defaultValue) ? defaultValue.trim() : "", 
             defaultValue.length ? element.attr(attrName, defaultValue) : $log.warn('ARIA: Attribute "', attrName, '", required for accessibility, is missing on node:', node));
         }
         function expectAsync(element, attrName, defaultValueGetter) {
@@ -11947,8 +12028,11 @@ function() {
         }
         function expectWithText(element, attrName) {
             expectAsync(element, attrName, function() {
-                return element.text().trim();
+                return getText(element);
             });
+        }
+        function getText(element) {
+            return element.text().trim();
         }
         function childHasAttribute(node, attrName) {
             function isHidden(el) {
@@ -11981,7 +12065,7 @@ function() {
             }).then(function(response) {
                 return response.data;
             }) : $q.when(template), $q.all(resolve).then(function(locals) {
-                var template = transformTemplate(locals.$template), element = angular.element("<div>").html(template.trim()).contents(), linkFn = $compile(element);
+                var template = transformTemplate(locals.$template), element = options.element || angular.element("<div>").html(template.trim()).contents(), linkFn = $compile(element);
                 return {
                     locals: locals,
                     element: element,
@@ -12050,7 +12134,7 @@ function() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera, isIos = userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) || userAgent.match(/iPod/i), isAndroid = userAgent.match(/Android/i), shouldHijackClicks = isIos || isAndroid;
     shouldHijackClicks && document.addEventListener("click", function(ev) {
         var isKeyClick = 0 === ev.clientX && 0 === ev.clientY;
-        isKeyClick || ev.$material || (ev.preventDefault(), ev.stopPropagation());
+        window.jQuery || isKeyClick || ev.$material || (ev.preventDefault(), ev.stopPropagation());
     }, !0), angular.element(document).on(START_EVENTS, gestureStart).on(MOVE_EVENTS, gestureMove).on(END_EVENTS, gestureEnd).on("$$mdGestureReset", function() {
         lastPointer = pointer = null;
     });
@@ -12070,7 +12154,7 @@ function() {
                 maxDistance: 6
             },
             onEnd: function(ev, pointer) {
-                pointer.distance < this.state.options.maxDistance && this.dispatchEvent(ev, "click", null, ev);
+                pointer.distance < this.state.options.maxDistance && this.dispatchEvent(ev, "click");
             }
         }), addHandler("press", {
             onStart: function(ev) {
@@ -12146,20 +12230,37 @@ function() {
         function GestureHandler(name) {
             this.name = name, this.state = {};
         }
-        function dispatchEvent(srcEvent, eventType, eventPointer, ev) {
+        function jQueryDispatchEvent(srcEvent, eventType, eventPointer) {
+            eventPointer = eventPointer || pointer;
+            var eventObj = new angular.element.Event(eventType);
+            eventObj.$material = !0, eventObj.pointer = eventPointer, eventObj.srcEvent = srcEvent, 
+            angular.extend(eventObj, {
+                clientX: eventPointer.x,
+                clientY: eventPointer.y,
+                screenX: eventPointer.x,
+                screenY: eventPointer.y,
+                pageX: eventPointer.x,
+                pageY: eventPointer.y,
+                ctrlKey: srcEvent.ctrlKey,
+                altKey: srcEvent.altKey,
+                shiftKey: srcEvent.shiftKey,
+                metaKey: srcEvent.metaKey
+            }), angular.element(eventPointer.target).trigger(eventObj);
+        }
+        function nativeDispatchEvent(srcEvent, eventType, eventPointer) {
             eventPointer = eventPointer || pointer;
             var eventObj;
-            "click" === eventType ? (eventObj = document.createEvent("MouseEvents"), eventObj.initMouseEvent("click", !0, !0, window, ev.detail, ev.screenX, ev.screenY, ev.clientX, ev.clientY, ev.ctrlKey, ev.altKey, ev.shiftKey, ev.metaKey, ev.button, ev.relatedTarget || null)) : (eventObj = document.createEvent("CustomEvent"), 
+            "click" === eventType ? (eventObj = document.createEvent("MouseEvents"), eventObj.initMouseEvent("click", !0, !0, window, srcEvent.detail, eventPointer.x, eventPointer.y, eventPointer.x, eventPointer.y, srcEvent.ctrlKey, srcEvent.altKey, srcEvent.shiftKey, srcEvent.metaKey, srcEvent.button, srcEvent.relatedTarget || null)) : (eventObj = document.createEvent("CustomEvent"), 
             eventObj.initCustomEvent(eventType, !0, !0, {})), eventObj.$material = !0, eventObj.pointer = eventPointer, 
             eventObj.srcEvent = srcEvent, eventPointer.target.dispatchEvent(eventObj);
         }
-        GestureHandler.prototype = {
+        return GestureHandler.prototype = {
             onStart: angular.noop,
             onMove: angular.noop,
             onEnd: angular.noop,
             onCancel: angular.noop,
             options: {},
-            dispatchEvent: dispatchEvent,
+            dispatchEvent: "undefined" != typeof window.jQuery && angular.element === window.jQuery ? jQueryDispatchEvent : nativeDispatchEvent,
             start: function(ev, pointer) {
                 if (!this.state.isRunning) {
                     var parentTarget = this.getNearestParent(ev.target), parentTargetOptions = parentTarget && parentTarget.$mdGesture[this.name] || {};
@@ -12193,8 +12294,7 @@ function() {
                 return element[0].$mdGesture = element[0].$mdGesture || {}, element[0].$mdGesture[this.name] = options || {}, 
                 element.on("$destroy", onDestroy), onDestroy;
             }
-        };
-        return GestureHandler;
+        }, GestureHandler;
     } ]);
 }(), function() {
     "use strict";
@@ -12203,6 +12303,9 @@ function() {
             function setDefaults(definition) {
                 return providerConfig.optionsFactory = definition.options, providerConfig.methods = (definition.methods || []).concat(EXPOSED_METHODS), 
                 provider;
+            }
+            function addMethod(name, fn) {
+                return customMethods[name] = fn, provider;
             }
             function addPreset(name, definition) {
                 if (definition = definition || {}, definition.methods = definition.methods || [], 
@@ -12232,7 +12335,9 @@ function() {
                     show: showInterimElement
                 };
                 return defaultMethods = providerConfig.methods || [], defaultOptions = invokeFactory(providerConfig.optionsFactory, {}), 
-                angular.forEach(providerConfig.presets, function(definition, name) {
+                angular.forEach(customMethods, function(fn, name) {
+                    publicService[name] = fn;
+                }), angular.forEach(providerConfig.presets, function(definition, name) {
                     function Preset(opts) {
                         this._options = angular.extend({}, presetDefaults, opts);
                     }
@@ -12255,11 +12360,12 @@ function() {
                     };
                 }), publicService;
             }
-            var EXPOSED_METHODS = [ "onHide", "onShow", "onRemove" ], providerConfig = {
+            var EXPOSED_METHODS = [ "onHide", "onShow", "onRemove" ], customMethods = {}, providerConfig = {
                 presets: {}
             }, provider = {
                 setDefaults: setDefaults,
                 addPreset: addPreset,
+                addMethod: addMethod,
                 $get: factory
             };
             return provider.addPreset("build", {
@@ -12273,7 +12379,9 @@ function() {
             var startSymbol = $interpolate.startSymbol(), endSymbol = $interpolate.endSymbol(), usesStandardSymbols = "{{" === startSymbol && "}}" === endSymbol, processTemplate = usesStandardSymbols ? angular.identity : replaceInterpolationSymbols;
             return function() {
                 function show(options) {
-                    stack.length && service.cancel();
+                    if (stack.length) return service.cancel().then(function() {
+                        return show(options);
+                    });
                     var interimElement = new InterimElement(options);
                     return stack.push(interimElement), interimElement.show().then(function() {
                         return interimElement.deferred.promise;
@@ -12283,17 +12391,18 @@ function() {
                     var interimElement = stack.shift();
                     return interimElement && interimElement.remove().then(function() {
                         interimElement.deferred.resolve(response);
-                    }), interimElement ? interimElement.deferred.promise : $q.when(response);
+                    });
                 }
                 function cancel(reason) {
                     var interimElement = stack.shift();
-                    return interimElement && interimElement.remove().then(function() {
+                    return $q.when(interimElement && interimElement.remove().then(function() {
                         interimElement.deferred.reject(reason);
-                    }), interimElement ? interimElement.deferred.promise : $q.reject(reason);
+                    }));
                 }
                 function InterimElement(options) {
-                    var self, hideTimeout, element;
+                    var self, hideTimeout, element, showDone, removeDone;
                     return options = options || {}, options = angular.extend({
+                        preserveScope: !1,
                         scope: options.scope || $rootScope.$new(options.isolateScope),
                         onShow: function(scope, element, options) {
                             return $animate.enter(element, options.parent);
@@ -12306,27 +12415,39 @@ function() {
                         options: options,
                         deferred: $q.defer(),
                         show: function() {
-                            return $mdCompiler.compile(options).then(function(compileData) {
+                            var compilePromise;
+                            return compilePromise = options.skipCompile ? $q(function(resolve) {
+                                resolve({
+                                    locals: {},
+                                    link: function() {
+                                        return options.element;
+                                    }
+                                });
+                            }) : $mdCompiler.compile(options), showDone = compilePromise.then(function(compileData) {
                                 function startHideTimeout() {
                                     options.hideDelay && (hideTimeout = $timeout(service.cancel, options.hideDelay));
                                 }
-                                angular.extend(compileData.locals, self.options), angular.isString(options.parent) ? options.parent = angular.element($document[0].querySelector(options.parent)) : options.parent || (options.parent = $rootElement.find("body"), 
-                                options.parent.length || (options.parent = $rootElement)), element = compileData.link(options.scope), 
+                                angular.extend(compileData.locals, self.options), element = compileData.link(options.scope), 
+                                angular.isFunction(options.parent) ? options.parent = options.parent(options.scope, element, options) : angular.isString(options.parent) && (options.parent = angular.element($document[0].querySelector(options.parent))), 
+                                (options.parent || {}).length || (options.parent = $rootElement.find("body"), options.parent.length || (options.parent = $rootElement)), 
                                 options.themable && $mdTheming(element);
                                 var ret = options.onShow(options.scope, element, options);
                                 return $q.when(ret).then(function() {
                                     (options.onComplete || angular.noop)(options.scope, element, options), startHideTimeout();
                                 });
+                            }, function(reason) {
+                                showDone = !0, self.deferred.reject(reason);
                             });
                         },
                         cancelTimeout: function() {
                             hideTimeout && ($timeout.cancel(hideTimeout), hideTimeout = void 0);
                         },
                         remove: function() {
-                            self.cancelTimeout();
-                            var ret = options.onRemove(options.scope, element, options);
-                            return $q.when(ret).then(function() {
-                                options.scope.$destroy();
+                            return self.cancelTimeout(), removeDone = $q.when(showDone).then(function() {
+                                var ret = element ? options.onRemove(options.scope, element, options) : !0;
+                                return $q.when(ret).then(function() {
+                                    options.preserveScope || options.scope.$destroy(), removeDone = !0;
+                                });
                             });
                         }
                     };
@@ -12399,7 +12520,7 @@ function() {
     function InkRippleService($window, $timeout) {
         function attachButtonBehavior(scope, element, options) {
             return attach(scope, element, angular.extend({
-                isFAB: element.hasClass("md-fab"),
+                fullRipple: !0,
                 isMenuItem: element.hasClass("md-menu-item"),
                 center: !1,
                 dimBackground: !0
@@ -12416,7 +12537,8 @@ function() {
             return attach(scope, element, angular.extend({
                 center: !1,
                 dimBackground: !0,
-                outline: !0
+                outline: !1,
+                rippleSize: "full"
             }, options));
         }
         function attach(scope, element, options) {
@@ -12463,13 +12585,13 @@ function() {
                     var multiplier, size, rect, width = container.prop("offsetWidth"), height = container.prop("offsetHeight");
                     return options.isMenuItem ? size = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) : options.outline ? (rect = node.getBoundingClientRect(), 
                     left -= rect.left, top -= rect.top, width = Math.max(left, width - left), height = Math.max(top, height - top), 
-                    size = 2 * Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))) : (multiplier = options.isFAB ? 1.1 : .8, 
+                    size = 2 * Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))) : (multiplier = options.fullRipple ? 1.1 : .8, 
                     size = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) * multiplier, options.fitRipple && (size = Math.min(height, width, size))), 
                     size;
                 }
                 function getRippleCss(size, left, top) {
                     function rgbaToRGB(color) {
-                        return color.replace("rgba", "rgb").replace(/,[^\)\,]+\)/, ")");
+                        return color.replace("rgba", "rgb").replace(/,[^\),]+\)/, ")");
                     }
                     var rect, css = {
                         backgroundColor: rgbaToRGB(color),
@@ -12501,12 +12623,7 @@ function() {
                 }, 0, !1), elem;
             }
             function onPressDown(ev) {
-                if (isRippleAllowed()) {
-                    {
-                        createRipple(ev.pointer.x, ev.pointer.y);
-                    }
-                    isHeld = !0;
-                }
+                isRippleAllowed() && (createRipple(ev.pointer.x, ev.pointer.y), isHeld = !0);
             }
             function onPressUp() {
                 isHeld = !1;
@@ -12532,18 +12649,18 @@ function() {
                 mousedownPauseTime: 150,
                 dimBackground: !1,
                 outline: !1,
-                isFAB: !1,
+                fullRipple: !0,
                 isMenuItem: !1,
                 fitRipple: !1
             }, options);
             var rippleSize, controller = element.controller("mdInkRipple") || {}, counter = 0, ripples = [], states = [], isActiveExpr = element.attr("md-highlight"), isActive = !1, isHeld = !1, node = element[0], rippleSizeSetting = element.attr("md-ripple-size"), color = parseColor(element.attr("md-ink-ripple")) || parseColor($window.getComputedStyle(options.colorElement[0]).color || "rgb(0, 0, 0)");
             switch (rippleSizeSetting) {
               case "full":
-                options.isFAB = !0;
+                options.fullRipple = !0;
                 break;
 
               case "partial":
-                options.isFAB = !1;
+                options.fullRipple = !1;
             }
             return options.mousedown && element.on("$md.pressdown", onPressDown).on("$md.pressup", onPressUp), 
             controller.createRipple = createRipple, isActiveExpr && scope.$watch(isActiveExpr, function(newValue) {
@@ -12987,7 +13104,7 @@ function() {
                     }), self;
                 }, self[colorType + "Color"] = function() {
                     var args = Array.prototype.slice.call(arguments);
-                    return console.warn("$mdThemingProviderTheme." + colorType + "Color() has been depricated. Use $mdThemingProviderTheme." + colorType + "Palette() instead."), 
+                    return console.warn("$mdThemingProviderTheme." + colorType + "Color() has been deprecated. Use $mdThemingProviderTheme." + colorType + "Palette() instead."), 
                     self[colorType + "Palette"].apply(self, args);
                 };
             });
@@ -13017,7 +13134,9 @@ function() {
                     var theme = ctrl && ctrl.$mdTheme || defaultTheme;
                     changeTheme(theme);
                 }
-            }, applyTheme.registered = registered, applyTheme;
+            }, applyTheme.registered = registered, applyTheme.defaultTheme = function() {
+                return defaultTheme;
+            }, applyTheme;
         }
         PALETTES = {}, THEMES = {};
         var defaultTheme = "default", alwaysWatchTheme = !1;
@@ -13115,7 +13234,7 @@ function() {
         if (angular.forEach(THEMES, function(theme) {
             THEME_COLOR_TYPES.forEach(function(colorType) {
                 styleString += parseRules(theme, colorType, rulesByType[colorType] + "");
-            }), theme.colors.primary.name == theme.colors.accent.name && console.warn("$mdThemingProvider: Using the same palette for primary andaccent. This violates the material design spec.");
+            }), theme.colors.primary.name == theme.colors.accent.name && console.warn("$mdThemingProvider: Using the same palette for primary and accent. This violates the material design spec.");
         }), !generationIsDone) {
             var style = document.createElement("style");
             style.innerHTML = styleString;
@@ -13181,6 +13300,9 @@ function() {
     var VALID_HUE_VALUES = [ "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "A100", "A200", "A400", "A700" ];
     ThemingProvider.$inject = [ "$mdColorPalette" ], ThemingDirective.$inject = [ "$mdTheming", "$interpolate", "$log" ], 
     ThemableDirective.$inject = [ "$mdTheming" ], generateThemes.$inject = [ "$injector" ];
+}(), function() {
+    "use strict";
+    angular.module("material.components.autocomplete", [ "material.core", "material.components.icon" ]);
 }(), function() {
     "use strict";
     function BackdropDirective($mdTheming) {
@@ -13281,7 +13403,7 @@ function() {
             });
         }
         return {
-            restrict: "E",
+            restrict: "EA",
             replace: !0,
             transclude: !0,
             template: getTemplate,
@@ -13321,7 +13443,8 @@ function() {
                 }
                 ngModelCtrl = ngModelCtrl || $mdUtil.fakeNgModel();
                 var checked = !1;
-                $mdTheming(element), $mdAria.expectWithText(element, "aria-label"), inputDirective.link.pre(scope, {
+                $mdTheming(element), attr.ngChecked && scope.$watch(scope.$eval.bind(scope, attr.ngChecked), ngModelCtrl.$setViewValue.bind(ngModelCtrl)), 
+                $mdAria.expectWithText(element, "aria-label"), inputDirective.link.pre(scope, {
                     on: angular.noop,
                     0: {}
                 }, attr, [ ngModelCtrl ]), element.on("click", listener).on("keypress", keypressHandler), 
@@ -13377,9 +13500,9 @@ function() {
         };
     }
     function MdDialogProvider($$interimElementProvider) {
-        function advancedDialogOptions($mdDialog) {
+        function advancedDialogOptions($mdDialog, $mdTheming) {
             return {
-                template: [ '<md-dialog aria-label="{{ dialog.ariaLabel }}">', "<md-content>", "<h2>{{ dialog.title }}</h2>", "<p>{{ dialog.content }}</p>", "</md-content>", '<div class="md-actions">', '<md-button ng-if="dialog.$type == \'confirm\'" ng-click="dialog.abort()">', "{{ dialog.cancel }}", "</md-button>", '<md-button ng-click="dialog.hide()" class="md-primary">', "{{ dialog.ok }}", "</md-button>", "</div>", "</md-dialog>" ].join(""),
+                template: [ '<md-dialog md-theme="{{ dialog.theme }}" aria-label="{{ dialog.ariaLabel }}">', "<md-content>", "<h2>{{ dialog.title }}</h2>", "<p>{{ dialog.content }}</p>", "</md-content>", '<div class="md-actions">', '<md-button ng-if="dialog.$type == \'confirm\'" ng-click="dialog.abort()">', "{{ dialog.cancel }}", "</md-button>", '<md-button ng-click="dialog.hide()" class="md-primary">', "{{ dialog.ok }}", "</md-button>", "</div>", "</md-dialog>" ].join(""),
                 controller: function() {
                     this.hide = function() {
                         $mdDialog.hide(!0);
@@ -13388,7 +13511,8 @@ function() {
                     };
                 },
                 controllerAs: "dialog",
-                bindToController: !0
+                bindToController: !0,
+                theme: $mdTheming.defaultTheme()
             };
         }
         function dialogDefaultOptions($timeout, $rootElement, $compile, $animate, $mdAria, $document, $mdUtil, $mdConstant, $mdTheming, $$rAF, $q, $mdDialog) {
@@ -13404,7 +13528,7 @@ function() {
                 options.parent = angular.element(options.parent), options.popInTarget = angular.element((options.targetEvent || {}).target);
                 var closeButton = findCloseButton();
                 if (configureAria(element.find("md-dialog")), options.hasBackdrop) {
-                    var parentOffset = options.parent.prop("scrollTop");
+                    var computeFrom = options.parent[0] == $document[0].body && $document[0].documentElement && $document[0].scrollTop ? angular.element($document[0].documentElement) : options.parent, parentOffset = computeFrom.prop("scrollTop");
                     options.backdrop = angular.element('<md-backdrop class="md-dialog-backdrop md-opaque">'), 
                     $mdTheming.inherit(options.backdrop, options.parent), $animate.enter(options.backdrop, options.parent), 
                     element.css("top", parentOffset + "px");
@@ -13441,26 +13565,18 @@ function() {
                 return parentElement.append(container), transformToClickElement(dialogEl, clickElement), 
                 $$rAF(function() {
                     dialogEl.addClass("transition-in").css($mdConstant.CSS.TRANSFORM, "");
-                }), dialogTransitionEnd(dialogEl);
+                }), $mdUtil.transitionEndPromise(dialogEl);
             }
             function dialogPopOut(container, parentElement, clickElement) {
                 var dialogEl = container.find("md-dialog");
                 return dialogEl.addClass("transition-out").removeClass("transition-in"), transformToClickElement(dialogEl, clickElement), 
-                dialogTransitionEnd(dialogEl);
+                $mdUtil.transitionEndPromise(dialogEl);
             }
             function transformToClickElement(dialogEl, clickElement) {
                 if (clickElement) {
                     var clickRect = clickElement[0].getBoundingClientRect(), dialogRect = dialogEl[0].getBoundingClientRect(), scaleX = Math.min(.5, clickRect.width / dialogRect.width), scaleY = Math.min(.5, clickRect.height / dialogRect.height);
                     dialogEl.css($mdConstant.CSS.TRANSFORM, "translate3d(" + (-dialogRect.left + clickRect.left + clickRect.width / 2 - dialogRect.width / 2) + "px," + (-dialogRect.top + clickRect.top + clickRect.height / 2 - dialogRect.height / 2) + "px,0) scale(" + scaleX + "," + scaleY + ")");
                 }
-            }
-            function dialogTransitionEnd(dialogEl) {
-                function finished(ev) {
-                    ev.target === dialogEl[0] && (dialogEl.off($mdConstant.CSS.TRANSITIONEND, finished), 
-                    deferred.resolve());
-                }
-                var deferred = $q.defer();
-                return dialogEl.on($mdConstant.CSS.TRANSITIONEND, finished), deferred.promise;
             }
             return {
                 hasBackdrop: !0,
@@ -13476,15 +13592,15 @@ function() {
                 }
             };
         }
-        return advancedDialogOptions.$inject = [ "$mdDialog" ], dialogDefaultOptions.$inject = [ "$timeout", "$rootElement", "$compile", "$animate", "$mdAria", "$document", "$mdUtil", "$mdConstant", "$mdTheming", "$$rAF", "$q", "$mdDialog" ], 
+        return advancedDialogOptions.$inject = [ "$mdDialog", "$mdTheming" ], dialogDefaultOptions.$inject = [ "$timeout", "$rootElement", "$compile", "$animate", "$mdAria", "$document", "$mdUtil", "$mdConstant", "$mdTheming", "$$rAF", "$q", "$mdDialog" ], 
         $$interimElementProvider("$mdDialog").setDefaults({
             methods: [ "disableParentScroll", "hasBackdrop", "clickOutsideToClose", "escapeToClose", "targetEvent" ],
             options: dialogDefaultOptions
         }).addPreset("alert", {
-            methods: [ "title", "content", "ariaLabel", "ok" ],
+            methods: [ "title", "content", "ariaLabel", "ok", "theme" ],
             options: advancedDialogOptions
         }).addPreset("confirm", {
-            methods: [ "title", "content", "ariaLabel", "ok", "cancel" ],
+            methods: [ "title", "content", "ariaLabel", "ok", "cancel", "theme" ],
             options: advancedDialogOptions
         });
     }
@@ -13504,17 +13620,480 @@ function() {
     MdDividerDirective.$inject = [ "$mdTheming" ];
 }(), function() {
     "use strict";
-    function mdIconDirective() {
+    function GridListDirective($interpolate, $mdConstant, $mdGridLayout, $mdMedia) {
+        function postLink(scope, element, attrs, ctrl) {
+            function watchMedia() {
+                for (var mediaName in $mdConstant.MEDIA) $mdMedia(mediaName), $mdMedia.getQuery($mdConstant.MEDIA[mediaName]).addListener(invalidateLayout);
+                return $mdMedia.watchResponsiveAttributes([ "md-cols", "md-row-height" ], attrs, layoutIfMediaMatch);
+            }
+            function unwatchMedia() {
+                unwatchAttrs();
+                for (var mediaName in $mdConstant.MEDIA) $mdMedia.getQuery($mdConstant.MEDIA[mediaName]).removeListener(invalidateLayout);
+            }
+            function layoutIfMediaMatch(mediaName) {
+                null == mediaName ? ctrl.invalidateLayout() : $mdMedia(mediaName) && ctrl.invalidateLayout();
+            }
+            function layoutDelegate() {
+                var tiles = getTileElements(), colCount = getColumnCount(), rowMode = getRowMode(), rowHeight = getRowHeight(), gutter = getGutter(), performance = $mdGridLayout(colCount, getTileSpans(), getTileElements()).map(function(tilePositions, rowCount) {
+                    return {
+                        grid: {
+                            element: element,
+                            style: getGridStyle(colCount, rowCount, gutter, rowMode, rowHeight)
+                        },
+                        tiles: tilePositions.map(function(ps, i) {
+                            return {
+                                element: angular.element(tiles[i]),
+                                style: getTileStyle(ps.position, ps.spans, colCount, rowCount, gutter, rowMode, rowHeight)
+                            };
+                        })
+                    };
+                }).reflow().performance();
+                scope.mdOnLayout({
+                    $event: {
+                        performance: performance
+                    }
+                });
+            }
+            function getTileStyle(position, spans, colCount, rowCount, gutter, rowMode, rowHeight) {
+                var hShare = 1 / colCount * 100, hGutterShare = 1 === colCount ? 0 : (colCount - 1) / colCount, hUnit = UNIT({
+                    share: hShare,
+                    gutterShare: hGutterShare,
+                    gutter: gutter
+                }), style = {
+                    left: POSITION({
+                        unit: hUnit,
+                        offset: position.col,
+                        gutter: gutter
+                    }),
+                    width: DIMENSION({
+                        unit: hUnit,
+                        span: spans.col,
+                        gutter: gutter
+                    }),
+                    paddingTop: "",
+                    marginTop: "",
+                    top: "",
+                    height: ""
+                };
+                switch (rowMode) {
+                  case "fixed":
+                    style.top = POSITION({
+                        unit: rowHeight,
+                        offset: position.row,
+                        gutter: gutter
+                    }), style.height = DIMENSION({
+                        unit: rowHeight,
+                        span: spans.row,
+                        gutter: gutter
+                    });
+                    break;
+
+                  case "ratio":
+                    var vShare = hShare * (1 / rowHeight), vUnit = UNIT({
+                        share: vShare,
+                        gutterShare: hGutterShare,
+                        gutter: gutter
+                    });
+                    style.paddingTop = DIMENSION({
+                        unit: vUnit,
+                        span: spans.row,
+                        gutter: gutter
+                    }), style.marginTop = POSITION({
+                        unit: vUnit,
+                        offset: position.row,
+                        gutter: gutter
+                    });
+                    break;
+
+                  case "fit":
+                    var vGutterShare = 1 === rowCount ? 0 : (rowCount - 1) / rowCount, vShare = 1 / rowCount * 100, vUnit = UNIT({
+                        share: vShare,
+                        gutterShare: vGutterShare,
+                        gutter: gutter
+                    });
+                    style.top = POSITION({
+                        unit: vUnit,
+                        offset: position.row,
+                        gutter: gutter
+                    }), style.height = DIMENSION({
+                        unit: vUnit,
+                        span: spans.row,
+                        gutter: gutter
+                    });
+                }
+                return style;
+            }
+            function getGridStyle(colCount, rowCount, gutter, rowMode, rowHeight) {
+                var style = {
+                    height: "",
+                    paddingBottom: ""
+                };
+                switch (rowMode) {
+                  case "fixed":
+                    style.height = DIMENSION({
+                        unit: rowHeight,
+                        span: rowCount,
+                        gutter: gutter
+                    });
+                    break;
+
+                  case "ratio":
+                    var hGutterShare = 1 === colCount ? 0 : (colCount - 1) / colCount, hShare = 1 / colCount * 100, vShare = hShare * (1 / rowHeight), vUnit = UNIT({
+                        share: vShare,
+                        gutterShare: hGutterShare,
+                        gutter: gutter
+                    });
+                    style.paddingBottom = DIMENSION({
+                        unit: vUnit,
+                        span: rowCount,
+                        gutter: gutter
+                    });
+                    break;
+
+                  case "fit":                }
+                return style;
+            }
+            function getTileElements() {
+                return ctrl.tiles.map(function(tile) {
+                    return tile.element;
+                });
+            }
+            function getTileSpans() {
+                return ctrl.tiles.map(function(tile) {
+                    return {
+                        row: parseInt($mdMedia.getResponsiveAttribute(tile.attrs, "md-rowspan"), 10) || 1,
+                        col: parseInt($mdMedia.getResponsiveAttribute(tile.attrs, "md-colspan"), 10) || 1
+                    };
+                });
+            }
+            function getColumnCount() {
+                var colCount = parseInt($mdMedia.getResponsiveAttribute(attrs, "md-cols"), 10);
+                if (isNaN(colCount)) throw "md-grid-list: md-cols attribute was not found, or contained a non-numeric value";
+                return colCount;
+            }
+            function getGutter() {
+                return applyDefaultUnit($mdMedia.getResponsiveAttribute(attrs, "md-gutter") || 1);
+            }
+            function getRowHeight() {
+                var rowHeight = $mdMedia.getResponsiveAttribute(attrs, "md-row-height");
+                switch (getRowMode()) {
+                  case "fixed":
+                    return applyDefaultUnit(rowHeight);
+
+                  case "ratio":
+                    var whRatio = rowHeight.split(":");
+                    return parseFloat(whRatio[0]) / parseFloat(whRatio[1]);
+
+                  case "fit":
+                    return 0;
+                }
+            }
+            function getRowMode() {
+                var rowHeight = $mdMedia.getResponsiveAttribute(attrs, "md-row-height");
+                return "fit" == rowHeight ? "fit" : -1 !== rowHeight.indexOf(":") ? "ratio" : "fixed";
+            }
+            function applyDefaultUnit(val) {
+                return /\D$/.test(val) ? val : val + "px";
+            }
+            element.attr("role", "list"), ctrl.layoutDelegate = layoutDelegate;
+            var invalidateLayout = angular.bind(ctrl, ctrl.invalidateLayout), unwatchAttrs = watchMedia();
+            scope.$on("$destroy", unwatchMedia);
+            var UNIT = $interpolate("{{ share }}% - ({{ gutter }} * {{ gutterShare }})"), POSITION = $interpolate("calc(({{ unit }}) * {{ offset }} + {{ offset }} * {{ gutter }})"), DIMENSION = $interpolate("calc(({{ unit }}) * {{ span }} + ({{ span }} - 1) * {{ gutter }})");
+        }
         return {
             restrict: "E",
-            template: '<object class="md-icon"></object>',
-            compile: function(element, attr) {
-                var object = angular.element(element[0].children[0]);
-                angular.isDefined(attr.icon) && object.attr("data", attr.icon);
-            }
+            controller: GridListController,
+            scope: {
+                mdOnLayout: "&"
+            },
+            link: postLink
         };
     }
-    angular.module("material.components.icon", [ "material.core" ]).directive("mdIcon", mdIconDirective);
+    function GridListController($timeout) {
+        this.invalidated = !1, this.$timeout_ = $timeout, this.tiles = [], this.layoutDelegate = angular.noop;
+    }
+    function GridLayoutFactory($mdUtil) {
+        function GridLayout(colCount, tileSpans) {
+            var self, layoutInfo, gridStyles, layoutTime, mapTime, reflowTime, layoutInfo;
+            return layoutTime = $mdUtil.time(function() {
+                layoutInfo = calculateGridFor(colCount, tileSpans);
+            }), self = {
+                layoutInfo: function() {
+                    return layoutInfo;
+                },
+                map: function(updateFn) {
+                    return mapTime = $mdUtil.time(function() {
+                        var info = self.layoutInfo();
+                        gridStyles = updateFn(info.positioning, info.rowCount);
+                    }), self;
+                },
+                reflow: function(animatorFn) {
+                    return reflowTime = $mdUtil.time(function() {
+                        var animator = animatorFn || defaultAnimator;
+                        animator(gridStyles.grid, gridStyles.tiles);
+                    }), self;
+                },
+                performance: function() {
+                    return {
+                        tileCount: tileSpans.length,
+                        layoutTime: layoutTime,
+                        mapTime: mapTime,
+                        reflowTime: reflowTime,
+                        totalTime: layoutTime + mapTime + reflowTime
+                    };
+                }
+            };
+        }
+        function GridTileAnimator(grid, tiles) {
+            grid.element.css(grid.style), tiles.forEach(function(t) {
+                t.element.css(t.style);
+            });
+        }
+        function calculateGridFor(colCount, tileSpans) {
+            function reserveSpace(spans, i) {
+                if (spans.col > colCount) throw "md-grid-list: Tile at position " + i + " has a colspan (" + spans.col + ") that exceeds the column count (" + colCount + ")";
+                for (var start = 0, end = 0; end - start < spans.col; ) curCol >= colCount ? nextRow() : (start = spaceTracker.indexOf(0, curCol), 
+                -1 !== start && -1 !== (end = findEnd(start + 1)) ? curCol = end + 1 : (start = end = 0, 
+                nextRow()));
+                return adjustRow(start, spans.col, spans.row), curCol = start + spans.col, {
+                    col: start,
+                    row: curRow
+                };
+            }
+            function nextRow() {
+                curCol = 0, curRow++, adjustRow(0, colCount, -1);
+            }
+            function adjustRow(from, cols, by) {
+                for (var i = from; from + cols > i; i++) spaceTracker[i] = Math.max(spaceTracker[i] + by, 0);
+            }
+            function findEnd(start) {
+                var i;
+                for (i = start; i < spaceTracker.length; i++) if (0 !== spaceTracker[i]) return i;
+                return i === spaceTracker.length ? i : void 0;
+            }
+            function newSpaceTracker() {
+                for (var tracker = [], i = 0; colCount > i; i++) tracker.push(0);
+                return tracker;
+            }
+            var curCol = 0, curRow = 0, spaceTracker = newSpaceTracker();
+            return {
+                positioning: tileSpans.map(function(spans, i) {
+                    return {
+                        spans: spans,
+                        position: reserveSpace(spans, i)
+                    };
+                }),
+                rowCount: curRow + Math.max.apply(Math, spaceTracker)
+            };
+        }
+        var defaultAnimator = GridTileAnimator;
+        return GridLayout.animateWith = function(customAnimator) {
+            defaultAnimator = angular.isFunction(customAnimator) ? customAnimator : GridTileAnimator;
+        }, GridLayout;
+    }
+    function GridTileDirective($mdMedia) {
+        function postLink(scope, element, attrs, gridCtrl) {
+            element.attr("role", "listitem");
+            var unwatchAttrs = $mdMedia.watchResponsiveAttributes([ "md-colspan", "md-rowspan" ], attrs, angular.bind(gridCtrl, gridCtrl.invalidateLayout));
+            gridCtrl.addTile(element, attrs, scope.$parent.$index), scope.$on("$destroy", function() {
+                unwatchAttrs(), gridCtrl.removeTile(element, attrs);
+            });
+        }
+        return {
+            restrict: "E",
+            require: "^mdGridList",
+            template: "<figure ng-transclude></figure>",
+            transclude: !0,
+            scope: {},
+            link: postLink
+        };
+    }
+    function GridTileCaptionDirective() {
+        return {
+            template: "<figcaption ng-transclude></figcaption>",
+            transclude: !0
+        };
+    }
+    angular.module("material.components.gridList", [ "material.core" ]).directive("mdGridList", GridListDirective).directive("mdGridTile", GridTileDirective).directive("mdGridTileFooter", GridTileCaptionDirective).directive("mdGridTileHeader", GridTileCaptionDirective).factory("$mdGridLayout", GridLayoutFactory), 
+    GridListDirective.$inject = [ "$interpolate", "$mdConstant", "$mdGridLayout", "$mdMedia", "$mdUtil" ], 
+    GridListController.$inject = [ "$timeout" ], GridListController.prototype = {
+        addTile: function(tileElement, tileAttrs, idx) {
+            var tile = {
+                element: tileElement,
+                attrs: tileAttrs
+            };
+            angular.isUndefined(idx) ? this.tiles.push(tile) : this.tiles.splice(idx, 0, tile), 
+            this.invalidateLayout();
+        },
+        removeTile: function(tileElement, tileAttrs) {
+            var idx = this._findTileIndex(tileAttrs);
+            -1 !== idx && (this.tiles.splice(idx, 1), this.invalidateLayout());
+        },
+        invalidateLayout: function() {
+            this.invalidated || (this.invalidated = !0, this.$timeout_(angular.bind(this, this.layout)));
+        },
+        layout: function() {
+            try {
+                this.layoutDelegate();
+            } finally {
+                this.invalidated = !1;
+            }
+        },
+        _findTileIndex: function(tileAttrs) {
+            for (var i = 0; i < this.tiles.length; i++) if (this.tiles[i].attrs == tileAttrs) return i;
+            return -1;
+        }
+    }, GridLayoutFactory.$inject = [ "$mdUtil" ], GridTileDirective.$inject = [ "$mdMedia" ];
+}(), function() {
+    "use strict";
+    function mdIconDirective($mdIcon, $mdTheming, $mdAria) {
+        function getTemplate(element, attr) {
+            return attr.mdFontIcon ? '<span class="md-font" ng-class="fontIcon"></span>' : "";
+        }
+        function postLink(scope, element, attr) {
+            function parentsHaveText() {
+                var parent = element.parent();
+                return parent.attr("aria-label") || parent.text() ? !0 : parent.parent().attr("aria-label") || parent.parent().text() ? !0 : !1;
+            }
+            $mdTheming(element);
+            var ariaLabel = attr.alt || scope.fontIcon || scope.svgIcon, attrName = attr.$normalize(attr.$attr.mdSvgIcon || attr.$attr.mdSvgSrc || "");
+            "" == attr.alt || parentsHaveText() ? $mdAria.expect(element, "aria-hidden", "true") : ($mdAria.expect(element, "aria-label", ariaLabel), 
+            $mdAria.expect(element, "role", "img")), attrName && attr.$observe(attrName, function(attrVal) {
+                element.empty(), attrVal && $mdIcon(attrVal).then(function(svg) {
+                    element.append(svg);
+                });
+            });
+        }
+        return {
+            scope: {
+                fontIcon: "@mdFontIcon",
+                svgIcon: "@mdSvgIcon",
+                svgSrc: "@mdSvgSrc"
+            },
+            restrict: "E",
+            template: getTemplate,
+            link: postLink
+        };
+    }
+    angular.module("material.components.icon", [ "material.core" ]).directive("mdIcon", mdIconDirective), 
+    mdIconDirective.$inject = [ "$mdIcon", "$mdTheming", "$mdAria" ];
+}(), function() {
+    "use strict";
+    function MdIconProvider() {}
+    function ConfigurationItem(url, iconSize) {
+        this.url = url, this.iconSize = iconSize || config.defaultIconSize;
+    }
+    function MdIconService(config, $http, $q, $log, $templateCache) {
+        function cacheIcon(id) {
+            return function(icon) {
+                return iconCache[id] = isIcon(icon) ? icon : new Icon(icon, config[id]), iconCache[id].clone();
+            };
+        }
+        function loadByID(id) {
+            var iconConfig = config[id];
+            return iconConfig ? loadByURL(iconConfig.url).then(function(icon) {
+                return new Icon(icon, iconConfig);
+            }) : $q.reject(id);
+        }
+        function loadFromIconSet(id) {
+            function extractFromSet(set) {
+                var iconName = id.slice(id.lastIndexOf(":") + 1), icon = set.querySelector("#" + iconName);
+                return icon ? new Icon(icon, iconSetConfig) : $q.reject(id);
+            }
+            var setName = id.substring(0, id.lastIndexOf(":")) || "$default", iconSetConfig = config[setName];
+            return iconSetConfig ? loadByURL(iconSetConfig.url).then(extractFromSet) : $q.reject(id);
+        }
+        function loadByURL(url) {
+            return $http.get(url, {
+                cache: $templateCache
+            }).then(function(response) {
+                for (var els = angular.element(response.data), i = 0; i < els.length; ++i) if ("svg" == els[i].nodeName) return els[i];
+            });
+        }
+        function announceIdNotFound(id) {
+            var msg;
+            return angular.isString(id) && (msg = "icon " + id + " not found", $log.warn(msg)), 
+            $q.reject(msg || id);
+        }
+        function announceNotFound(err) {
+            var msg = angular.isString(err) ? err : err.message || err.data || err.statusText;
+            return $log.warn(msg), $q.reject(msg);
+        }
+        function isIcon(target) {
+            return angular.isDefined(target.element) && angular.isDefined(target.config);
+        }
+        function Icon(el, config) {
+            "svg" != el.tagName && (el = angular.element('<svg xmlns="http://www.w3.org/2000/svg">').append(el)[0]), 
+            el = angular.element(el), el.attr("xmlns") || el.attr("xmlns", "http://www.w3.org/2000/svg"), 
+            this.element = el, this.config = config, this.prepare();
+        }
+        function prepareAndStyle() {
+            var iconSize = this.config ? this.config.iconSize : config.defaultIconSize, svg = angular.element(this.element);
+            svg.attr({
+                fit: "",
+                height: "100%",
+                width: "100%",
+                preserveAspectRatio: "xMidYMid meet",
+                viewBox: svg.attr("viewBox") || "0 0 " + iconSize + " " + iconSize
+            }).css({
+                "pointer-events": "none",
+                display: "block"
+            }), this.element = svg;
+        }
+        function cloneSVG() {
+            return angular.element(this.element[0].cloneNode(!0));
+        }
+        var iconCache = {}, urlRegex = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/i;
+        return Icon.prototype = {
+            clone: cloneSVG,
+            prepare: prepareAndStyle
+        }, function(id) {
+            return id = id || "", iconCache[id] ? $q.when(iconCache[id].clone()) : urlRegex.test(id) ? loadByURL(id).then(cacheIcon(id)) : (-1 == id.indexOf(":") && (id = "$default:" + id), 
+            loadByID(id)["catch"](loadFromIconSet)["catch"](announceIdNotFound)["catch"](announceNotFound).then(cacheIcon(id)));
+        };
+    }
+    angular.module("material.components.icon").provider("$mdIcon", MdIconProvider);
+    var config = {
+        defaultIconSize: 24
+    };
+    MdIconProvider.prototype = {
+        icon: function(id, url, iconSize) {
+            return -1 == id.indexOf(":") && (id = "$default:" + id), config[id] = new ConfigurationItem(url, iconSize), 
+            this;
+        },
+        iconSet: function(id, url, iconSize) {
+            return config[id] = new ConfigurationItem(url, iconSize), this;
+        },
+        defaultIconSet: function(url, iconSize) {
+            var setName = "$default";
+            return config[setName] || (config[setName] = new ConfigurationItem(url, iconSize)), 
+            config[setName].iconSize = iconSize || config.defaultIconSize, this;
+        },
+        defaultIconSize: function(iconSize) {
+            return config.defaultIconSize = iconSize, this;
+        },
+        preloadIcons: function($templateCache) {
+            var iconProvider = this, svgRegistry = [ {
+                id: "tabs-arrow",
+                url: "tabs-arrow.svg",
+                svg: '<svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24"><g id="tabs-arrow"><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "/></g></svg>'
+            }, {
+                id: "close",
+                url: "close.svg",
+                svg: '<svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24"><g id="close"><path d="M19 6.41l-1.41-1.41-5.59 5.59-5.59-5.59-1.41 1.41 5.59 5.59-5.59 5.59 1.41 1.41 5.59-5.59 5.59 5.59 1.41-1.41-5.59-5.59z"/></g></svg>'
+            }, {
+                id: "cancel",
+                url: "cancel.svg",
+                svg: '<svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24"><g id="cancel"><path d="M12 2c-5.53 0-10 4.47-10 10s4.47 10 10 10 10-4.47 10-10-4.47-10-10-10zm5 13.59l-1.41 1.41-3.59-3.59-3.59 3.59-1.41-1.41 3.59-3.59-3.59-3.59 1.41-1.41 3.59 3.59 3.59-3.59 1.41 1.41-3.59 3.59 3.59 3.59z"/></g></svg>'
+            } ];
+            svgRegistry.forEach(function(asset) {
+                iconProvider.icon(asset.id, asset.url), $templateCache.put(asset.url, asset.svg);
+            });
+        },
+        $get: [ "$http", "$q", "$log", "$templateCache", function($http, $q, $log, $templateCache) {
+            return this.preloadIcons($templateCache), new MdIconService(config, $http, $q, $log, $templateCache);
+        } ]
+    };
 }(), function() {
     function mdInputContainerDirective($mdTheming, $parse) {
         function postLink(scope, element) {
@@ -13546,7 +14125,7 @@ function() {
             restrict: "E",
             require: "^?mdInputContainer",
             link: function(scope, element, attr, containerCtrl) {
-                containerCtrl && (containerCtrl.label = element, scope.$on("$destroy", function() {
+                containerCtrl && !attr.mdNoFloat && (containerCtrl.label = element, scope.$on("$destroy", function() {
                     containerCtrl.label = null;
                 }));
             }
@@ -13565,11 +14144,13 @@ function() {
                     return onChangeTextarea(), value;
                 }
                 function growTextarea() {
-                    node.style.height = "auto";
+                    node.style.height = "auto", node.scrollTop = 0;
+                    var height = getHeight();
+                    height && (node.style.height = height + "px");
+                }
+                function getHeight() {
                     var line = node.scrollHeight - node.offsetHeight;
-                    node.scrollTop = 0;
-                    var height = node.offsetHeight + (line > 0 ? line : 0);
-                    node.style.height = height + "px";
+                    return node.offsetHeight + (line > 0 ? line : 0);
                 }
                 function onScroll() {
                     node.scrollTop = 0;
@@ -13588,13 +14169,13 @@ function() {
                 if (containerCtrl.input) throw new Error("<md-input-container> can only have *one* <input> or <textarea> child element!");
                 containerCtrl.input = element, element.addClass("md-input"), element.attr("id") || element.attr("id", "input_" + $mdUtil.nextUid()), 
                 "textarea" === element[0].tagName.toLowerCase() && setupTextarea();
-                var isErrorGetter = containerCtrl.isErrorGetter || function() {
-                    return ngModelCtrl.$invalid && ngModelCtrl.$touched;
+                var touched = !1, isErrorGetter = containerCtrl.isErrorGetter || function() {
+                    return ngModelCtrl.$invalid && (touched || ngModelCtrl.$touched);
                 };
                 scope.$watch(isErrorGetter, containerCtrl.setInvalid), ngModelCtrl.$parsers.push(ngModelPipelineCheckValue), 
                 ngModelCtrl.$formatters.push(ngModelPipelineCheckValue), element.on("input", inputCheckValue), 
                 isReadonly || element.on("focus", function() {
-                    containerCtrl.setFocused(!0);
+                    touched = !0, containerCtrl.setFocused(!0), scope.$evalAsync();
                 }).on("blur", function() {
                     containerCtrl.setFocused(!1), inputCheckValue();
                 }), scope.$on("$destroy", function() {
@@ -13633,7 +14214,7 @@ function() {
     }
     function placeholderDirective() {
         function postLink(scope, element, attr, inputContainer) {
-            if (inputContainer) {
+            if (inputContainer && !angular.isDefined(inputContainer.element.attr("md-no-float"))) {
                 var placeholderText = attr.placeholder;
                 element.removeAttr("placeholder"), inputContainer.element.append('<div class="md-placeholder">' + placeholderText + "</div>");
             }
@@ -13645,7 +14226,7 @@ function() {
         };
     }
     angular.module("material.components.input", [ "material.core" ]).directive("mdInputContainer", mdInputContainerDirective).directive("label", labelDirective).directive("input", inputTextareaDirective).directive("textarea", inputTextareaDirective).directive("mdMaxlength", mdMaxlengthDirective).directive("placeholder", placeholderDirective), 
-    mdInputContainerDirective.$inject = [ "$mdTheming", "$parse" ], inputTextareaDirective.$inject = [ "$mdUtil", "$window", "$compile", "$animate" ], 
+    mdInputContainerDirective.$inject = [ "$mdTheming", "$parse" ], inputTextareaDirective.$inject = [ "$mdUtil", "$window" ], 
     mdMaxlengthDirective.$inject = [ "$animate" ];
 }(), function() {
     "use strict";
@@ -13669,7 +14250,7 @@ function() {
             }
         };
     }
-    angular.module("material.components.list", [ "material.core" ]).directive("mdList", mdListDirective).directive("mdItem", mdItemDirective);
+    angular.module("material.components.list", [ "material.core" ]).directive("mdList", mdListDirective).directive("mdItem", mdItemDirective).directive("mdListItem", mdItemDirective);
 }(), function() {
     "use strict";
     function MdProgressCircularDirective($$rAF, $mdConstant, $mdTheming) {
@@ -13807,7 +14388,7 @@ function() {
             };
         }
         function changeSelectedButton(parent, increment) {
-            var buttons = $mdUtil.iterator(Array.prototype.slice.call(parent[0].querySelectorAll("md-radio-button")), !0);
+            var buttons = $mdUtil.iterator(parent[0].querySelectorAll("md-radio-button"), !0);
             if (buttons.count()) {
                 var validate = function(button) {
                     return !angular.element(button).attr("disabled");
@@ -13865,6 +14446,418 @@ function() {
     mdRadioGroupDirective.$inject = [ "$mdUtil", "$mdConstant", "$mdTheming" ], mdRadioButtonDirective.$inject = [ "$mdAria", "$mdUtil", "$mdTheming" ];
 }(), function() {
     "use strict";
+    function SelectDirective($mdSelect, $mdUtil, $mdTheming, $interpolate, $compile) {
+        function compile(element, attr) {
+            var labelEl = element.find("md-select-label").remove();
+            labelEl.length || (labelEl = angular.element("<md-select-label><span></span></md-select-label>")), 
+            labelEl.append('<span class="md-select-icon" aria-hidden="true"></span>'), labelEl.addClass("md-select-label"), 
+            labelEl.attr("id", "select_label_" + $mdUtil.nextUid()), element.find("md-content").length || element.append(angular.element("<md-content>").append(element.contents())), 
+            attr.mdOnOpen && element.find("md-content").prepend(angular.element("<md-progress-circular>").attr("md-mode", "indeterminate").attr("ng-hide", "$$loadingAsyncDone").wrap("<div>").parent());
+            var selectTemplate = '<div class="md-select-menu-container"><md-select-menu ' + (angular.isDefined(attr.multiple) ? "multiple" : "") + ">" + element.html() + "</md-select-menu></div>";
+            return element.empty().append(labelEl), $mdTheming(element), function(scope, element, attr, ctrls) {
+                function syncLabelText() {
+                    if (selectContainer) {
+                        var selectMenuCtrl = selectContainer.find("md-select-menu").controller("mdSelectMenu");
+                        mdSelectCtrl.setLabelText(selectMenuCtrl.selectedLabels());
+                    }
+                }
+                function createSelect() {
+                    selectContainer = angular.element(selectTemplate);
+                    var selectEl = selectContainer.find("md-select-menu");
+                    selectEl.data("$ngModelController", ngModel), selectEl.data("$mdSelectController", mdSelectCtrl), 
+                    selectScope = scope.$new(), selectContainer = $compile(selectContainer)(selectScope);
+                }
+                function openOnKeypress(e) {
+                    var allowedCodes = [ 32, 13, 38, 40 ];
+                    -1 != allowedCodes.indexOf(e.keyCode) && (e.preventDefault(), openSelect(e));
+                }
+                function openSelect() {
+                    scope.$evalAsync(function() {
+                        isOpen = !0, $mdSelect.show({
+                            scope: selectScope,
+                            preserveScope: !0,
+                            skipCompile: !0,
+                            element: selectContainer,
+                            target: element[0],
+                            hasBackdrop: !0,
+                            loadingAsync: attr.mdOnOpen ? scope.$eval(attr.mdOnOpen) : !1
+                        }).then(function() {
+                            isOpen = !1;
+                        });
+                    });
+                }
+                var isOpen, selectContainer, selectScope, mdSelectCtrl = ctrls[0], ngModel = ctrls[1], labelEl = element.find("md-select-label"), customLabel = 0 !== labelEl.text().length;
+                createSelect();
+                var originalRender = ngModel.$render;
+                ngModel.$render = function() {
+                    originalRender(), syncLabelText();
+                }, mdSelectCtrl.setLabelText = function(text) {
+                    if (!customLabel) {
+                        mdSelectCtrl.setIsPlaceholder(!text);
+                        var newText = text || attr.placeholder || "", target = customLabel ? labelEl : labelEl.children().eq(0);
+                        target.text(newText);
+                    }
+                }, mdSelectCtrl.setIsPlaceholder = function(val) {
+                    val ? labelEl.addClass("md-placeholder") : labelEl.removeClass("md-placeholder");
+                }, scope.$$postDigest(syncLabelText), attr.$observe("disabled", function(disabled) {
+                    "string" == typeof disabled && (disabled = !0), disabled ? (element.attr("tabindex", -1), 
+                    element.off("click", openSelect), element.off("keydown", openOnKeypress)) : (element.attr("tabindex", 0), 
+                    element.on("click", openSelect), element.on("keydown", openOnKeypress));
+                }), attr.disabled || attr.ngDisabled || (element.attr("tabindex", 0), element.on("click", openSelect), 
+                element.on("keydown", openOnKeypress)), element.attr({
+                    role: "combobox",
+                    id: "select_" + $mdUtil.nextUid(),
+                    "aria-haspopup": !0,
+                    "aria-expanded": "false",
+                    "aria-labelledby": labelEl.attr("id")
+                }), scope.$on("$destroy", function() {
+                    isOpen ? $mdSelect.cancel().then(function() {
+                        selectContainer.remove();
+                    }) : selectContainer.remove();
+                });
+            };
+        }
+        $interpolate.startSymbol(), $interpolate.endSymbol();
+        return {
+            restrict: "E",
+            require: [ "mdSelect", "ngModel" ],
+            compile: compile,
+            controller: function() {}
+        };
+    }
+    function SelectMenuDirective($parse, $mdUtil, $mdTheming) {
+        function preLink(scope, element, attr, ctrls) {
+            function configureAria() {
+                element.attr({
+                    id: "select_menu_" + $mdUtil.nextUid(),
+                    role: "listbox",
+                    "aria-multiselectable": selectCtrl.isMultiple ? "true" : "false"
+                });
+            }
+            function keyListener(e) {
+                (13 == e.keyCode || 32 == e.keyCode) && clickListener(e);
+            }
+            function clickListener(ev) {
+                var option = $mdUtil.getClosest(ev.target, "md-option"), optionCtrl = option && angular.element(option).data("$mdOptionController");
+                if (option && optionCtrl) {
+                    var optionHashKey = selectCtrl.hashGetter(optionCtrl.value), isSelected = angular.isDefined(selectCtrl.selected[optionHashKey]);
+                    scope.$apply(function() {
+                        selectCtrl.isMultiple ? isSelected ? selectCtrl.deselect(optionHashKey) : selectCtrl.select(optionHashKey, optionCtrl.value) : isSelected || (selectCtrl.deselect(Object.keys(selectCtrl.selected)[0]), 
+                        selectCtrl.select(optionHashKey, optionCtrl.value)), selectCtrl.refreshViewValue();
+                    });
+                }
+            }
+            var selectCtrl = ctrls[0], ngModel = ctrls[1];
+            $mdTheming(element), element.on("click", clickListener), element.on("keypress", keyListener), 
+            ngModel && selectCtrl.init(ngModel), configureAria();
+        }
+        function SelectMenuController($scope, $attrs, $element) {
+            function renderMultiple() {
+                var newSelectedValues = self.ngModel.$modelValue || self.ngModel.$viewValue;
+                if (angular.isArray(newSelectedValues)) {
+                    var oldSelected = Object.keys(self.selected), newSelectedHashes = newSelectedValues.map(self.hashGetter), deselected = oldSelected.filter(function(hash) {
+                        return -1 === newSelectedHashes.indexOf(hash);
+                    });
+                    deselected.forEach(self.deselect), newSelectedHashes.forEach(function(hashKey, i) {
+                        self.select(hashKey, newSelectedValues[i]);
+                    });
+                }
+            }
+            function renderSingular() {
+                var value = self.ngModel.$viewValue || self.ngModel.$modelValue;
+                Object.keys(self.selected).forEach(self.deselect), self.select(self.hashGetter(value), value);
+            }
+            var self = this;
+            self.isMultiple = angular.isDefined($attrs.multiple), self.selected = {}, self.options = {}, 
+            self.init = function(ngModel) {
+                function validateArray(modelValue, viewValue) {
+                    return angular.isArray(modelValue || viewValue || []);
+                }
+                if (self.ngModel = ngModel, ngModel.$options && ngModel.$options.trackBy) {
+                    var trackByLocals = {}, trackByParsed = $parse(ngModel.$options.trackBy);
+                    self.hashGetter = function(value, valueScope) {
+                        return trackByLocals.$value = value, trackByParsed(valueScope || $scope, trackByLocals);
+                    };
+                } else self.hashGetter = function(value) {
+                    return angular.isObject(value) ? "$$object_" + (value.$$mdSelectId || (value.$$mdSelectId = ++selectNextId)) : value;
+                };
+                self.isMultiple ? (ngModel.$validators["md-multiple"] = validateArray, ngModel.$render = renderMultiple, 
+                $scope.$watchCollection($attrs.ngModel, function(value) {
+                    validateArray(value) && renderMultiple(value);
+                })) : ngModel.$render = renderSingular;
+            }, self.selectedLabels = function() {
+                var selectedOptionEls = nodesToArray($element[0].querySelectorAll("md-option[selected]"));
+                return selectedOptionEls.length ? selectedOptionEls.map(function(el) {
+                    return el.textContent;
+                }).join(", ") : "";
+            }, self.select = function(hashKey, hashedValue) {
+                var option = self.options[hashKey];
+                option && option.setSelected(!0), self.selected[hashKey] = hashedValue;
+            }, self.deselect = function(hashKey) {
+                var option = self.options[hashKey];
+                option && option.setSelected(!1), delete self.selected[hashKey];
+            }, self.addOption = function(hashKey, optionCtrl) {
+                if (angular.isDefined(self.options[hashKey])) throw new Error('Duplicate md-option values are not allowed in a select. Duplicate value "' + optionCtrl.value + '" found.');
+                self.options[hashKey] = optionCtrl, angular.isDefined(self.selected[hashKey]) && (self.select(hashKey, optionCtrl.value), 
+                self.refreshViewValue());
+            }, self.removeOption = function(hashKey) {
+                delete self.options[hashKey];
+            }, self.refreshViewValue = function() {
+                var option, values = [];
+                for (var hashKey in self.selected) values.push((option = self.options[hashKey]) ? option.value : self.selected[hashKey]);
+                self.ngModel.$setViewValue(self.isMultiple ? values : values[0]);
+            };
+        }
+        return SelectMenuController.$inject = [ "$scope", "$attrs", "$element" ], {
+            restrict: "E",
+            require: [ "mdSelectMenu", "?ngModel" ],
+            controller: SelectMenuController,
+            link: {
+                pre: preLink
+            }
+        };
+    }
+    function OptionDirective($mdInkRipple, $mdUtil) {
+        function compile(element, attr) {
+            return element.append(angular.element('<div class="md-text">').append(element.contents())), 
+            void 0 === attr.tabindex && element.attr("tabindex", 0), postLink;
+        }
+        function postLink(scope, element, attr, ctrls) {
+            function setOptionValue(newValue, oldValue) {
+                var oldHashKey = selectCtrl.hashGetter(oldValue, scope), newHashKey = selectCtrl.hashGetter(newValue, scope);
+                optionCtrl.hashKey = newHashKey, optionCtrl.value = newValue, selectCtrl.removeOption(oldHashKey, optionCtrl), 
+                selectCtrl.addOption(newHashKey, optionCtrl);
+            }
+            function configureAria() {
+                element.attr({
+                    role: "option",
+                    "aria-selected": "false",
+                    id: "select_option_" + $mdUtil.nextUid()
+                });
+            }
+            var optionCtrl = ctrls[0], selectCtrl = ctrls[1];
+            if (angular.isDefined(attr.ngValue)) scope.$watch(attr.ngValue, setOptionValue); else {
+                if (!angular.isDefined(attr.value)) throw new Error("Expected either ngValue or value attr");
+                setOptionValue(attr.value);
+            }
+            attr.$observe("selected", function(selected) {
+                angular.isDefined(selected) && (selected ? (selectCtrl.isMultiple || selectCtrl.deselect(Object.keys(selectCtrl.selected)[0]), 
+                selectCtrl.select(optionCtrl.hashKey, optionCtrl.value)) : selectCtrl.deselect(optionCtrl.hashKey), 
+                selectCtrl.refreshViewValue(), selectCtrl.ngModel.$render());
+            }), $mdInkRipple.attachButtonBehavior(scope, element), configureAria(), scope.$on("$destroy", function() {
+                selectCtrl.removeOption(optionCtrl.hashKey, optionCtrl);
+            });
+        }
+        function OptionController($element) {
+            this.selected = !1, this.setSelected = function(isSelected) {
+                isSelected && !this.selected ? $element.attr({
+                    selected: "selected",
+                    "aria-selected": "true"
+                }) : !isSelected && this.selected && ($element.removeAttr("selected"), $element.attr("aria-selected", "false")), 
+                this.selected = isSelected;
+            };
+        }
+        return OptionController.$inject = [ "$element" ], {
+            restrict: "E",
+            require: [ "mdOption", "^^mdSelectMenu" ],
+            controller: OptionController,
+            compile: compile
+        };
+    }
+    function OptgroupDirective() {
+        function compile(el, attrs) {
+            var labelElement = el.find("label");
+            labelElement.length || (labelElement = angular.element("<label>"), el.prepend(labelElement)), 
+            attrs.label && labelElement.text(attrs.label);
+        }
+        return {
+            restrict: "E",
+            compile: compile
+        };
+    }
+    function SelectProvider($$interimElementProvider) {
+        function selectDefaultOptions($mdSelect, $mdConstant, $$rAF, $mdUtil, $mdTheming, $timeout) {
+            function onShow(scope, element, opts) {
+                function configureAria() {
+                    opts.selectEl.attr("aria-labelledby", opts.target.attr("id")), opts.target.attr("aria-owns", opts.selectEl.attr("id")), 
+                    opts.target.attr("aria-expanded", "true");
+                }
+                function activateInteraction() {
+                    function focusOption(direction) {
+                        var optionsArray = nodesToArray(optionNodes), index = optionsArray.indexOf(opts.focusedNode);
+                        -1 === index ? index = 0 : "next" === direction && index < optionsArray.length - 1 ? index++ : "prev" === direction && index > 0 && index--;
+                        var newOption = opts.focusedNode = optionsArray[index];
+                        newOption && newOption.focus();
+                    }
+                    function focusNextOption() {
+                        focusOption("next");
+                    }
+                    function focusPrevOption() {
+                        focusOption("prev");
+                    }
+                    function closeMenu() {
+                        opts.restoreFocus = !0, scope.$evalAsync(function() {
+                            $mdSelect.hide(selectCtrl.ngModel.$viewValue);
+                        });
+                    }
+                    if (!opts.isRemoved) {
+                        var selectCtrl = opts.selectEl.controller("mdSelectMenu") || {};
+                        element.addClass("md-clickable"), opts.backdrop && opts.backdrop.on("click", function(e) {
+                            e.preventDefault(), e.stopPropagation(), opts.restoreFocus = !1, scope.$apply($mdSelect.cancel);
+                        }), opts.selectEl.on("keydown", function(ev) {
+                            switch (ev.keyCode) {
+                              case $mdConstant.KEY_CODE.SPACE:
+                              case $mdConstant.KEY_CODE.ENTER:
+                                var option = $mdUtil.getClosest(ev.target, "md-option");
+                                option && (opts.selectEl.triggerHandler({
+                                    type: "click",
+                                    target: option
+                                }), ev.preventDefault());
+                                break;
+
+                              case $mdConstant.KEY_CODE.TAB:
+                              case $mdConstant.KEY_CODE.ESCAPE:
+                                ev.preventDefault(), opts.restoreFocus = !0, scope.$apply($mdSelect.cancel);
+                            }
+                        }), opts.selectEl.on("keydown", function(ev) {
+                            switch (ev.keyCode) {
+                              case $mdConstant.KEY_CODE.UP_ARROW:
+                                return focusPrevOption();
+
+                              case $mdConstant.KEY_CODE.DOWN_ARROW:
+                                return focusNextOption();
+                            }
+                        }), selectCtrl.isMultiple || (opts.selectEl.on("click", closeMenu), opts.selectEl.on("keydown", function(e) {
+                            (32 == e.keyCode || 13 == e.keyCode) && closeMenu();
+                        }));
+                    }
+                }
+                if (!opts.target) throw new Error('$mdSelect.show() expected a target element in options.target but got "' + opts.target + '"!');
+                angular.extend(opts, {
+                    isRemoved: !1,
+                    target: angular.element(opts.target),
+                    parent: angular.element(opts.parent),
+                    selectEl: element.find("md-select-menu"),
+                    contentEl: element.find("md-content"),
+                    backdrop: opts.hasBackdrop && angular.element('<md-backdrop class="md-select-backdrop">')
+                }), configureAria(), element.removeClass("md-leave");
+                var optionNodes = opts.selectEl[0].getElementsByTagName("md-option");
+                return opts.loadingAsync && opts.loadingAsync.then && opts.loadingAsync.then(function() {
+                    scope.$$loadingAsyncDone = !0, $$rAF(function() {
+                        $$rAF(function() {
+                            opts.isRemoved || animateSelect(scope, element, opts);
+                        });
+                    });
+                }), opts.disableParentScroll && (opts.disableTarget = opts.parent.find("md-content"), 
+                opts.disableTarget.length || (opts.disableTarget = opts.parent), opts.lastOverflow = opts.disableTarget.css("overflow"), 
+                opts.disableTarget.css("overflow", "hidden")), $timeout(activateInteraction, 75, !1), 
+                opts.backdrop && ($mdTheming.inherit(opts.backdrop, opts.parent), opts.parent.append(opts.backdrop)), 
+                opts.parent.append(element), $$rAF(function() {
+                    $$rAF(function() {
+                        opts.isRemoved || animateSelect(scope, element, opts);
+                    });
+                }), $mdUtil.transitionEndPromise(opts.selectEl, {
+                    timeout: 350
+                });
+            }
+            function onRemove(scope, element, opts) {
+                opts.isRemoved = !0, element.addClass("md-leave").removeClass("md-clickable"), opts.target.attr("aria-expanded", "false"), 
+                opts.disableParentScroll && $mdUtil.floatingScrollbars() && (opts.disableTarget.css("overflow", opts.lastOverflow), 
+                delete opts.lastOverflow, delete opts.disableTarget);
+                var mdSelect = opts.selectEl.controller("mdSelect");
+                return mdSelect && mdSelect.setLabelText(opts.selectEl.controller("mdSelectMenu").selectedLabels()), 
+                $mdUtil.transitionEndPromise(element, {
+                    timeout: 350
+                }).then(function() {
+                    element.removeClass("md-active"), opts.parent[0].removeChild(element[0]), opts.backdrop && opts.backdrop.remove(), 
+                    opts.restoreFocus && opts.target.focus();
+                });
+            }
+            function animateSelect(scope, element, opts) {
+                var centeredNode, containerNode = element[0], targetNode = opts.target[0], parentNode = opts.parent[0], selectNode = opts.selectEl[0], contentNode = opts.contentEl[0], parentRect = parentNode.getBoundingClientRect(), targetRect = $mdUtil.clientRect(targetNode, parentNode), shouldOpenAroundTarget = !1, bounds = {
+                    left: parentNode.scrollLeft + SELECT_EDGE_MARGIN,
+                    top: parentNode.scrollTop + SELECT_EDGE_MARGIN,
+                    bottom: parentRect.height + parentNode.scrollTop - SELECT_EDGE_MARGIN,
+                    right: parentRect.width - SELECT_EDGE_MARGIN
+                }, spaceAvailable = {
+                    top: targetRect.top - bounds.top,
+                    left: targetRect.left - bounds.left,
+                    right: bounds.right - (targetRect.left + targetRect.width),
+                    bottom: bounds.bottom - (targetRect.top + targetRect.height)
+                }, maxWidth = parentRect.width - 2 * SELECT_EDGE_MARGIN, isScrollable = contentNode.scrollHeight > contentNode.offsetHeight, selectedNode = selectNode.querySelector("md-option[selected]"), optionNodes = selectNode.getElementsByTagName("md-option"), optgroupNodes = selectNode.getElementsByTagName("md-optgroup");
+                centeredNode = selectedNode ? selectedNode : optgroupNodes.length ? optgroupNodes[0] : optionNodes.length ? optionNodes[0] : contentNode.firstElementChild || contentNode, 
+                contentNode.offsetWidth > maxWidth && (contentNode.style["max-width"] = maxWidth + "px"), 
+                shouldOpenAroundTarget && (contentNode.style["min-width"] = targetRect.width + "px"), 
+                isScrollable && selectNode.classList.add("md-overflow");
+                var selectMenuRect = selectNode.getBoundingClientRect(), centeredRect = getOffsetRect(centeredNode);
+                if (centeredNode) {
+                    var centeredStyle = window.getComputedStyle(centeredNode);
+                    centeredRect.paddingLeft = parseInt(centeredStyle.paddingLeft, 10) || 0, centeredRect.paddingRight = parseInt(centeredStyle.paddingRight, 10) || 0;
+                }
+                var focusedNode = centeredNode;
+                if ("MD-OPTGROUP" === (focusedNode.tagName || "").toUpperCase() && (focusedNode = optionNodes[0] || contentNode.firstElementChild || contentNode), 
+                focusedNode && (opts.focusedNode = focusedNode, focusedNode.focus()), isScrollable) {
+                    var scrollBuffer = contentNode.offsetHeight / 2;
+                    contentNode.scrollTop = centeredRect.top + centeredRect.height / 2 - scrollBuffer, 
+                    spaceAvailable.top < scrollBuffer ? contentNode.scrollTop = Math.min(centeredRect.top, contentNode.scrollTop + scrollBuffer - spaceAvailable.top) : spaceAvailable.bottom < scrollBuffer && (contentNode.scrollTop = Math.max(centeredRect.top + centeredRect.height - selectMenuRect.height, contentNode.scrollTop - scrollBuffer + spaceAvailable.bottom));
+                }
+                var left, top, transformOrigin;
+                shouldOpenAroundTarget ? (left = targetRect.left, top = targetRect.top + targetRect.height, 
+                transformOrigin = "50% 0", top + selectMenuRect.height > bounds.bottom && (top = targetRect.top - selectMenuRect.height, 
+                transformOrigin = "50% 100%")) : (left = targetRect.left + centeredRect.left - centeredRect.paddingLeft, 
+                top = targetRect.top + targetRect.height / 2 - centeredRect.height / 2 - centeredRect.top + contentNode.scrollTop, 
+                transformOrigin = centeredRect.left + targetRect.width / 2 + "px " + (centeredRect.top + centeredRect.height / 2 - contentNode.scrollTop) + "px 0px", 
+                containerNode.style.minWidth = targetRect.width + centeredRect.paddingLeft + centeredRect.paddingRight + "px");
+                var containerRect = containerNode.getBoundingClientRect();
+                containerNode.style.left = clamp(bounds.left, left, bounds.right - containerRect.width) + "px", 
+                containerNode.style.top = clamp(bounds.top, top, bounds.bottom - containerRect.height) + "px", 
+                selectNode.style[$mdConstant.CSS.TRANSFORM_ORIGIN] = transformOrigin, selectNode.style[$mdConstant.CSS.TRANSFORM] = "scale(" + Math.min(targetRect.width / selectMenuRect.width, 1) + "," + Math.min(targetRect.height / selectMenuRect.height, 1) + ")", 
+                $$rAF(function() {
+                    element.addClass("md-active"), selectNode.style[$mdConstant.CSS.TRANSFORM] = "";
+                });
+            }
+            return {
+                parent: "body",
+                onShow: onShow,
+                onRemove: onRemove,
+                hasBackdrop: !0,
+                disableParentScroll: $mdUtil.floatingScrollbars(),
+                themable: !0
+            };
+        }
+        function clamp(min, n, max) {
+            return Math.min(max, Math.max(n, min));
+        }
+        function getOffsetRect(node) {
+            return node ? {
+                left: node.offsetLeft,
+                top: node.offsetTop,
+                width: node.offsetWidth,
+                height: node.offsetHeight
+            } : {
+                left: 0,
+                top: 0,
+                width: 0,
+                height: 0
+            };
+        }
+        return selectDefaultOptions.$inject = [ "$mdSelect", "$mdConstant", "$$rAF", "$mdUtil", "$mdTheming", "$timeout" ], 
+        $$interimElementProvider("$mdSelect").setDefaults({
+            methods: [ "target" ],
+            options: selectDefaultOptions
+        });
+    }
+    function nodesToArray(nodes) {
+        for (var results = [], i = 0; i < nodes.length; ++i) results.push(nodes.item(i));
+        return results;
+    }
+    var SELECT_EDGE_MARGIN = 8, selectNextId = 0;
+    angular.module("material.components.select", [ "material.core", "material.components.backdrop" ]).directive("mdSelect", SelectDirective).directive("mdSelectMenu", SelectMenuDirective).directive("mdOption", OptionDirective).directive("mdOptgroup", OptgroupDirective).provider("$mdSelect", SelectProvider), 
+    SelectDirective.$inject = [ "$mdSelect", "$mdUtil", "$mdTheming", "$interpolate", "$compile", "$parse" ], 
+    SelectMenuDirective.$inject = [ "$parse", "$mdUtil", "$mdTheming" ], OptionDirective.$inject = [ "$mdInkRipple", "$mdUtil" ], 
+    SelectProvider.$inject = [ "$$interimElementProvider" ];
+}(), function() {
+    "use strict";
     function SidenavService($mdComponentRegistry, $q) {
         return function(handle) {
             var errorMsg = "SideNav '" + handle + "' is not available!", instance = $mdComponentRegistry.get(handle);
@@ -13887,7 +14880,7 @@ function() {
             };
         };
     }
-    function SidenavDirective($timeout, $animate, $parse, $mdMedia, $mdConstant, $compile, $mdTheming, $q, $document) {
+    function SidenavDirective($timeout, $animate, $parse, $log, $mdMedia, $mdConstant, $compile, $mdTheming, $q, $document) {
         function postLink(scope, element, attr, sidenavCtrl) {
             function updateIsLocked(isLocked, oldValue) {
                 scope.isLockedOpen = isLocked, isLocked === oldValue ? element.toggleClass("md-locked-open", !!isLocked) : $animate[isLocked ? "addClass" : "removeClass"](element, "md-locked-open"), 
@@ -13919,7 +14912,11 @@ function() {
             }
             var triggeringElement = null, promise = $q.when(!0), isLockedOpenParsed = $parse(attr.mdIsLockedOpen), isLocked = function() {
                 return isLockedOpenParsed(scope.$parent, {
-                    $media: $mdMedia
+                    $media: function(arg) {
+                        return $log.warn("$media is deprecated for is-locked-open. Use $mdMedia instead."), 
+                        $mdMedia(arg);
+                    },
+                    $mdMedia: $mdMedia
                 });
             }, backdrop = $compile('<md-backdrop class="md-sidenav-backdrop md-opaque ng-enter">')(scope);
             element.on("$destroy", sidenavCtrl.destroy), $mdTheming.inherit(backdrop, element), 
@@ -13953,11 +14950,17 @@ function() {
         }, self.destroy = $mdComponentRegistry.register(self, $attrs.mdComponentId);
     }
     angular.module("material.components.sidenav", [ "material.core", "material.components.backdrop" ]).factory("$mdSidenav", SidenavService).directive("mdSidenav", SidenavDirective).controller("$mdSidenavController", SidenavController), 
-    SidenavService.$inject = [ "$mdComponentRegistry", "$q" ], SidenavDirective.$inject = [ "$timeout", "$animate", "$parse", "$mdMedia", "$mdConstant", "$compile", "$mdTheming", "$q", "$document" ], 
+    SidenavService.$inject = [ "$mdComponentRegistry", "$q" ], SidenavDirective.$inject = [ "$timeout", "$animate", "$parse", "$log", "$mdMedia", "$mdConstant", "$compile", "$mdTheming", "$q", "$document" ], 
     SidenavController.$inject = [ "$scope", "$element", "$attrs", "$mdComponentRegistry", "$q" ];
 }(), function() {
     "use strict";
     function SliderDirective($$rAF, $window, $mdAria, $mdUtil, $mdConstant, $mdTheming, $mdGesture, $parse) {
+        function compile(tElement) {
+            return tElement.attr({
+                tabIndex: 0,
+                role: "slider"
+            }), $mdAria.expect(tElement, "aria-label"), postLink;
+        }
         function postLink(scope, element, attr, ngModelCtrl) {
             function updateAll() {
                 refreshSliderDimensions(), ngModelRender(), redrawTicks();
@@ -14020,7 +15023,7 @@ function() {
                 return angular.isNumber(value) ? Math.round(value / step) * step : void 0;
             }
             function setSliderPercent(percent) {
-                activeTrack.css("width", 100 * percent + "%"), thumbContainer.css($mdConstant.CSS.TRANSFORM, "translate3d(" + 100 * percent + "%,0,0)"), 
+                activeTrack.css("width", 100 * percent + "%"), thumbContainer.css("left", 100 * percent + "%"), 
                 element.toggleClass("md-min", 0 === percent);
             }
             function onPressDown(ev) {
@@ -14037,7 +15040,7 @@ function() {
                     element.removeClass("dragging active");
                     var exactVal = percentToValue(positionToPercent(ev.pointer.x)), closestVal = minMaxValidator(stepValidator(exactVal));
                     scope.$apply(function() {
-                        setModelValue(closestVal);
+                        setModelValue(closestVal), ngModelRender();
                     });
                 }
             }
@@ -14089,10 +15092,7 @@ function() {
             attr.step ? attr.$observe("step", updateStep) : updateStep(1);
             var stopDisabledWatch = angular.noop;
             attr.ngDisabled && (stopDisabledWatch = scope.$parent.$watch(attr.ngDisabled, updateAriaDisabled)), 
-            $mdAria.expect(element, "aria-label"), $mdGesture.register(element, "drag"), element.attr({
-                tabIndex: 0,
-                role: "slider"
-            }).on("keydown", keydownListener).on("$md.pressdown", onPressDown).on("$md.pressup", onPressUp).on("$md.dragstart", onDragStart).on("$md.drag", onDrag).on("$md.dragend", onDragEnd), 
+            $mdGesture.register(element, "drag"), element.on("keydown", keydownListener).on("$md.pressdown", onPressDown).on("$md.pressup", onPressUp).on("$md.dragstart", onDragStart).on("$md.drag", onDrag).on("$md.dragend", onDragEnd), 
             setTimeout(updateAll);
             var debouncedUpdateAll = $$rAF.throttle(updateAll);
             angular.element($window).on("resize", debouncedUpdateAll), scope.$on("$destroy", function() {
@@ -14106,8 +15106,8 @@ function() {
         return {
             scope: {},
             require: "?ngModel",
-            template: '<div class="md-track-container"><div class="md-track"></div><div class="md-track md-track-fill"></div><div class="md-track-ticks"></div></div><div class="md-thumb-container"><div class="md-thumb"></div><div class="md-focus-thumb"></div><div class="md-focus-ring"></div><div class="md-sign"><span class="md-thumb-text"></span></div><div class="md-disabled-thumb"></div></div>',
-            link: postLink
+            template: '<div class="md-slider-wrapper">        <div class="md-track-container">          <div class="md-track"></div>          <div class="md-track md-track-fill"></div>          <div class="md-track-ticks"></div>        </div>        <div class="md-thumb-container">          <div class="md-thumb"></div>          <div class="md-focus-thumb"></div>          <div class="md-focus-ring"></div>          <div class="md-sign">            <span class="md-thumb-text"></span>          </div>          <div class="md-disabled-thumb"></div>        </div>      </div>',
+            compile: compile
         };
     }
     angular.module("material.components.slider", [ "material.core" ]).directive("mdSlider", SliderDirective), 
@@ -14325,7 +15325,7 @@ function() {
     MdSwitch.$inject = [ "mdCheckboxDirective", "$mdTheming", "$mdUtil", "$document", "$mdConstant", "$parse", "$$rAF", "$mdGesture" ];
 }(), function() {
     "use strict";
-    angular.module("material.components.tabs", [ "material.core" ]);
+    angular.module("material.components.tabs", [ "material.core", "material.components.icon" ]);
 }(), function() {
     "use strict";
     function mdTextFloatDirective($mdTheming, $mdUtil, $parse, $log) {
@@ -14407,9 +15407,9 @@ function() {
         };
     }
     function MdToastProvider($$interimElementProvider) {
-        function toastDefaultOptions($timeout, $animate, $mdTheming, $mdToast) {
+        function toastDefaultOptions($timeout, $animate, $mdToast) {
             function onShow(scope, element, options) {
-                return element.addClass(options.position.split(" ").map(function(pos) {
+                return activeToastContent = options.content, element.addClass(options.position.split(" ").map(function(pos) {
                     return "md-" + pos;
                 }).join(" ")), options.parent.addClass(toastOpenClass(options.position)), options.onSwipe = function(ev) {
                     element.addClass("md-" + ev.type.replace("$md.", "")), $timeout($mdToast.cancel);
@@ -14430,26 +15430,35 @@ function() {
                 hideDelay: 3e3
             };
         }
-        return toastDefaultOptions.$inject = [ "$timeout", "$animate", "$mdTheming", "$mdToast" ], 
-        $$interimElementProvider("$mdToast").setDefaults({
+        var activeToastContent, $mdToast = $$interimElementProvider("$mdToast").setDefaults({
             methods: [ "position", "hideDelay", "capsule" ],
             options: toastDefaultOptions
         }).addPreset("simple", {
             argOption: "content",
-            methods: [ "content", "action", "highlightAction" ],
-            options: [ "$mdToast", function($mdToast) {
-                return {
-                    template: [ "<md-toast ng-class=\"{'md-capsule': toast.capsule}\">", "<span flex>{{ toast.content }}</span>", '<md-button class="md-action" ng-if="toast.action" ng-click="toast.resolve()" ng-class="{\'md-highlight\': toast.highlightAction}">', "{{ toast.action }}", "</md-button>", "</md-toast>" ].join(""),
-                    controller: function() {
-                        this.resolve = function() {
+            methods: [ "content", "action", "highlightAction", "theme" ],
+            options: [ "$mdToast", "$mdTheming", function($mdToast, $mdTheming) {
+                var opts = {
+                    template: [ '<md-toast md-theme="{{ toast.theme }}" ng-class="{\'md-capsule\': toast.capsule}">', "<span flex>{{ toast.content }}</span>", '<md-button class="md-action" ng-if="toast.action" ng-click="toast.resolve()" ng-class="{\'md-highlight\': toast.highlightAction}">', "{{ toast.action }}", "</md-button>", "</md-toast>" ].join(""),
+                    controller: [ "$scope", function($scope) {
+                        var self = this;
+                        $scope.$watch(function() {
+                            return activeToastContent;
+                        }, function() {
+                            self.content = activeToastContent;
+                        }), this.resolve = function() {
                             $mdToast.hide();
                         };
-                    },
+                    } ],
+                    theme: $mdTheming.defaultTheme(),
                     controllerAs: "toast",
                     bindToController: !0
                 };
+                return opts;
             } ]
+        }).addMethod("updateContent", function(newContent) {
+            activeToastContent = newContent;
         });
+        return toastDefaultOptions.$inject = [ "$timeout", "$animate", "$mdToast" ], $mdToast;
     }
     angular.module("material.components.toast", [ "material.core", "material.components.button" ]).directive("mdToast", MdToastDirective).provider("$mdToast", MdToastProvider), 
     MdToastProvider.$inject = [ "$$interimElementProvider" ];
@@ -14488,7 +15497,7 @@ function() {
     mdToolbarDirective.$inject = [ "$$rAF", "$mdConstant", "$mdUtil", "$mdTheming" ];
 }(), function() {
     "use strict";
-    function MdTooltipDirective($timeout, $window, $$rAF, $document, $mdUtil, $mdTheming, $rootElement) {
+    function MdTooltipDirective($timeout, $window, $$rAF, $document, $mdUtil, $mdTheming, $rootElement, $animate, $q) {
         function postLink(scope, element, attr) {
             function setVisible(value) {
                 setVisible.value = !!value, setVisible.queued || (value ? (setVisible.queued = !0, 
@@ -14499,33 +15508,71 @@ function() {
                 }));
             }
             function showTooltip() {
-                element.removeClass("md-hide"), parent.attr("aria-describedby", element.attr("id")), 
-                tooltipParent.append(element), positionTooltip(), $$rAF(function() {
-                    $$rAF(function() {
-                        positionTooltip(), scope.visible && element.addClass("md-show");
-                    });
-                });
+                parent.attr("aria-describedby", element.attr("id")), tooltipParent.append(element), 
+                positionTooltip(), $animate.addClass(element, "md-show"), $animate.addClass(background, "md-show"), 
+                $animate.addClass(content, "md-show");
             }
             function hideTooltip() {
-                element.removeClass("md-show").addClass("md-hide"), parent.removeAttr("aria-describedby"), 
-                $timeout(function() {
+                parent.removeAttr("aria-describedby"), $q.all([ $animate.removeClass(content, "md-show"), $animate.removeClass(background, "md-show"), $animate.removeClass(element, "md-show") ]).then(function() {
                     scope.visible || element.detach();
-                }, 200, !1);
+                });
             }
             function positionTooltip() {
-                var tipRect = $mdUtil.elementRect(element, tooltipParent), parentRect = $mdUtil.elementRect(parent, tooltipParent), tipDirection = "bottom", newPosition = {
-                    left: parentRect.left + parentRect.width / 2 - tipRect.width / 2,
-                    top: parentRect.top + parentRect.height
-                };
-                newPosition.left = Math.min(newPosition.left, tooltipParent.prop("scrollWidth") - tipRect.width - TOOLTIP_WINDOW_EDGE_SPACE), 
-                newPosition.left = Math.max(newPosition.left, TOOLTIP_WINDOW_EDGE_SPACE), newPosition.top + tipRect.height > tooltipParent.prop("scrollHeight") && (newPosition.top = parentRect.top - tipRect.height, 
-                tipDirection = "top"), element.css({
+                function positionBackground() {
+                    var size = "left" === direction || "right" === direction ? 2 * Math.sqrt(Math.pow(tipRect.width, 2) + Math.pow(tipRect.height / 2, 2)) : 2 * Math.sqrt(Math.pow(tipRect.width / 2, 2) + Math.pow(tipRect.height, 2)), position = "left" === direction ? {
+                        left: 100,
+                        top: 50
+                    } : "right" === direction ? {
+                        left: 0,
+                        top: 50
+                    } : "top" === direction ? {
+                        left: 50,
+                        top: 100
+                    } : {
+                        left: 50,
+                        top: 0
+                    };
+                    background.css({
+                        width: size + "px",
+                        height: size + "px",
+                        left: position.left + "%",
+                        top: position.top + "%"
+                    });
+                }
+                function fitInParent(pos) {
+                    var newPosition = {
+                        left: pos.left,
+                        top: pos.top
+                    };
+                    return newPosition.left = Math.min(newPosition.left, tooltipParent.prop("scrollWidth") - tipRect.width - TOOLTIP_WINDOW_EDGE_SPACE), 
+                    newPosition.left = Math.max(newPosition.left, TOOLTIP_WINDOW_EDGE_SPACE), newPosition.top = Math.min(newPosition.top, tooltipParent.prop("scrollHeight") - tipRect.height - TOOLTIP_WINDOW_EDGE_SPACE), 
+                    newPosition.top = Math.max(newPosition.top, TOOLTIP_WINDOW_EDGE_SPACE), newPosition;
+                }
+                function getPosition(dir) {
+                    return "left" === dir ? {
+                        left: parentRect.left - tipRect.width - TOOLTIP_WINDOW_EDGE_SPACE,
+                        top: parentRect.top + parentRect.height / 2 - tipRect.height / 2
+                    } : "right" === dir ? {
+                        left: parentRect.left + parentRect.width + TOOLTIP_WINDOW_EDGE_SPACE,
+                        top: parentRect.top + parentRect.height / 2 - tipRect.height / 2
+                    } : "top" === dir ? {
+                        left: parentRect.left + parentRect.width / 2 - tipRect.width / 2,
+                        top: parentRect.top - tipRect.height - TOOLTIP_WINDOW_EDGE_SPACE
+                    } : {
+                        left: parentRect.left + parentRect.width / 2 - tipRect.width / 2,
+                        top: parentRect.top + parentRect.height + TOOLTIP_WINDOW_EDGE_SPACE
+                    };
+                }
+                var tipRect = $mdUtil.offsetRect(element, tooltipParent), parentRect = $mdUtil.offsetRect(parent, tooltipParent), newPosition = getPosition(direction);
+                direction ? newPosition = fitInParent(newPosition) : newPosition.top > tooltipParent.prop("scrollHeight") - tipRect.height - TOOLTIP_WINDOW_EDGE_SPACE && (newPosition = fitInParent(getPosition("top"))), 
+                element.css({
                     top: newPosition.top + "px",
                     left: newPosition.left + "px"
-                }), element.attr("width-32", Math.ceil(tipRect.width / 32)), element.attr("md-direction", tipDirection);
+                }), positionBackground();
             }
             $mdTheming(element);
-            for (var parent = element.parent(), current = element.parent()[0]; current && current !== $rootElement[0] && current !== document.body && (!current.tagName || "md-content" != current.tagName.toLowerCase()); ) current = current.parentNode;
+            for (var parent = element.parent(), background = angular.element(element[0].getElementsByClassName("md-background")[0]), content = angular.element(element[0].getElementsByClassName("md-content")[0]), direction = attr.mdDirection; "none" == $window.getComputedStyle(parent[0])["pointer-events"]; ) parent = parent.parent();
+            for (var current = element.parent()[0]; current && current !== $rootElement[0] && current !== document.body && (!current.tagName || "md-content" != current.tagName.toLowerCase()); ) current = current.parentNode;
             var tooltipParent = angular.element(current || document.body);
             angular.isDefined(attr.mdDelay) || (scope.delay = TOOLTIP_SHOW_DELAY), element.detach(), 
             element.attr("role", "tooltip"), element.attr("id", attr.id || "tooltip_" + $mdUtil.nextUid()), 
@@ -14543,7 +15590,7 @@ function() {
                 scope.visible = !1, element.remove(), angular.element($window).off("resize", debouncedOnResize);
             });
         }
-        var TOOLTIP_SHOW_DELAY = 400, TOOLTIP_WINDOW_EDGE_SPACE = 8;
+        var TOOLTIP_SHOW_DELAY = 0, TOOLTIP_WINDOW_EDGE_SPACE = 8;
         return {
             restrict: "E",
             transclude: !0,
@@ -14556,10 +15603,204 @@ function() {
         };
     }
     angular.module("material.components.tooltip", [ "material.core" ]).directive("mdTooltip", MdTooltipDirective), 
-    MdTooltipDirective.$inject = [ "$timeout", "$window", "$$rAF", "$document", "$mdUtil", "$mdTheming", "$rootElement" ];
+    MdTooltipDirective.$inject = [ "$timeout", "$window", "$$rAF", "$document", "$mdUtil", "$mdTheming", "$rootElement", "$animate", "$q" ];
 }(), function() {
     "use strict";
     angular.module("material.components.whiteframe", []);
+}(), function() {
+    "use strict";
+    function MdAutocompleteCtrl($scope, $element, $q, $mdUtil, $mdConstant) {
+        function init() {
+            configureWatchers(), configureAria();
+        }
+        function configureAria() {
+            var ul = angular.element(elements.ul), input = angular.element(elements.input), id = ul.attr("id") || "ul_" + $mdUtil.nextUid();
+            ul.attr("id", id), input.attr("aria-owns", id);
+        }
+        function getItemScope(item) {
+            if (item) {
+                var locals = {};
+                return self.itemName && (locals[self.itemName] = item), locals;
+            }
+        }
+        function configureWatchers() {
+            var wait = parseInt($scope.delay, 10) || 0;
+            $scope.$watch("searchText", wait ? $mdUtil.debounce(handleSearchText, wait) : handleSearchText), 
+            $scope.$watch("selectedItem", function(selectedItem, previousSelectedItem) {
+                $scope.itemChange && selectedItem !== previousSelectedItem && $scope.itemChange(getItemScope(selectedItem));
+            });
+        }
+        function handleSearchText(searchText, previousSearchText) {
+            if (self.index = -1, !searchText || searchText.length < Math.max(parseInt($scope.minLength, 10), 1)) return self.loading = !1, 
+            self.matches = [], self.hidden = shouldHide(), void updateMessages();
+            var term = searchText.toLowerCase();
+            promise && promise.cancel && (promise.cancel(), promise = null), !$scope.noCache && cache[term] ? (self.matches = cache[term], 
+            updateMessages()) : self.fetch(searchText), self.hidden = shouldHide(), $scope.textChange && searchText !== previousSearchText && $scope.textChange(getItemScope($scope.selectedItem));
+        }
+        function fetchResults(searchText) {
+            function handleResults(matches) {
+                cache[term] = matches, searchText === $scope.searchText && (promise = null, self.loading = !1, 
+                self.matches = matches, self.hidden = shouldHide(), updateMessages());
+            }
+            var items = $scope.$parent.$eval(itemExpr), term = searchText.toLowerCase();
+            angular.isArray(items) ? handleResults(items) : (self.loading = !0, promise = $q.when(items).then(handleResults));
+        }
+        function updateMessages() {
+            if (!self.hidden) switch (self.matches.length) {
+              case 0:
+                return self.messages.splice(0);
+
+              case 1:
+                return self.messages.push({
+                    display: "There is 1 match available."
+                });
+
+              default:
+                return self.messages.push({
+                    display: "There are " + self.matches.length + " matches available."
+                });
+            }
+        }
+        function updateSelectionMessage() {
+            self.messages.push({
+                display: getCurrentDisplayValue()
+            });
+        }
+        function blur() {
+            noBlur || (self.hidden = !0);
+        }
+        function keydown(event) {
+            switch (event.keyCode) {
+              case $mdConstant.KEY_CODE.DOWN_ARROW:
+                if (self.loading) return;
+                event.preventDefault(), self.index = Math.min(self.index + 1, self.matches.length - 1), 
+                updateScroll(), updateSelectionMessage();
+                break;
+
+              case $mdConstant.KEY_CODE.UP_ARROW:
+                if (self.loading) return;
+                event.preventDefault(), self.index = Math.max(0, self.index - 1), updateScroll(), 
+                updateSelectionMessage();
+                break;
+
+              case $mdConstant.KEY_CODE.ENTER:
+                if (self.loading || self.index < 0) return;
+                event.preventDefault(), select(self.index);
+                break;
+
+              case $mdConstant.KEY_CODE.ESCAPE:
+                self.matches = [], self.hidden = !0, self.index = -1;
+                break;
+
+              case $mdConstant.KEY_CODE.TAB:            }
+        }
+        function clearValue() {
+            $scope.searchText = "", select(-1), elements.input.focus();
+        }
+        function shouldHide() {
+            return 1 === self.matches.length && $scope.searchText === getDisplayValue(self.matches[0]);
+        }
+        function getCurrentDisplayValue() {
+            return getDisplayValue(self.matches[self.index]);
+        }
+        function getDisplayValue(item) {
+            return item && $scope.itemText ? $scope.itemText(getItemScope(item)) : item;
+        }
+        function select(index) {
+            $scope.selectedItem = self.matches[index], $scope.searchText = getDisplayValue($scope.selectedItem) || $scope.searchText, 
+            self.hidden = !0, self.index = -1, self.matches = [];
+        }
+        function updateScroll() {
+            var top = 41 * self.index, bot = top + 41, hgt = 225.5;
+            top < elements.ul.scrollTop ? elements.ul.scrollTop = top : bot > elements.ul.scrollTop + hgt && (elements.ul.scrollTop = bot - hgt);
+        }
+        var self = this, itemParts = $scope.itemsExpr.split(/ in /i), itemExpr = itemParts[1], elements = {
+            main: $element[0],
+            ul: $element[0].getElementsByTagName("ul")[0],
+            input: $element[0].getElementsByTagName("input")[0]
+        }, promise = null, cache = {}, noBlur = !1;
+        return self.scope = $scope, self.parent = $scope.$parent, self.itemName = itemParts[0], 
+        self.matches = [], self.loading = !1, self.hidden = !0, self.index = 0, self.keydown = keydown, 
+        self.blur = blur, self.clear = clearValue, self.select = select, self.getCurrentDisplayValue = getCurrentDisplayValue, 
+        self.fetch = $mdUtil.debounce(fetchResults), self.messages = [], self.listEnter = function() {
+            noBlur = !0;
+        }, self.listLeave = function() {
+            noBlur = !1;
+        }, self.mouseUp = function() {
+            elements.input.focus();
+        }, init();
+    }
+    angular.module("material.components.autocomplete").controller("MdAutocompleteCtrl", MdAutocompleteCtrl), 
+    MdAutocompleteCtrl.$inject = [ "$scope", "$element", "$q", "$mdUtil", "$mdConstant" ];
+}(), function() {
+    "use strict";
+    function MdAutocomplete() {
+        return {
+            template: '        <md-autocomplete-wrap role="listbox">          <input type="text"              ng-disabled="isDisabled"              ng-model="searchText"              ng-keydown="$mdAutocompleteCtrl.keydown($event)"              ng-blur="$mdAutocompleteCtrl.blur()"              placeholder="{{placeholder}}"              aria-label="{{placeholder}}"              aria-autocomplete="list"              aria-haspopup="true"              aria-activedescendant=""              aria-expanded="{{!$mdAutocompleteCtrl.hidden}}"/>          <button              type="button"              ng-if="searchText"              ng-click="$mdAutocompleteCtrl.clear()">            <md-icon md-svg-icon="cancel"></md-icon>            <span class="visually-hidden">Clear</span>          </button>          <md-progress-linear              ng-if="$mdAutocompleteCtrl.loading"              md-mode="indeterminate"></md-progress-linear>        </md-autocomplete-wrap>        <ul role="presentation"            ng-mouseenter="$mdAutocompleteCtrl.listEnter()"            ng-mouseleave="$mdAutocompleteCtrl.listLeave()"            ng-mouseup="$mdAutocompleteCtrl.mouseUp()">          <li ng-repeat="(index, item) in $mdAutocompleteCtrl.matches"              ng-class="{ selected: index === $mdAutocompleteCtrl.index }"              ng-show="searchText && !$mdAutocompleteCtrl.hidden"              ng-click="$mdAutocompleteCtrl.select(index)"              ng-transclude              md-autocomplete-list-item="$mdAutocompleteCtrl.itemName">          </li>        </ul>        <aria-status            class="visually-hidden"            role="status"            aria-live="assertive">          <p ng-repeat="message in $mdAutocompleteCtrl.messages">{{message.display}}</p>        </aria-status>',
+            transclude: !0,
+            controller: "MdAutocompleteCtrl",
+            controllerAs: "$mdAutocompleteCtrl",
+            scope: {
+                searchText: "=mdSearchText",
+                selectedItem: "=mdSelectedItem",
+                itemsExpr: "@mdItems",
+                itemText: "&mdItemText",
+                placeholder: "@placeholder",
+                noCache: "=mdNoCache",
+                itemChange: "&mdSelectedItemChange",
+                textChange: "&mdSearchTextChange",
+                isDisabled: "=ngDisabled",
+                minLength: "=mdMinLength",
+                delay: "=mdDelay"
+            }
+        };
+    }
+    angular.module("material.components.autocomplete").directive("mdAutocomplete", MdAutocomplete);
+}(), function() {
+    "use strict";
+    function MdHighlightCtrl($scope, $element, $interpolate) {
+        function sanitize(term) {
+            return term ? term.replace(/[\*\[\]\(\)\{\}\\\^\$]/g, "\\$&") : term;
+        }
+        var term = $element.attr("md-highlight-text"), text = $interpolate($element.text())($scope), watcher = $scope.$watch(term, function(term) {
+            var regex = new RegExp("^" + sanitize(term), "i"), html = text.replace(regex, '<span class="highlight">$&</span>');
+            $element.html(html);
+        });
+        $element.on("$destroy", function() {
+            watcher();
+        });
+    }
+    angular.module("material.components.autocomplete").controller("MdHighlightCtrl", MdHighlightCtrl), 
+    MdHighlightCtrl.$inject = [ "$scope", "$element", "$interpolate" ];
+}(), function() {
+    "use strict";
+    function MdHighlight() {
+        return {
+            terminal: !0,
+            scope: !1,
+            controller: "MdHighlightCtrl"
+        };
+    }
+    angular.module("material.components.autocomplete").directive("mdHighlightText", MdHighlight);
+}(), function() {
+    "use strict";
+    function MdAutocompleteListItem($compile, $mdUtil) {
+        function link(scope, element, attr, ctrl) {
+            var newScope = ctrl.parent.$new(!1, ctrl.parent), itemName = ctrl.scope.$eval(attr.mdAutocompleteListItem);
+            newScope[itemName] = scope.item, $compile(element.contents())(newScope), element.attr({
+                role: "option",
+                id: "item_" + $mdUtil.nextUid()
+            });
+        }
+        return {
+            require: "^?mdAutocomplete",
+            terminal: !0,
+            link: link,
+            scope: !1
+        };
+    }
+    angular.module("material.components.autocomplete").directive("mdAutocompleteListItem", MdAutocompleteListItem), 
+    MdAutocompleteListItem.$inject = [ "$compile", "$mdUtil" ];
 }(), function() {
     "use strict";
     function MdTabInkDirective($$rAF) {
@@ -14842,12 +16083,10 @@ function() {
                     $timeout(function() {
                         tabsCtrl.scope.$broadcast("$mdTabsChanged");
                     }, 0, !1);
-                }), transcludeTabContent(), configureAria();
-                var detachRippleFn = $mdInkRipple.attachTabBehavior(scope, element, {
+                }), transcludeTabContent(), configureAria(), $mdInkRipple.attachTabBehavior(scope, element, {
                     colorElement: tabsCtrl.inkBarElement
-                });
-                tabsCtrl.add(tabItemCtrl), scope.$on("$destroy", function() {
-                    detachRippleFn(), tabsCtrl.remove(tabItemCtrl);
+                }), tabsCtrl.add(tabItemCtrl), scope.$on("$destroy", function() {
+                    tabsCtrl.remove(tabItemCtrl);
                 }), element.on("$destroy", function() {
                     $timeout(function() {
                         tabsCtrl.scope.$broadcast("$mdTabsChanged");
@@ -14959,13 +16198,14 @@ function() {
             scope: {
                 selectedIndex: "=?mdSelected"
             },
-            template: '<section class="md-header" ng-class="{\'md-paginating\': pagination.active}"><button class="md-paginator md-prev" ng-if="pagination.active && pagination.hasPrev" ng-click="pagination.clickPrevious()" aria-hidden="true"></button><div class="md-header-items-container" md-tabs-pagination><div class="md-header-items"><md-tabs-ink-bar></md-tabs-ink-bar></div></div><button class="md-paginator md-next" ng-if="pagination.active && pagination.hasNext" ng-click="pagination.clickNext()" aria-hidden="true"></button></section><section class="md-tabs-content"></section>',
+            template: '<section class="md-header" ng-class="{\'md-paginating\': pagination.active}"><button class="md-paginator md-prev" ng-if="pagination.active && pagination.hasPrev" ng-click="pagination.clickPrevious()" aria-hidden="true"><md-icon md-svg-icon="tabs-arrow"></md-icon></button><div class="md-header-items-container" md-tabs-pagination><div class="md-header-items"><md-tabs-ink-bar></md-tabs-ink-bar></div></div><button class="md-paginator md-next" ng-if="pagination.active && pagination.hasNext" ng-click="pagination.clickNext()" aria-hidden="true"><md-icon md-svg-icon="tabs-arrow"></md-icon></button></section><section class="md-tabs-content"></section>',
             link: postLink
         };
     }
     angular.module("material.components.tabs").directive("mdTabs", TabsDirective), TabsDirective.$inject = [ "$mdTheming" ];
-}(), angular.module("material.core").constant("$MD_THEME_CSS", "md-backdrop.md-opaque.md-THEME_NAME-theme {  background-color: '{{foreground-4-0.5}}'; }md-bottom-sheet.md-THEME_NAME-theme {  background-color: '{{background-50}}';  border-top-color: '{{background-300}}'; }  md-bottom-sheet.md-THEME_NAME-theme.md-list md-item {    color: '{{foreground-1}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    background-color: '{{background-50}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    color: '{{foreground-1}}'; }md-toolbar .md-button.md-THEME_NAME-theme.md-fab {  background-color: white; }.md-button.md-THEME_NAME-theme {  border-radius: 3px; }  .md-button.md-THEME_NAME-theme:not([disabled]):hover, .md-button.md-THEME_NAME-theme:not([disabled]):focus {    background-color: '{{background-500-0.2}}'; }  .md-button.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }    .md-button.md-THEME_NAME-theme.md-primary.md-raised, .md-button.md-THEME_NAME-theme.md-primary.md-fab {      color: '{{primary-contrast}}';      background-color: '{{primary-color}}'; }      .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):focus {        background-color: '{{primary-600}}'; }  .md-button.md-THEME_NAME-theme.md-fab {    border-radius: 50%;    background-color: '{{accent-color}}';    color: '{{accent-contrast}}'; }    .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):focus {      background-color: '{{accent-A700}}'; }  .md-button.md-THEME_NAME-theme.md-raised {    color: '{{background-contrast}}';    background-color: '{{background-50}}'; }    .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):focus {      background-color: '{{background-200}}'; }  .md-button.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }    .md-button.md-THEME_NAME-theme.md-warn.md-raised, .md-button.md-THEME_NAME-theme.md-warn.md-fab {      color: '{{warn-contrast}}';      background-color: '{{warn-color}}'; }      .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):focus {        background-color: '{{warn-700}}'; }  .md-button.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }    .md-button.md-THEME_NAME-theme.md-accent.md-raised, .md-button.md-THEME_NAME-theme.md-accent.md-fab {      color: '{{accent-contrast}}';      background-color: '{{accent-color}}'; }      .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):focus {        background-color: '{{accent-700}}'; }  .md-button.md-THEME_NAME-theme[disabled], .md-button.md-THEME_NAME-theme.md-raised[disabled], .md-button.md-THEME_NAME-theme.md-fab[disabled] {    color: '{{foreground-3}}';    background-color: transparent;    cursor: not-allowed; }md-card.md-THEME_NAME-theme {  border-radius: 2px; }  md-card.md-THEME_NAME-theme .md-card-image {    border-radius: 2px 2px 0 0; }md-checkbox.md-THEME_NAME-theme .md-ripple {  color: '{{accent-600}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon {  background-color: '{{accent-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary .md-ripple {  color: '{{primary-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-icon {  background-color: '{{primary-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-ripple {  color: '{{warn-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon {  background-color: '{{warn-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme[disabled] .md-icon {  border-color: '{{foreground-3}}'; }md-checkbox.md-THEME_NAME-theme[disabled].md-checked .md-icon {  background-color: '{{foreground-3}}'; }md-content.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-dialog.md-THEME_NAME-theme {  border-radius: 4px;  background-color: '{{background-hue-3}}'; }  md-dialog.md-THEME_NAME-theme.md-content-overflow .md-actions {    border-top-color: '{{foreground-4}}'; }md-divider.md-THEME_NAME-theme {  border-top-color: '{{foreground-4}}'; }md-input-container.md-THEME_NAME-theme .md-input {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}';  text-shadow: '{{foreground-shadow}}'; }  md-input-container.md-THEME_NAME-theme .md-input::-webkit-input-placeholder, md-input-container.md-THEME_NAME-theme .md-input::-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme label, md-input-container.md-THEME_NAME-theme .md-placeholder {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-has-value label {  color: '{{foreground-2}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused .md-input {  border-color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused label {  color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent .md-input {  border-color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid data-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid x-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid [ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [data-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [x-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid .md-char-counter {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme .md-input[disabled] {  border-bottom-color: transparent;  color: '{{foreground-3}}';  background-image: linear-gradient(to right, '{{foreground-4}}' 0%, '{{foreground-4}}' 33%, transparent 0%); }md-progress-circular.md-THEME_NAME-theme {  background-color: transparent; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-gap {    border-top-color: '{{primary-color}}';    border-bottom-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-top-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-right-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle {    border-left-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-gap {    border-top-color: '{{warn-color}}';    border-bottom-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-top-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-right-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle {    border-left-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-gap {    border-top-color: '{{accent-color}}';    border-bottom-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-top-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-right-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle {    border-left-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme .md-container {  background-color: '{{primary-100}}'; }md-progress-linear.md-THEME_NAME-theme .md-bar {  background-color: '{{primary-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-container {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-bar {  background-color: '{{warn-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-container {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-bar {  background-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-bar1 {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-dashed:before {  background: radial-gradient('{{warn-100}}' 0%, '{{warn-100}}' 16%, transparent 42%); }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-bar1 {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-dashed:before {  background: radial-gradient('{{accent-100}}' 0%, '{{accent-100}}' 16%, transparent 42%); }md-radio-button.md-THEME_NAME-theme .md-off {  border-color: '{{foreground-2}}'; }md-radio-button.md-THEME_NAME-theme .md-on {  background-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-off {  border-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-ink-ripple {  color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme .md-container .md-ripple {  color: '{{accent-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary .md-on {  background-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-off {  border-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-ink-ripple {  color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary .md-container .md-ripple {  color: '{{primary-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-on {  background-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-off {  border-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-ink-ripple {  color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-container .md-ripple {  color: '{{warn-600}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-off {  border-color: '{{foreground-3}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-on {  border-color: '{{foreground-3}}'; }md-radio-group.md-THEME_NAME-theme:focus:not(:empty) {  border-color: '{{foreground-1}}'; }md-sidenav.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track {  background-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme .md-track-ticks {  background-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-focus-thumb {  background-color: '{{foreground-2}}'; }md-slider.md-THEME_NAME-theme .md-focus-ring {  border-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-disabled-thumb {  border-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme.md-min .md-thumb:after {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track.md-track-fill {  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb:after {  border-color: '{{primary-color}}';  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-sign {  background-color: '{{primary-color}}'; }  md-slider.md-THEME_NAME-theme .md-sign:after {    border-top-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb-text {  color: '{{primary-contrast}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-track-fill {  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb:after {  border-color: '{{warn-color}}';  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-sign {  background-color: '{{warn-color}}'; }  md-slider.md-THEME_NAME-theme.md-warn .md-sign:after {    border-top-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb-text {  color: '{{warn-contrast}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-track-fill {  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-thumb:after {  border-color: '{{primary-color}}';  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-sign {  background-color: '{{primary-color}}'; }  md-slider.md-THEME_NAME-theme.md-primary .md-sign:after {    border-top-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-thumb-text {  color: '{{primary-contrast}}'; }md-slider.md-THEME_NAME-theme[disabled] .md-thumb:after {  border-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme[disabled]:not(.md-min) .md-thumb:after {  background-color: '{{foreground-3}}'; }.md-subheader.md-THEME_NAME-theme {  color: '{{ foreground-2-0.23 }}';  background-color: '{{background-hue-3}}'; }  .md-subheader.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme .md-thumb {  background-color: '{{background-50}}'; }md-switch.md-THEME_NAME-theme .md-bar {  background-color: '{{background-500}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-thumb {  background-color: '{{accent-color}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-bar {  background-color: '{{accent-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-primary .md-thumb {  background-color: '{{primary-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-primary .md-bar {  background-color: '{{primary-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-thumb {  background-color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-bar {  background-color: '{{warn-color-0.5}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-thumb {  background-color: '{{background-400}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-bar {  background-color: '{{foreground-4}}'; }md-switch.md-THEME_NAME-theme:focus .md-label:not(:empty) {  border-color: '{{foreground-1}}';  border-style: dotted; }md-tabs.md-THEME_NAME-theme .md-header {  background-color: '{{primary-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent .md-header {  background-color: '{{accent-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]) {  color: '{{accent-100}}'; }  md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]).active {    color: '{{accent-contrast}}'; }md-tabs.md-THEME_NAME-theme.md-warn .md-header {  background-color: '{{warn-color}}'; }md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]) {  color: '{{warn-100}}'; }  md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]).active {    color: '{{warn-contrast}}'; }md-tabs.md-THEME_NAME-theme md-tabs-ink-bar {  color: '{{primary-contrast}}';  background: '{{primary-contrast}}'; }md-tabs.md-THEME_NAME-theme md-tab {  color: '{{primary-100}}'; }  md-tabs.md-THEME_NAME-theme md-tab.active {    color: '{{primary-contrast}}'; }  md-tabs.md-THEME_NAME-theme md-tab[disabled] {    color: '{{foreground-4}}'; }  md-tabs.md-THEME_NAME-theme md-tab:focus {    color: '{{primary-contrast}}';    background-color: '{{primary-contrast-0.1}}'; }  md-tabs.md-THEME_NAME-theme md-tab .md-ripple-container {    color: '{{primary-contrast}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  text-shadow: '{{foreground-shadow}}'; }  md-input-group.md-THEME_NAME-theme input::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme input::-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-ms-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme label {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused input, md-input-group.md-THEME_NAME-theme.md-input-focused textarea {  border-color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused label {  color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent input, md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent textarea {  border-color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-has-value:not(.md-input-focused) label {  color: '{{foreground-2}}'; }md-input-group.md-THEME_NAME-theme .md-input[disabled] {  border-bottom-color: '{{foreground-4}}';  color: '{{foreground-3}}'; }md-toast.md-THEME_NAME-theme {  background-color: '{{foreground-1}}';  color: '{{background-50}}'; }  md-toast.md-THEME_NAME-theme .md-button {    color: '{{background-50}}'; }    md-toast.md-THEME_NAME-theme .md-button.md-highlight {      color: '{{primary-A200}}'; }      md-toast.md-THEME_NAME-theme .md-button.md-highlight.md-accent {        color: '{{accent-A200}}'; }      md-toast.md-THEME_NAME-theme .md-button.md-highlight.md-warn {        color: '{{warn-A200}}'; }md-toolbar.md-THEME_NAME-theme {  background-color: '{{primary-color}}';  color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme .md-button {    color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-accent {    background-color: '{{accent-color}}';    color: '{{accent-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-warn {    background-color: '{{warn-color}}';    color: '{{warn-contrast}}'; }md-tooltip.md-THEME_NAME-theme {  color: '{{background-A100}}'; }  md-tooltip.md-THEME_NAME-theme .md-background {    background-color: '{{foreground-2}}'; }"), 
-function() {
+}(), function() {
+    angular.module("material.core").constant("$MD_THEME_CSS", "md-autocomplete {  background: '{{background-50}}'; }  md-autocomplete button md-icon path {    fill: '{{background-600}}'; }  md-autocomplete button:after {    background: '{{background-600-0.3}}'; }  md-autocomplete ul {    background: '{{background-50}}'; }    md-autocomplete ul li {      border-top: 1px solid '{{background-400}}';      color: '{{background-900}}'; }      md-autocomplete ul li .highlight {        color: '{{background-600}}'; }      md-autocomplete ul li:hover, md-autocomplete ul li.selected {        background: '{{background-200}}'; }md-backdrop.md-opaque.md-THEME_NAME-theme {  background-color: '{{foreground-4-0.5}}'; }md-bottom-sheet.md-THEME_NAME-theme {  background-color: '{{background-50}}';  border-top-color: '{{background-300}}'; }  md-bottom-sheet.md-THEME_NAME-theme.md-list md-item {    color: '{{foreground-1}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    background-color: '{{background-50}}'; }  md-bottom-sheet.md-THEME_NAME-theme .md-subheader {    color: '{{foreground-1}}'; }md-toolbar .md-button.md-THEME_NAME-theme.md-fab {  background-color: white; }.md-button.md-THEME_NAME-theme {  border-radius: 3px; }  .md-button.md-THEME_NAME-theme:not([disabled]):hover, .md-button.md-THEME_NAME-theme:not([disabled]):focus {    background-color: '{{background-500-0.2}}'; }  .md-button.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }    .md-button.md-THEME_NAME-theme.md-primary.md-raised, .md-button.md-THEME_NAME-theme.md-primary.md-fab {      color: '{{primary-contrast}}';      background-color: '{{primary-color}}'; }      .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-primary.md-fab:not([disabled]):focus {        background-color: '{{primary-600}}'; }  .md-button.md-THEME_NAME-theme.md-fab {    border-radius: 50%;    background-color: '{{accent-color}}';    color: '{{accent-contrast}}'; }    .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-fab:not([disabled]):focus {      background-color: '{{accent-A700}}'; }  .md-button.md-THEME_NAME-theme.md-raised {    color: '{{background-contrast}}';    background-color: '{{background-50}}'; }    .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-raised:not([disabled]):focus {      background-color: '{{background-200}}'; }  .md-button.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }    .md-button.md-THEME_NAME-theme.md-warn.md-raised, .md-button.md-THEME_NAME-theme.md-warn.md-fab {      color: '{{warn-contrast}}';      background-color: '{{warn-color}}'; }      .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-warn.md-fab:not([disabled]):focus {        background-color: '{{warn-700}}'; }  .md-button.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }    .md-button.md-THEME_NAME-theme.md-accent.md-raised, .md-button.md-THEME_NAME-theme.md-accent.md-fab {      color: '{{accent-contrast}}';      background-color: '{{accent-color}}'; }      .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-raised:not([disabled]):focus, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):hover, .md-button.md-THEME_NAME-theme.md-accent.md-fab:not([disabled]):focus {        background-color: '{{accent-700}}'; }  .md-button.md-THEME_NAME-theme[disabled], .md-button.md-THEME_NAME-theme.md-raised[disabled], .md-button.md-THEME_NAME-theme.md-fab[disabled] {    color: '{{foreground-3}}';    background-color: transparent;    cursor: not-allowed; }md-card.md-THEME_NAME-theme {  border-radius: 2px; }  md-card.md-THEME_NAME-theme .md-card-image {    border-radius: 2px 2px 0 0; }md-checkbox.md-THEME_NAME-theme .md-ripple {  color: '{{accent-600}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon {  background-color: '{{accent-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary .md-ripple {  color: '{{primary-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-ripple {  color: '{{background-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-icon {  background-color: '{{primary-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-ripple {  color: '{{warn-600}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn .md-icon {  border-color: '{{foreground-2}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon {  background-color: '{{warn-color-0.87}}'; }md-checkbox.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-icon:after {  border-color: '{{background-200}}'; }md-checkbox.md-THEME_NAME-theme[disabled] .md-icon {  border-color: '{{foreground-3}}'; }md-checkbox.md-THEME_NAME-theme[disabled].md-checked .md-icon {  background-color: '{{foreground-3}}'; }md-content.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-dialog.md-THEME_NAME-theme {  border-radius: 4px;  background-color: '{{background-hue-3}}'; }  md-dialog.md-THEME_NAME-theme.md-content-overflow .md-actions {    border-top-color: '{{foreground-4}}'; }md-divider.md-THEME_NAME-theme {  border-top-color: '{{foreground-4}}'; }md-icon.md-THEME_NAME-theme.md-primary {  color: '{{primary-color}}'; }md-icon.md-THEME_NAME-theme.md-accent {  color: '{{accent-color}}'; }md-icon.md-THEME_NAME-theme.md-warn {  color: '{{warn-color}}'; }md-icon.md-THEME_NAME-theme.md-danger {  color: '{{danger-color}}'; }md-input-container.md-THEME_NAME-theme .md-input {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}';  text-shadow: '{{foreground-shadow}}'; }  md-input-container.md-THEME_NAME-theme .md-input::-webkit-input-placeholder, md-input-container.md-THEME_NAME-theme .md-input::-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-moz-placeholder, md-input-container.md-THEME_NAME-theme .md-input:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme > md-icon {  fill: '{{foreground-1}}'; }md-input-container.md-THEME_NAME-theme label, md-input-container.md-THEME_NAME-theme .md-placeholder {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-has-value label {  color: '{{foreground-2}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused .md-input {  border-color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused label {  color: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused md-icon {  fill: '{{primary-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent .md-input {  border-color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme:not(.md-input-invalid).md-input-focused.md-warn label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid .md-input {  border-color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid label {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme.md-input-invalid ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid data-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid x-ng-message, md-input-container.md-THEME_NAME-theme.md-input-invalid [ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [data-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid [x-ng-message], md-input-container.md-THEME_NAME-theme.md-input-invalid .md-char-counter {  color: '{{warn-500}}'; }md-input-container.md-THEME_NAME-theme .md-input[disabled], [disabled] md-input-container.md-THEME_NAME-theme .md-input {  border-bottom-color: transparent;  color: '{{foreground-3}}';  background-image: linear-gradient(to right, '{{foreground-4}}' 0%, '{{foreground-4}}' 33%, transparent 0%);  background-image: -ms-linear-gradient(left, transparent 0%, '{{foreground-4}}' 100%); }md-progress-circular.md-THEME_NAME-theme {  background-color: transparent; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-gap {    border-top-color: '{{primary-color}}';    border-bottom-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-top-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-right .md-half-circle {    border-right-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme .md-inner .md-left .md-half-circle {    border-left-color: '{{primary-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-gap {    border-top-color: '{{warn-color}}';    border-bottom-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-top-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-right .md-half-circle {    border-right-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-warn .md-inner .md-left .md-half-circle {    border-left-color: '{{warn-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-gap {    border-top-color: '{{accent-color}}';    border-bottom-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle, md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-top-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-right .md-half-circle {    border-right-color: '{{accent-color}}'; }  md-progress-circular.md-THEME_NAME-theme.md-accent .md-inner .md-left .md-half-circle {    border-left-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme .md-container {  background-color: '{{primary-100}}'; }md-progress-linear.md-THEME_NAME-theme .md-bar {  background-color: '{{primary-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-container {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-warn .md-bar {  background-color: '{{warn-color}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-container {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme.md-accent .md-bar {  background-color: '{{accent-color}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-bar1 {  background-color: '{{warn-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-warn .md-dashed:before {  background: radial-gradient('{{warn-100}}' 0%, '{{warn-100}}' 16%, transparent 42%); }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-bar1 {  background-color: '{{accent-100}}'; }md-progress-linear.md-THEME_NAME-theme[md-mode=buffer].md-accent .md-dashed:before {  background: radial-gradient('{{accent-100}}' 0%, '{{accent-100}}' 16%, transparent 42%); }md-radio-button.md-THEME_NAME-theme .md-off {  border-color: '{{foreground-2}}'; }md-radio-button.md-THEME_NAME-theme .md-on {  background-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-off {  border-color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme.md-checked .md-ink-ripple {  color: '{{accent-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme .md-container .md-ripple {  color: '{{accent-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary .md-on {  background-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-off {  border-color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary.md-checked .md-ink-ripple {  color: '{{primary-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-primary .md-container .md-ripple {  color: '{{primary-600}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-on {  background-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-off {  border-color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn.md-checked .md-ink-ripple {  color: '{{warn-color-0.87}}'; }md-radio-button.md-THEME_NAME-theme:not([disabled]).md-warn .md-container .md-ripple {  color: '{{warn-600}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-off {  border-color: '{{foreground-3}}'; }md-radio-button.md-THEME_NAME-theme[disabled] .md-container .md-on {  border-color: '{{foreground-3}}'; }md-radio-group.md-THEME_NAME-theme:focus:not(:empty) {  border-color: '{{foreground-1}}'; }md-select.md-THEME_NAME-theme:not([disabled]):focus .md-select-label {  border-bottom-color: '{{primary-color}}';  color: '{{ foreground-1 }}'; }  md-select.md-THEME_NAME-theme:not([disabled]):focus .md-select-label.md-placeholder {    color: '{{ foreground-1 }}'; }md-select.md-THEME_NAME-theme:not([disabled]):focus.md-accent .md-select-label {  border-bottom-color: '{{accent-color}}'; }md-select.md-THEME_NAME-theme:not([disabled]):focus.md-warn .md-select-label {  border-bottom-color: '{{warn-color}}'; }md-select.md-THEME_NAME-theme[disabled] .md-select-label {  color: '{{foreground-3}}'; }  md-select.md-THEME_NAME-theme[disabled] .md-select-label.md-placeholder {    color: '{{foreground-3}}'; }md-select.md-THEME_NAME-theme .md-select-label {  border-bottom-color: '{{foreground-4}}'; }  md-select.md-THEME_NAME-theme .md-select-label.md-placeholder {    color: '{{foreground-2}}'; }md-select-menu.md-THEME_NAME-theme md-optgroup {  color: '{{foreground-2}}'; }  md-select-menu.md-THEME_NAME-theme md-optgroup md-option {    color: '{{foreground-1}}'; }md-select-menu.md-THEME_NAME-theme md-option[selected] {  background-color: '{{primary-50}}'; }  md-select-menu.md-THEME_NAME-theme md-option[selected]:focus {    background-color: '{{primary-100}}'; }  md-select-menu.md-THEME_NAME-theme md-option[selected].md-accent {    background-color: '{{accent-50}}'; }    md-select-menu.md-THEME_NAME-theme md-option[selected].md-accent:focus {      background-color: '{{accent-100}}'; }md-select-menu.md-THEME_NAME-theme md-option:focus:not([selected]) {  background: '{{background-200}}'; }md-sidenav.md-THEME_NAME-theme {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track {  background-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme .md-track-ticks {  background-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-focus-thumb {  background-color: '{{foreground-2}}'; }md-slider.md-THEME_NAME-theme .md-focus-ring {  border-color: '{{foreground-4}}'; }md-slider.md-THEME_NAME-theme .md-disabled-thumb {  border-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme.md-min .md-thumb:after {  background-color: '{{background-hue-3}}'; }md-slider.md-THEME_NAME-theme .md-track.md-track-fill {  background-color: '{{accent-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb:after {  border-color: '{{accent-color}}';  background-color: '{{accent-color}}'; }md-slider.md-THEME_NAME-theme .md-sign {  background-color: '{{accent-color}}'; }  md-slider.md-THEME_NAME-theme .md-sign:after {    border-top-color: '{{accent-color}}'; }md-slider.md-THEME_NAME-theme .md-thumb-text {  color: '{{accent-contrast}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-track.md-track-fill {  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb:after {  border-color: '{{warn-color}}';  background-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-sign {  background-color: '{{warn-color}}'; }  md-slider.md-THEME_NAME-theme.md-warn .md-sign:after {    border-top-color: '{{warn-color}}'; }md-slider.md-THEME_NAME-theme.md-warn .md-thumb-text {  color: '{{warn-contrast}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-track.md-track-fill {  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-thumb:after {  border-color: '{{primary-color}}';  background-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-sign {  background-color: '{{primary-color}}'; }  md-slider.md-THEME_NAME-theme.md-primary .md-sign:after {    border-top-color: '{{primary-color}}'; }md-slider.md-THEME_NAME-theme.md-primary .md-thumb-text {  color: '{{primary-contrast}}'; }md-slider.md-THEME_NAME-theme[disabled] .md-thumb:after {  border-color: '{{foreground-3}}'; }md-slider.md-THEME_NAME-theme[disabled]:not(.md-min) .md-thumb:after {  background-color: '{{foreground-3}}'; }.md-subheader.md-THEME_NAME-theme {  color: '{{ foreground-2-0.23 }}';  background-color: '{{background-hue-3}}'; }  .md-subheader.md-THEME_NAME-theme.md-primary {    color: '{{primary-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-accent {    color: '{{accent-color}}'; }  .md-subheader.md-THEME_NAME-theme.md-warn {    color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme .md-thumb {  background-color: '{{background-50}}'; }md-switch.md-THEME_NAME-theme .md-bar {  background-color: '{{background-500}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-thumb {  background-color: '{{accent-color}}'; }md-switch.md-THEME_NAME-theme.md-checked .md-bar {  background-color: '{{accent-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-primary .md-thumb {  background-color: '{{primary-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-primary .md-bar {  background-color: '{{primary-color-0.5}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-thumb {  background-color: '{{warn-color}}'; }md-switch.md-THEME_NAME-theme.md-checked.md-warn .md-bar {  background-color: '{{warn-color-0.5}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-thumb {  background-color: '{{background-400}}'; }md-switch.md-THEME_NAME-theme[disabled] .md-bar {  background-color: '{{foreground-4}}'; }md-switch.md-THEME_NAME-theme:focus .md-label:not(:empty) {  border-color: '{{foreground-1}}';  border-style: dotted; }md-tabs.md-THEME_NAME-theme .md-header {  background-color: transparent; }md-tabs.md-THEME_NAME-theme .md-paginator md-icon {  color: '{{primary-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent .md-header {  background-color: '{{accent-color}}'; }md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]) {  color: '{{accent-100}}'; }  md-tabs.md-THEME_NAME-theme.md-accent md-tab:not([disabled]).active {    color: '{{accent-contrast}}'; }md-tabs.md-THEME_NAME-theme.md-primary .md-header {  background-color: '{{primary-color}}'; }md-tabs.md-THEME_NAME-theme.md-primary md-tab:not([disabled]) {  color: '{{primary-100}}'; }  md-tabs.md-THEME_NAME-theme.md-primary md-tab:not([disabled]).active {    color: '{{primary-contrast}}'; }md-tabs.md-THEME_NAME-theme.md-primary md-tab {  color: '{{primary-100}}'; }  md-tabs.md-THEME_NAME-theme.md-primary md-tab[disabled] {    color: '{{foreground-3}}'; }  md-tabs.md-THEME_NAME-theme.md-primary md-tab:focus {    color: '{{primary-contrast}}';    background-color: '{{primary-contrast-0.1}}'; }  md-tabs.md-THEME_NAME-theme.md-primary md-tab.active {    color: '{{primary-contrast}}'; }  md-tabs.md-THEME_NAME-theme.md-primary md-tab .md-ripple-container {    color: '{{primary-contrast}}'; }md-tabs.md-THEME_NAME-theme.md-warn .md-header {  background-color: '{{warn-color}}'; }md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]) {  color: '{{warn-100}}'; }  md-tabs.md-THEME_NAME-theme.md-warn md-tab:not([disabled]).active {    color: '{{warn-contrast}}'; }md-tabs.md-THEME_NAME-theme md-tabs-ink-bar {  color: '{{accent-color}}';  background: '{{accent-color}}'; }md-tabs.md-THEME_NAME-theme md-tab {  color: '{{foreground-2}}'; }  md-tabs.md-THEME_NAME-theme md-tab[disabled] {    color: '{{foreground-3}}'; }  md-tabs.md-THEME_NAME-theme md-tab:focus {    color: '{{foreground-1}}'; }  md-tabs.md-THEME_NAME-theme md-tab.active {    color: '{{primary-color}}'; }  md-tabs.md-THEME_NAME-theme md-tab .md-ripple-container {    color: '{{accent-100}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  text-shadow: '{{foreground-shadow}}'; }  md-input-group.md-THEME_NAME-theme input::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme input::-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-moz-placeholder, md-input-group.md-THEME_NAME-theme input:-ms-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-webkit-input-placeholder, md-input-group.md-THEME_NAME-theme textarea::-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-moz-placeholder, md-input-group.md-THEME_NAME-theme textarea:-ms-input-placeholder {    color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme label {  text-shadow: '{{foreground-shadow}}';  color: '{{foreground-3}}'; }md-input-group.md-THEME_NAME-theme input, md-input-group.md-THEME_NAME-theme textarea {  color: '{{foreground-1}}';  border-color: '{{foreground-4}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused input, md-input-group.md-THEME_NAME-theme.md-input-focused textarea {  border-color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused label {  color: '{{primary-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent input, md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent textarea {  border-color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-focused.md-accent label {  color: '{{accent-500}}'; }md-input-group.md-THEME_NAME-theme.md-input-has-value:not(.md-input-focused) label {  color: '{{foreground-2}}'; }md-input-group.md-THEME_NAME-theme .md-input[disabled] {  border-bottom-color: '{{foreground-4}}';  color: '{{foreground-3}}'; }md-toast.md-THEME_NAME-theme {  background-color: '{{foreground-1}}';  color: '{{background-50}}'; }  md-toast.md-THEME_NAME-theme .md-button {    color: '{{background-50}}'; }    md-toast.md-THEME_NAME-theme .md-button.md-highlight {      color: '{{primary-A200}}'; }      md-toast.md-THEME_NAME-theme .md-button.md-highlight.md-accent {        color: '{{accent-A200}}'; }      md-toast.md-THEME_NAME-theme .md-button.md-highlight.md-warn {        color: '{{warn-A200}}'; }md-toolbar.md-THEME_NAME-theme {  background-color: '{{primary-color}}';  color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme .md-button {    color: '{{primary-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-accent {    background-color: '{{accent-color}}';    color: '{{accent-contrast}}'; }  md-toolbar.md-THEME_NAME-theme.md-warn {    background-color: '{{warn-color}}';    color: '{{warn-contrast}}'; }md-tooltip.md-THEME_NAME-theme {  color: '{{background-A100}}'; }  md-tooltip.md-THEME_NAME-theme .md-background {    background-color: '{{foreground-2}}'; }");
+}(), function() {
     "use strict";
     angular.module("wu.masonry", []).controller("MasonryCtrl", [ "$scope", "$element", "$timeout", function($scope, $element, $timeout) {
         function defaultLoaded($element) {
@@ -15053,7 +16293,7 @@ function() {
     };
     storage ? storage.get(key) ? $translate.use(storage.get(key))["catch"](fallbackFromIncorrectStorageValue) : fallbackFromIncorrectStorageValue() : angular.isString($translate.preferredLanguage()) && $translate.use($translate.preferredLanguage());
 } ]), angular.module("pascalprecht.translate").provider("$translate", [ "$STORAGE_KEY", "$windowProvider", function($STORAGE_KEY, $windowProvider) {
-    var $preferredLanguage, $languageKeyAliases, $fallbackLanguage, $fallbackWasString, $uses, $nextLang, $storageFactory, $storagePrefix, $missingTranslationHandlerFactory, $interpolationFactory, $loaderFactory, $loaderOptions, $notFoundIndicatorLeft, $notFoundIndicatorRight, loaderCache, $translationTable = {}, $availableLanguageKeys = [], $storageKey = $STORAGE_KEY, $interpolatorFactories = [], $interpolationSanitizationStrategy = !1, $cloakClassName = "translate-cloak", $postCompilingEnabled = !1, NESTED_OBJECT_DELIMITER = ".", directivePriority = 0, version = "2.6.0", getFirstBrowserLanguage = function() {
+    var $preferredLanguage, $languageKeyAliases, $fallbackLanguage, $fallbackWasString, $uses, $nextLang, $storageFactory, $storagePrefix, $missingTranslationHandlerFactory, $interpolationFactory, $loaderFactory, $loaderOptions, $notFoundIndicatorLeft, $notFoundIndicatorRight, loaderCache, $translationTable = {}, $availableLanguageKeys = [], $storageKey = $STORAGE_KEY, $interpolatorFactories = [], $interpolationSanitizationStrategy = !1, $cloakClassName = "translate-cloak", $postCompilingEnabled = !1, NESTED_OBJECT_DELIMITER = ".", directivePriority = 0, version = "2.6.1", getFirstBrowserLanguage = function() {
         var i, language, nav = $windowProvider.$get().navigator, browserLanguagePropertyKeys = [ "language", "browserLanguage", "systemLanguage", "userLanguage" ];
         if (angular.isArray(nav.languages)) for (i = 0; i < nav.languages.length; i++) if (language = nav.languages[i], 
         language && language.length) return language;
@@ -15332,8 +16572,9 @@ function() {
             }
             return deferred.promise;
         }, determineTranslationInstant = function(translationId, interpolateParams, interpolationId) {
-            var result, table = $uses ? $translationTable[$uses] : $translationTable, Interpolator = interpolationId ? interpolatorHashMap[interpolationId] : defaultInterpolator;
-            if (table && Object.prototype.hasOwnProperty.call(table, translationId)) {
+            var result, table = $uses ? $translationTable[$uses] : $translationTable, Interpolator = defaultInterpolator;
+            if (interpolatorHashMap && Object.prototype.hasOwnProperty.call(interpolatorHashMap, interpolationId) && (Interpolator = interpolatorHashMap[interpolationId]), 
+            table && Object.prototype.hasOwnProperty.call(table, translationId)) {
                 var translation = table[translationId];
                 result = "@:" === translation.substr(0, 2) ? determineTranslationInstant(translation.substr(2), interpolateParams, interpolationId) : Interpolator.interpolate(translation, interpolateParams);
             } else {
@@ -15566,7 +16807,1014 @@ angular.module("pascalprecht.translate").directive("translate", [ "$translate", 
         $translate.instant(translationId, interpolateParams, interpolation);
     };
     return translateFilter.$stateful = !0, translateFilter;
-} ]), angular.module("ui.bootstrap", [ "ui.bootstrap.tpls", "ui.bootstrap.pagination" ]), 
+} ]), function(window, undefined) {
+    "use strict";
+    var _zcSwfVersion, _currentElement, _copyTarget, _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _setInterval = _window.setInterval, _clearInterval = _window.clearInterval, _getComputedStyle = _window.getComputedStyle, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
+        var unwrapper = function(el) {
+            return el;
+        };
+        if ("function" == typeof _window.wrap && "function" == typeof _window.unwrap) try {
+            var div = _document.createElement("div"), unwrappedDiv = _window.unwrap(div);
+            1 === div.nodeType && unwrappedDiv && 1 === unwrappedDiv.nodeType && (unwrapper = _window.unwrap);
+        } catch (e) {}
+        return unwrapper;
+    }(), _args = function(argumentsObj) {
+        return _slice.call(argumentsObj, 0);
+    }, _extend = function() {
+        var i, len, arg, prop, src, copy, args = _args(arguments), target = args[0] || {};
+        for (i = 1, len = args.length; len > i; i++) if (null != (arg = args[i])) for (prop in arg) _hasOwn.call(arg, prop) && (src = target[prop], 
+        copy = arg[prop], target !== copy && copy !== undefined && (target[prop] = copy));
+        return target;
+    }, _deepCopy = function(source) {
+        var copy, i, len, prop;
+        if ("object" != typeof source || null == source || "number" == typeof source.nodeType) copy = source; else if ("number" == typeof source.length) for (copy = [], 
+        i = 0, len = source.length; len > i; i++) _hasOwn.call(source, i) && (copy[i] = _deepCopy(source[i])); else {
+            copy = {};
+            for (prop in source) _hasOwn.call(source, prop) && (copy[prop] = _deepCopy(source[prop]));
+        }
+        return copy;
+    }, _pick = function(obj, keys) {
+        for (var newObj = {}, i = 0, len = keys.length; len > i; i++) keys[i] in obj && (newObj[keys[i]] = obj[keys[i]]);
+        return newObj;
+    }, _omit = function(obj, keys) {
+        var newObj = {};
+        for (var prop in obj) -1 === keys.indexOf(prop) && (newObj[prop] = obj[prop]);
+        return newObj;
+    }, _deleteOwnProperties = function(obj) {
+        if (obj) for (var prop in obj) _hasOwn.call(obj, prop) && delete obj[prop];
+        return obj;
+    }, _containedBy = function(el, ancestorEl) {
+        if (el && 1 === el.nodeType && el.ownerDocument && ancestorEl && (1 === ancestorEl.nodeType && ancestorEl.ownerDocument && ancestorEl.ownerDocument === el.ownerDocument || 9 === ancestorEl.nodeType && !ancestorEl.ownerDocument && ancestorEl === el.ownerDocument)) do {
+            if (el === ancestorEl) return !0;
+            el = el.parentNode;
+        } while (el);
+        return !1;
+    }, _getDirPathOfUrl = function(url) {
+        var dir;
+        return "string" == typeof url && url && (dir = url.split("#")[0].split("?")[0], 
+        dir = url.slice(0, url.lastIndexOf("/") + 1)), dir;
+    }, _getCurrentScriptUrlFromErrorStack = function(stack) {
+        var url, matches;
+        return "string" == typeof stack && stack && (matches = stack.match(/^(?:|[^:@]*@|.+\)@(?=http[s]?|file)|.+?\s+(?: at |@)(?:[^:\(]+ )*[\(]?)((?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?/), 
+        matches && matches[1] ? url = matches[1] : (matches = stack.match(/\)@((?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?/), 
+        matches && matches[1] && (url = matches[1]))), url;
+    }, _getCurrentScriptUrlFromError = function() {
+        var url, err;
+        try {
+            throw new _Error();
+        } catch (e) {
+            err = e;
+        }
+        return err && (url = err.sourceURL || err.fileName || _getCurrentScriptUrlFromErrorStack(err.stack)), 
+        url;
+    }, _getCurrentScriptUrl = function() {
+        var jsPath, scripts, i;
+        if (_document.currentScript && (jsPath = _document.currentScript.src)) return jsPath;
+        if (scripts = _document.getElementsByTagName("script"), 1 === scripts.length) return scripts[0].src || undefined;
+        if ("readyState" in scripts[0]) for (i = scripts.length; i--; ) if ("interactive" === scripts[i].readyState && (jsPath = scripts[i].src)) return jsPath;
+        return "loading" === _document.readyState && (jsPath = scripts[scripts.length - 1].src) ? jsPath : (jsPath = _getCurrentScriptUrlFromError()) ? jsPath : undefined;
+    }, _getUnanimousScriptParentDir = function() {
+        var i, jsDir, jsPath, scripts = _document.getElementsByTagName("script");
+        for (i = scripts.length; i--; ) {
+            if (!(jsPath = scripts[i].src)) {
+                jsDir = null;
+                break;
+            }
+            if (jsPath = _getDirPathOfUrl(jsPath), null == jsDir) jsDir = jsPath; else if (jsDir !== jsPath) {
+                jsDir = null;
+                break;
+            }
+        }
+        return jsDir || undefined;
+    }, _getDefaultSwfPath = function() {
+        var jsDir = _getDirPathOfUrl(_getCurrentScriptUrl()) || _getUnanimousScriptParentDir() || "";
+        return jsDir + "ZeroClipboard.swf";
+    }, _pageIsFramed = function() {
+        return null == window.opener && (!!window.top && window != window.top || !!window.parent && window != window.parent);
+    }(), _flashState = {
+        bridge: null,
+        version: "0.0.0",
+        pluginType: "unknown",
+        disabled: null,
+        outdated: null,
+        sandboxed: null,
+        unavailable: null,
+        degraded: null,
+        deactivated: null,
+        overdue: null,
+        ready: null
+    }, _minimumFlashVersion = "11.0.0", _handlers = {}, _clipData = {}, _clipDataFormatMap = null, _flashCheckTimeout = 0, _swfFallbackCheckInterval = 0, _eventMessages = {
+        ready: "Flash communication is established",
+        error: {
+            "flash-disabled": "Flash is disabled or not installed. May also be attempting to run Flash in a sandboxed iframe, which is impossible.",
+            "flash-outdated": "Flash is too outdated to support ZeroClipboard",
+            "flash-sandboxed": "Attempting to run Flash in a sandboxed iframe, which is impossible",
+            "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
+            "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
+            "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate.\nThis may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity.\nMay also be attempting to run Flash in a sandboxed iframe, which is impossible.",
+            "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
+            "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
+            "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
+            "config-mismatch": "ZeroClipboard configuration does not match Flash's reality",
+            "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity"
+        }
+    }, _errorsThatOnlyOccurAfterFlashLoads = [ "flash-unavailable", "flash-degraded", "flash-overdue", "version-mismatch", "config-mismatch", "clipboard-error" ], _flashStateErrorNames = [ "flash-disabled", "flash-outdated", "flash-sandboxed", "flash-unavailable", "flash-degraded", "flash-deactivated", "flash-overdue" ], _flashStateErrorNameMatchingRegex = new RegExp("^flash-(" + _flashStateErrorNames.map(function(errorName) {
+        return errorName.replace(/^flash-/, "");
+    }).join("|") + ")$"), _flashStateEnabledErrorNameMatchingRegex = new RegExp("^flash-(" + _flashStateErrorNames.slice(1).map(function(errorName) {
+        return errorName.replace(/^flash-/, "");
+    }).join("|") + ")$"), _globalConfig = {
+        swfPath: _getDefaultSwfPath(),
+        trustedDomains: window.location.host ? [ window.location.host ] : [],
+        cacheBust: !0,
+        forceEnhancedClipboard: !1,
+        flashLoadTimeout: 3e4,
+        autoActivate: !0,
+        bubbleEvents: !0,
+        containerId: "global-zeroclipboard-html-bridge",
+        containerClass: "global-zeroclipboard-container",
+        swfObjectId: "global-zeroclipboard-flash-bridge",
+        hoverClass: "zeroclipboard-is-hover",
+        activeClass: "zeroclipboard-is-active",
+        forceHandCursor: !1,
+        title: null,
+        zIndex: 999999999
+    }, _config = function(options) {
+        if ("object" == typeof options && null !== options) for (var prop in options) if (_hasOwn.call(options, prop)) if (/^(?:forceHandCursor|title|zIndex|bubbleEvents)$/.test(prop)) _globalConfig[prop] = options[prop]; else if (null == _flashState.bridge) if ("containerId" === prop || "swfObjectId" === prop) {
+            if (!_isValidHtml4Id(options[prop])) throw new Error("The specified `" + prop + "` value is not valid as an HTML4 Element ID");
+            _globalConfig[prop] = options[prop];
+        } else _globalConfig[prop] = options[prop];
+        {
+            if ("string" != typeof options || !options) return _deepCopy(_globalConfig);
+            if (_hasOwn.call(_globalConfig, options)) return _globalConfig[options];
+        }
+    }, _state = function() {
+        return _detectSandbox(), {
+            browser: _pick(_navigator, [ "userAgent", "platform", "appName" ]),
+            flash: _omit(_flashState, [ "bridge" ]),
+            zeroclipboard: {
+                version: ZeroClipboard.version,
+                config: ZeroClipboard.config()
+            }
+        };
+    }, _isFlashUnusable = function() {
+        return !!(_flashState.disabled || _flashState.outdated || _flashState.sandboxed || _flashState.unavailable || _flashState.degraded || _flashState.deactivated);
+    }, _on = function(eventType, listener) {
+        var i, len, events, added = {};
+        if ("string" == typeof eventType && eventType) events = eventType.toLowerCase().split(/\s+/); else if ("object" == typeof eventType && eventType && "undefined" == typeof listener) for (i in eventType) _hasOwn.call(eventType, i) && "string" == typeof i && i && "function" == typeof eventType[i] && ZeroClipboard.on(i, eventType[i]);
+        if (events && events.length) {
+            for (i = 0, len = events.length; len > i; i++) eventType = events[i].replace(/^on/, ""), 
+            added[eventType] = !0, _handlers[eventType] || (_handlers[eventType] = []), _handlers[eventType].push(listener);
+            if (added.ready && _flashState.ready && ZeroClipboard.emit({
+                type: "ready"
+            }), added.error) {
+                for (i = 0, len = _flashStateErrorNames.length; len > i; i++) if (_flashState[_flashStateErrorNames[i].replace(/^flash-/, "")] === !0) {
+                    ZeroClipboard.emit({
+                        type: "error",
+                        name: _flashStateErrorNames[i]
+                    });
+                    break;
+                }
+                _zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion && ZeroClipboard.emit({
+                    type: "error",
+                    name: "version-mismatch",
+                    jsVersion: ZeroClipboard.version,
+                    swfVersion: _zcSwfVersion
+                });
+            }
+        }
+        return ZeroClipboard;
+    }, _off = function(eventType, listener) {
+        var i, len, foundIndex, events, perEventHandlers;
+        if (0 === arguments.length) events = _keys(_handlers); else if ("string" == typeof eventType && eventType) events = eventType.split(/\s+/); else if ("object" == typeof eventType && eventType && "undefined" == typeof listener) for (i in eventType) _hasOwn.call(eventType, i) && "string" == typeof i && i && "function" == typeof eventType[i] && ZeroClipboard.off(i, eventType[i]);
+        if (events && events.length) for (i = 0, len = events.length; len > i; i++) if (eventType = events[i].toLowerCase().replace(/^on/, ""), 
+        perEventHandlers = _handlers[eventType], perEventHandlers && perEventHandlers.length) if (listener) for (foundIndex = perEventHandlers.indexOf(listener); -1 !== foundIndex; ) perEventHandlers.splice(foundIndex, 1), 
+        foundIndex = perEventHandlers.indexOf(listener, foundIndex); else perEventHandlers.length = 0;
+        return ZeroClipboard;
+    }, _listeners = function(eventType) {
+        var copy;
+        return copy = "string" == typeof eventType && eventType ? _deepCopy(_handlers[eventType]) || null : _deepCopy(_handlers);
+    }, _emit = function(event) {
+        var eventCopy, returnVal, tmp;
+        return event = _createEvent(event), event && !_preprocessEvent(event) ? "ready" === event.type && _flashState.overdue === !0 ? ZeroClipboard.emit({
+            type: "error",
+            name: "flash-overdue"
+        }) : (eventCopy = _extend({}, event), _dispatchCallbacks.call(this, eventCopy), 
+        "copy" === event.type && (tmp = _mapClipDataToFlash(_clipData), returnVal = tmp.data, 
+        _clipDataFormatMap = tmp.formatMap), returnVal) : void 0;
+    }, _create = function() {
+        var previousState = _flashState.sandboxed;
+        if (_detectSandbox(), "boolean" != typeof _flashState.ready && (_flashState.ready = !1), 
+        _flashState.sandboxed !== previousState && _flashState.sandboxed === !0) _flashState.ready = !1, 
+        ZeroClipboard.emit({
+            type: "error",
+            name: "flash-sandboxed"
+        }); else if (!ZeroClipboard.isFlashUnusable() && null === _flashState.bridge) {
+            var maxWait = _globalConfig.flashLoadTimeout;
+            "number" == typeof maxWait && maxWait >= 0 && (_flashCheckTimeout = _setTimeout(function() {
+                "boolean" != typeof _flashState.deactivated && (_flashState.deactivated = !0), _flashState.deactivated === !0 && ZeroClipboard.emit({
+                    type: "error",
+                    name: "flash-deactivated"
+                });
+            }, maxWait)), _flashState.overdue = !1, _embedSwf();
+        }
+    }, _destroy = function() {
+        ZeroClipboard.clearData(), ZeroClipboard.blur(), ZeroClipboard.emit("destroy"), 
+        _unembedSwf(), ZeroClipboard.off();
+    }, _setData = function(format, data) {
+        var dataObj;
+        if ("object" == typeof format && format && "undefined" == typeof data) dataObj = format, 
+        ZeroClipboard.clearData(); else {
+            if ("string" != typeof format || !format) return;
+            dataObj = {}, dataObj[format] = data;
+        }
+        for (var dataFormat in dataObj) "string" == typeof dataFormat && dataFormat && _hasOwn.call(dataObj, dataFormat) && "string" == typeof dataObj[dataFormat] && dataObj[dataFormat] && (_clipData[dataFormat] = dataObj[dataFormat]);
+    }, _clearData = function(format) {
+        "undefined" == typeof format ? (_deleteOwnProperties(_clipData), _clipDataFormatMap = null) : "string" == typeof format && _hasOwn.call(_clipData, format) && delete _clipData[format];
+    }, _getData = function(format) {
+        return "undefined" == typeof format ? _deepCopy(_clipData) : "string" == typeof format && _hasOwn.call(_clipData, format) ? _clipData[format] : void 0;
+    }, _focus = function(element) {
+        if (element && 1 === element.nodeType) {
+            _currentElement && (_removeClass(_currentElement, _globalConfig.activeClass), _currentElement !== element && _removeClass(_currentElement, _globalConfig.hoverClass)), 
+            _currentElement = element, _addClass(element, _globalConfig.hoverClass);
+            var newTitle = element.getAttribute("title") || _globalConfig.title;
+            if ("string" == typeof newTitle && newTitle) {
+                var htmlBridge = _getHtmlBridge(_flashState.bridge);
+                htmlBridge && htmlBridge.setAttribute("title", newTitle);
+            }
+            var useHandCursor = _globalConfig.forceHandCursor === !0 || "pointer" === _getStyle(element, "cursor");
+            _setHandCursor(useHandCursor), _reposition();
+        }
+    }, _blur = function() {
+        var htmlBridge = _getHtmlBridge(_flashState.bridge);
+        htmlBridge && (htmlBridge.removeAttribute("title"), htmlBridge.style.left = "0px", 
+        htmlBridge.style.top = "-9999px", htmlBridge.style.width = "1px", htmlBridge.style.height = "1px"), 
+        _currentElement && (_removeClass(_currentElement, _globalConfig.hoverClass), _removeClass(_currentElement, _globalConfig.activeClass), 
+        _currentElement = null);
+    }, _activeElement = function() {
+        return _currentElement || null;
+    }, _isValidHtml4Id = function(id) {
+        return "string" == typeof id && id && /^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(id);
+    }, _createEvent = function(event) {
+        var eventType;
+        if ("string" == typeof event && event ? (eventType = event, event = {}) : "object" == typeof event && event && "string" == typeof event.type && event.type && (eventType = event.type), 
+        eventType) {
+            eventType = eventType.toLowerCase(), !event.target && (/^(copy|aftercopy|_click)$/.test(eventType) || "error" === eventType && "clipboard-error" === event.name) && (event.target = _copyTarget), 
+            _extend(event, {
+                type: eventType,
+                target: event.target || _currentElement || null,
+                relatedTarget: event.relatedTarget || null,
+                currentTarget: _flashState && _flashState.bridge || null,
+                timeStamp: event.timeStamp || _now() || null
+            });
+            var msg = _eventMessages[event.type];
+            return "error" === event.type && event.name && msg && (msg = msg[event.name]), msg && (event.message = msg), 
+            "ready" === event.type && _extend(event, {
+                target: null,
+                version: _flashState.version
+            }), "error" === event.type && (_flashStateErrorNameMatchingRegex.test(event.name) && _extend(event, {
+                target: null,
+                minimumVersion: _minimumFlashVersion
+            }), _flashStateEnabledErrorNameMatchingRegex.test(event.name) && _extend(event, {
+                version: _flashState.version
+            })), "copy" === event.type && (event.clipboardData = {
+                setData: ZeroClipboard.setData,
+                clearData: ZeroClipboard.clearData
+            }), "aftercopy" === event.type && (event = _mapClipResultsFromFlash(event, _clipDataFormatMap)), 
+            event.target && !event.relatedTarget && (event.relatedTarget = _getRelatedTarget(event.target)), 
+            _addMouseData(event);
+        }
+    }, _getRelatedTarget = function(targetEl) {
+        var relatedTargetId = targetEl && targetEl.getAttribute && targetEl.getAttribute("data-clipboard-target");
+        return relatedTargetId ? _document.getElementById(relatedTargetId) : null;
+    }, _addMouseData = function(event) {
+        if (event && /^_(?:click|mouse(?:over|out|down|up|move))$/.test(event.type)) {
+            var srcElement = event.target, fromElement = "_mouseover" === event.type && event.relatedTarget ? event.relatedTarget : undefined, toElement = "_mouseout" === event.type && event.relatedTarget ? event.relatedTarget : undefined, pos = _getElementPosition(srcElement), screenLeft = _window.screenLeft || _window.screenX || 0, screenTop = _window.screenTop || _window.screenY || 0, scrollLeft = _document.body.scrollLeft + _document.documentElement.scrollLeft, scrollTop = _document.body.scrollTop + _document.documentElement.scrollTop, pageX = pos.left + ("number" == typeof event._stageX ? event._stageX : 0), pageY = pos.top + ("number" == typeof event._stageY ? event._stageY : 0), clientX = pageX - scrollLeft, clientY = pageY - scrollTop, screenX = screenLeft + clientX, screenY = screenTop + clientY, moveX = "number" == typeof event.movementX ? event.movementX : 0, moveY = "number" == typeof event.movementY ? event.movementY : 0;
+            delete event._stageX, delete event._stageY, _extend(event, {
+                srcElement: srcElement,
+                fromElement: fromElement,
+                toElement: toElement,
+                screenX: screenX,
+                screenY: screenY,
+                pageX: pageX,
+                pageY: pageY,
+                clientX: clientX,
+                clientY: clientY,
+                x: clientX,
+                y: clientY,
+                movementX: moveX,
+                movementY: moveY,
+                offsetX: 0,
+                offsetY: 0,
+                layerX: 0,
+                layerY: 0
+            });
+        }
+        return event;
+    }, _shouldPerformAsync = function(event) {
+        var eventType = event && "string" == typeof event.type && event.type || "";
+        return !/^(?:(?:before)?copy|destroy)$/.test(eventType);
+    }, _dispatchCallback = function(func, context, args, async) {
+        async ? _setTimeout(function() {
+            func.apply(context, args);
+        }, 0) : func.apply(context, args);
+    }, _dispatchCallbacks = function(event) {
+        if ("object" == typeof event && event && event.type) {
+            var async = _shouldPerformAsync(event), wildcardTypeHandlers = _handlers["*"] || [], specificTypeHandlers = _handlers[event.type] || [], handlers = wildcardTypeHandlers.concat(specificTypeHandlers);
+            if (handlers && handlers.length) {
+                var i, len, func, context, eventCopy, originalContext = this;
+                for (i = 0, len = handlers.length; len > i; i++) func = handlers[i], context = originalContext, 
+                "string" == typeof func && "function" == typeof _window[func] && (func = _window[func]), 
+                "object" == typeof func && func && "function" == typeof func.handleEvent && (context = func, 
+                func = func.handleEvent), "function" == typeof func && (eventCopy = _extend({}, event), 
+                _dispatchCallback(func, context, [ eventCopy ], async));
+            }
+            return this;
+        }
+    }, _getSandboxStatusFromErrorEvent = function(event) {
+        var isSandboxed = null;
+        return (_pageIsFramed === !1 || event && "error" === event.type && event.name && -1 !== _errorsThatOnlyOccurAfterFlashLoads.indexOf(event.name)) && (isSandboxed = !1), 
+        isSandboxed;
+    }, _preprocessEvent = function(event) {
+        var element = event.target || _currentElement || null, sourceIsSwf = "swf" === event._source;
+        switch (delete event._source, event.type) {
+          case "error":
+            var isSandboxed = "flash-sandboxed" === event.name || _getSandboxStatusFromErrorEvent(event);
+            "boolean" == typeof isSandboxed && (_flashState.sandboxed = isSandboxed), -1 !== _flashStateErrorNames.indexOf(event.name) ? _extend(_flashState, {
+                disabled: "flash-disabled" === event.name,
+                outdated: "flash-outdated" === event.name,
+                unavailable: "flash-unavailable" === event.name,
+                degraded: "flash-degraded" === event.name,
+                deactivated: "flash-deactivated" === event.name,
+                overdue: "flash-overdue" === event.name,
+                ready: !1
+            }) : "version-mismatch" === event.name && (_zcSwfVersion = event.swfVersion, _extend(_flashState, {
+                disabled: !1,
+                outdated: !1,
+                unavailable: !1,
+                degraded: !1,
+                deactivated: !1,
+                overdue: !1,
+                ready: !1
+            })), _clearTimeoutsAndPolling();
+            break;
+
+          case "ready":
+            _zcSwfVersion = event.swfVersion;
+            var wasDeactivated = _flashState.deactivated === !0;
+            _extend(_flashState, {
+                disabled: !1,
+                outdated: !1,
+                sandboxed: !1,
+                unavailable: !1,
+                degraded: !1,
+                deactivated: !1,
+                overdue: wasDeactivated,
+                ready: !wasDeactivated
+            }), _clearTimeoutsAndPolling();
+            break;
+
+          case "beforecopy":
+            _copyTarget = element;
+            break;
+
+          case "copy":
+            var textContent, htmlContent, targetEl = event.relatedTarget;
+            !_clipData["text/html"] && !_clipData["text/plain"] && targetEl && (htmlContent = targetEl.value || targetEl.outerHTML || targetEl.innerHTML) && (textContent = targetEl.value || targetEl.textContent || targetEl.innerText) ? (event.clipboardData.clearData(), 
+            event.clipboardData.setData("text/plain", textContent), htmlContent !== textContent && event.clipboardData.setData("text/html", htmlContent)) : !_clipData["text/plain"] && event.target && (textContent = event.target.getAttribute("data-clipboard-text")) && (event.clipboardData.clearData(), 
+            event.clipboardData.setData("text/plain", textContent));
+            break;
+
+          case "aftercopy":
+            _queueEmitClipboardErrors(event), ZeroClipboard.clearData(), element && element !== _safeActiveElement() && element.focus && element.focus();
+            break;
+
+          case "_mouseover":
+            ZeroClipboard.focus(element), _globalConfig.bubbleEvents === !0 && sourceIsSwf && (element && element !== event.relatedTarget && !_containedBy(event.relatedTarget, element) && _fireMouseEvent(_extend({}, event, {
+                type: "mouseenter",
+                bubbles: !1,
+                cancelable: !1
+            })), _fireMouseEvent(_extend({}, event, {
+                type: "mouseover"
+            })));
+            break;
+
+          case "_mouseout":
+            ZeroClipboard.blur(), _globalConfig.bubbleEvents === !0 && sourceIsSwf && (element && element !== event.relatedTarget && !_containedBy(event.relatedTarget, element) && _fireMouseEvent(_extend({}, event, {
+                type: "mouseleave",
+                bubbles: !1,
+                cancelable: !1
+            })), _fireMouseEvent(_extend({}, event, {
+                type: "mouseout"
+            })));
+            break;
+
+          case "_mousedown":
+            _addClass(element, _globalConfig.activeClass), _globalConfig.bubbleEvents === !0 && sourceIsSwf && _fireMouseEvent(_extend({}, event, {
+                type: event.type.slice(1)
+            }));
+            break;
+
+          case "_mouseup":
+            _removeClass(element, _globalConfig.activeClass), _globalConfig.bubbleEvents === !0 && sourceIsSwf && _fireMouseEvent(_extend({}, event, {
+                type: event.type.slice(1)
+            }));
+            break;
+
+          case "_click":
+            _copyTarget = null, _globalConfig.bubbleEvents === !0 && sourceIsSwf && _fireMouseEvent(_extend({}, event, {
+                type: event.type.slice(1)
+            }));
+            break;
+
+          case "_mousemove":
+            _globalConfig.bubbleEvents === !0 && sourceIsSwf && _fireMouseEvent(_extend({}, event, {
+                type: event.type.slice(1)
+            }));
+        }
+        return /^_(?:click|mouse(?:over|out|down|up|move))$/.test(event.type) ? !0 : void 0;
+    }, _queueEmitClipboardErrors = function(aftercopyEvent) {
+        if (aftercopyEvent.errors && aftercopyEvent.errors.length > 0) {
+            var errorEvent = _deepCopy(aftercopyEvent);
+            _extend(errorEvent, {
+                type: "error",
+                name: "clipboard-error"
+            }), delete errorEvent.success, _setTimeout(function() {
+                ZeroClipboard.emit(errorEvent);
+            }, 0);
+        }
+    }, _fireMouseEvent = function(event) {
+        if (event && "string" == typeof event.type && event) {
+            var e, target = event.target || null, doc = target && target.ownerDocument || _document, defaults = {
+                view: doc.defaultView || _window,
+                canBubble: !0,
+                cancelable: !0,
+                detail: "click" === event.type ? 1 : 0,
+                button: "number" == typeof event.which ? event.which - 1 : "number" == typeof event.button ? event.button : doc.createEvent ? 0 : 1
+            }, args = _extend(defaults, event);
+            target && doc.createEvent && target.dispatchEvent && (args = [ args.type, args.canBubble, args.cancelable, args.view, args.detail, args.screenX, args.screenY, args.clientX, args.clientY, args.ctrlKey, args.altKey, args.shiftKey, args.metaKey, args.button, args.relatedTarget ], 
+            e = doc.createEvent("MouseEvents"), e.initMouseEvent && (e.initMouseEvent.apply(e, args), 
+            e._source = "js", target.dispatchEvent(e)));
+        }
+    }, _watchForSwfFallbackContent = function() {
+        var maxWait = _globalConfig.flashLoadTimeout;
+        if ("number" == typeof maxWait && maxWait >= 0) {
+            var pollWait = Math.min(1e3, maxWait / 10), fallbackContentId = _globalConfig.swfObjectId + "_fallbackContent";
+            _swfFallbackCheckInterval = _setInterval(function() {
+                var el = _document.getElementById(fallbackContentId);
+                _isElementVisible(el) && (_clearTimeoutsAndPolling(), _flashState.deactivated = null, 
+                ZeroClipboard.emit({
+                    type: "error",
+                    name: "swf-not-found"
+                }));
+            }, pollWait);
+        }
+    }, _createHtmlBridge = function() {
+        var container = _document.createElement("div");
+        return container.id = _globalConfig.containerId, container.className = _globalConfig.containerClass, 
+        container.style.position = "absolute", container.style.left = "0px", container.style.top = "-9999px", 
+        container.style.width = "1px", container.style.height = "1px", container.style.zIndex = "" + _getSafeZIndex(_globalConfig.zIndex), 
+        container;
+    }, _getHtmlBridge = function(flashBridge) {
+        for (var htmlBridge = flashBridge && flashBridge.parentNode; htmlBridge && "OBJECT" === htmlBridge.nodeName && htmlBridge.parentNode; ) htmlBridge = htmlBridge.parentNode;
+        return htmlBridge || null;
+    }, _embedSwf = function() {
+        var len, flashBridge = _flashState.bridge, container = _getHtmlBridge(flashBridge);
+        if (!flashBridge) {
+            var allowScriptAccess = _determineScriptAccess(_window.location.host, _globalConfig), allowNetworking = "never" === allowScriptAccess ? "none" : "all", flashvars = _vars(_extend({
+                jsVersion: ZeroClipboard.version
+            }, _globalConfig)), swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
+            container = _createHtmlBridge();
+            var divToBeReplaced = _document.createElement("div");
+            container.appendChild(divToBeReplaced), _document.body.appendChild(container);
+            var tmpDiv = _document.createElement("div"), usingActiveX = "activex" === _flashState.pluginType;
+            tmpDiv.innerHTML = '<object id="' + _globalConfig.swfObjectId + '" name="' + _globalConfig.swfObjectId + '" width="100%" height="100%" ' + (usingActiveX ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (usingActiveX ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/><param name="allowNetworking" value="' + allowNetworking + '"/><param name="menu" value="false"/><param name="wmode" value="transparent"/><param name="flashvars" value="' + flashvars + '"/><div id="' + _globalConfig.swfObjectId + '_fallbackContent">&nbsp;</div></object>', 
+            flashBridge = tmpDiv.firstChild, tmpDiv = null, _unwrap(flashBridge).ZeroClipboard = ZeroClipboard, 
+            container.replaceChild(flashBridge, divToBeReplaced), _watchForSwfFallbackContent();
+        }
+        return flashBridge || (flashBridge = _document[_globalConfig.swfObjectId], flashBridge && (len = flashBridge.length) && (flashBridge = flashBridge[len - 1]), 
+        !flashBridge && container && (flashBridge = container.firstChild)), _flashState.bridge = flashBridge || null, 
+        flashBridge;
+    }, _unembedSwf = function() {
+        var flashBridge = _flashState.bridge;
+        if (flashBridge) {
+            var htmlBridge = _getHtmlBridge(flashBridge);
+            htmlBridge && ("activex" === _flashState.pluginType && "readyState" in flashBridge ? (flashBridge.style.display = "none", 
+            function removeSwfFromIE() {
+                if (4 === flashBridge.readyState) {
+                    for (var prop in flashBridge) "function" == typeof flashBridge[prop] && (flashBridge[prop] = null);
+                    flashBridge.parentNode && flashBridge.parentNode.removeChild(flashBridge), htmlBridge.parentNode && htmlBridge.parentNode.removeChild(htmlBridge);
+                } else _setTimeout(removeSwfFromIE, 10);
+            }()) : (flashBridge.parentNode && flashBridge.parentNode.removeChild(flashBridge), 
+            htmlBridge.parentNode && htmlBridge.parentNode.removeChild(htmlBridge))), _clearTimeoutsAndPolling(), 
+            _flashState.ready = null, _flashState.bridge = null, _flashState.deactivated = null, 
+            _zcSwfVersion = undefined;
+        }
+    }, _mapClipDataToFlash = function(clipData) {
+        var newClipData = {}, formatMap = {};
+        if ("object" == typeof clipData && clipData) {
+            for (var dataFormat in clipData) if (dataFormat && _hasOwn.call(clipData, dataFormat) && "string" == typeof clipData[dataFormat] && clipData[dataFormat]) switch (dataFormat.toLowerCase()) {
+              case "text/plain":
+              case "text":
+              case "air:text":
+              case "flash:text":
+                newClipData.text = clipData[dataFormat], formatMap.text = dataFormat;
+                break;
+
+              case "text/html":
+              case "html":
+              case "air:html":
+              case "flash:html":
+                newClipData.html = clipData[dataFormat], formatMap.html = dataFormat;
+                break;
+
+              case "application/rtf":
+              case "text/rtf":
+              case "rtf":
+              case "richtext":
+              case "air:rtf":
+              case "flash:rtf":
+                newClipData.rtf = clipData[dataFormat], formatMap.rtf = dataFormat;
+            }
+            return {
+                data: newClipData,
+                formatMap: formatMap
+            };
+        }
+    }, _mapClipResultsFromFlash = function(clipResults, formatMap) {
+        if ("object" != typeof clipResults || !clipResults || "object" != typeof formatMap || !formatMap) return clipResults;
+        var newResults = {};
+        for (var prop in clipResults) if (_hasOwn.call(clipResults, prop)) if ("errors" === prop) {
+            newResults[prop] = clipResults[prop] ? clipResults[prop].slice() : [];
+            for (var i = 0, len = newResults[prop].length; len > i; i++) newResults[prop][i].format = formatMap[newResults[prop][i].format];
+        } else if ("success" !== prop && "data" !== prop) newResults[prop] = clipResults[prop]; else {
+            newResults[prop] = {};
+            var tmpHash = clipResults[prop];
+            for (var dataFormat in tmpHash) dataFormat && _hasOwn.call(tmpHash, dataFormat) && _hasOwn.call(formatMap, dataFormat) && (newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat]);
+        }
+        return newResults;
+    }, _cacheBust = function(path, options) {
+        var cacheBust = null == options || options && options.cacheBust === !0;
+        return cacheBust ? (-1 === path.indexOf("?") ? "?" : "&") + "noCache=" + _now() : "";
+    }, _vars = function(options) {
+        var i, len, domain, domains, str = "", trustedOriginsExpanded = [];
+        if (options.trustedDomains && ("string" == typeof options.trustedDomains ? domains = [ options.trustedDomains ] : "object" == typeof options.trustedDomains && "length" in options.trustedDomains && (domains = options.trustedDomains)), 
+        domains && domains.length) for (i = 0, len = domains.length; len > i; i++) if (_hasOwn.call(domains, i) && domains[i] && "string" == typeof domains[i]) {
+            if (domain = _extractDomain(domains[i]), !domain) continue;
+            if ("*" === domain) {
+                trustedOriginsExpanded.length = 0, trustedOriginsExpanded.push(domain);
+                break;
+            }
+            trustedOriginsExpanded.push.apply(trustedOriginsExpanded, [ domain, "//" + domain, _window.location.protocol + "//" + domain ]);
+        }
+        return trustedOriginsExpanded.length && (str += "trustedOrigins=" + _encodeURIComponent(trustedOriginsExpanded.join(","))), 
+        options.forceEnhancedClipboard === !0 && (str += (str ? "&" : "") + "forceEnhancedClipboard=true"), 
+        "string" == typeof options.swfObjectId && options.swfObjectId && (str += (str ? "&" : "") + "swfObjectId=" + _encodeURIComponent(options.swfObjectId)), 
+        "string" == typeof options.jsVersion && options.jsVersion && (str += (str ? "&" : "") + "jsVersion=" + _encodeURIComponent(options.jsVersion)), 
+        str;
+    }, _extractDomain = function(originOrUrl) {
+        if (null == originOrUrl || "" === originOrUrl) return null;
+        if (originOrUrl = originOrUrl.replace(/^\s+|\s+$/g, ""), "" === originOrUrl) return null;
+        var protocolIndex = originOrUrl.indexOf("//");
+        originOrUrl = -1 === protocolIndex ? originOrUrl : originOrUrl.slice(protocolIndex + 2);
+        var pathIndex = originOrUrl.indexOf("/");
+        return originOrUrl = -1 === pathIndex ? originOrUrl : -1 === protocolIndex || 0 === pathIndex ? null : originOrUrl.slice(0, pathIndex), 
+        originOrUrl && ".swf" === originOrUrl.slice(-4).toLowerCase() ? null : originOrUrl || null;
+    }, _determineScriptAccess = function() {
+        var _extractAllDomains = function(origins) {
+            var i, len, tmp, resultsArray = [];
+            if ("string" == typeof origins && (origins = [ origins ]), "object" != typeof origins || !origins || "number" != typeof origins.length) return resultsArray;
+            for (i = 0, len = origins.length; len > i; i++) if (_hasOwn.call(origins, i) && (tmp = _extractDomain(origins[i]))) {
+                if ("*" === tmp) {
+                    resultsArray.length = 0, resultsArray.push("*");
+                    break;
+                }
+                -1 === resultsArray.indexOf(tmp) && resultsArray.push(tmp);
+            }
+            return resultsArray;
+        };
+        return function(currentDomain, configOptions) {
+            var swfDomain = _extractDomain(configOptions.swfPath);
+            null === swfDomain && (swfDomain = currentDomain);
+            var trustedDomains = _extractAllDomains(configOptions.trustedDomains), len = trustedDomains.length;
+            if (len > 0) {
+                if (1 === len && "*" === trustedDomains[0]) return "always";
+                if (-1 !== trustedDomains.indexOf(currentDomain)) return 1 === len && currentDomain === swfDomain ? "sameDomain" : "always";
+            }
+            return "never";
+        };
+    }(), _safeActiveElement = function() {
+        try {
+            return _document.activeElement;
+        } catch (err) {
+            return null;
+        }
+    }, _addClass = function(element, value) {
+        var c, cl, className, classNames = [];
+        if ("string" == typeof value && value && (classNames = value.split(/\s+/)), element && 1 === element.nodeType && classNames.length > 0) if (element.classList) for (c = 0, 
+        cl = classNames.length; cl > c; c++) element.classList.add(classNames[c]); else if (element.hasOwnProperty("className")) {
+            for (className = " " + element.className + " ", c = 0, cl = classNames.length; cl > c; c++) -1 === className.indexOf(" " + classNames[c] + " ") && (className += classNames[c] + " ");
+            element.className = className.replace(/^\s+|\s+$/g, "");
+        }
+        return element;
+    }, _removeClass = function(element, value) {
+        var c, cl, className, classNames = [];
+        if ("string" == typeof value && value && (classNames = value.split(/\s+/)), element && 1 === element.nodeType && classNames.length > 0) if (element.classList && element.classList.length > 0) for (c = 0, 
+        cl = classNames.length; cl > c; c++) element.classList.remove(classNames[c]); else if (element.className) {
+            for (className = (" " + element.className + " ").replace(/[\r\n\t]/g, " "), c = 0, 
+            cl = classNames.length; cl > c; c++) className = className.replace(" " + classNames[c] + " ", " ");
+            element.className = className.replace(/^\s+|\s+$/g, "");
+        }
+        return element;
+    }, _getStyle = function(el, prop) {
+        var value = _getComputedStyle(el, null).getPropertyValue(prop);
+        return "cursor" !== prop || value && "auto" !== value || "A" !== el.nodeName ? value : "pointer";
+    }, _getElementPosition = function(el) {
+        var pos = {
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0
+        };
+        if (el.getBoundingClientRect) {
+            var elRect = el.getBoundingClientRect(), pageXOffset = _window.pageXOffset, pageYOffset = _window.pageYOffset, leftBorderWidth = _document.documentElement.clientLeft || 0, topBorderWidth = _document.documentElement.clientTop || 0, leftBodyOffset = 0, topBodyOffset = 0;
+            if ("relative" === _getStyle(_document.body, "position")) {
+                var bodyRect = _document.body.getBoundingClientRect(), htmlRect = _document.documentElement.getBoundingClientRect();
+                leftBodyOffset = bodyRect.left - htmlRect.left || 0, topBodyOffset = bodyRect.top - htmlRect.top || 0;
+            }
+            pos.left = elRect.left + pageXOffset - leftBorderWidth - leftBodyOffset, pos.top = elRect.top + pageYOffset - topBorderWidth - topBodyOffset, 
+            pos.width = "width" in elRect ? elRect.width : elRect.right - elRect.left, pos.height = "height" in elRect ? elRect.height : elRect.bottom - elRect.top;
+        }
+        return pos;
+    }, _isElementVisible = function(el) {
+        if (!el) return !1;
+        var styles = _getComputedStyle(el, null), hasCssHeight = _parseFloat(styles.height) > 0, hasCssWidth = _parseFloat(styles.width) > 0, hasCssTop = _parseFloat(styles.top) >= 0, hasCssLeft = _parseFloat(styles.left) >= 0, cssKnows = hasCssHeight && hasCssWidth && hasCssTop && hasCssLeft, rect = cssKnows ? null : _getElementPosition(el), isVisible = "none" !== styles.display && "collapse" !== styles.visibility && (cssKnows || !!rect && (hasCssHeight || rect.height > 0) && (hasCssWidth || rect.width > 0) && (hasCssTop || rect.top >= 0) && (hasCssLeft || rect.left >= 0));
+        return isVisible;
+    }, _clearTimeoutsAndPolling = function() {
+        _clearTimeout(_flashCheckTimeout), _flashCheckTimeout = 0, _clearInterval(_swfFallbackCheckInterval), 
+        _swfFallbackCheckInterval = 0;
+    }, _reposition = function() {
+        var htmlBridge;
+        if (_currentElement && (htmlBridge = _getHtmlBridge(_flashState.bridge))) {
+            var pos = _getElementPosition(_currentElement);
+            _extend(htmlBridge.style, {
+                width: pos.width + "px",
+                height: pos.height + "px",
+                top: pos.top + "px",
+                left: pos.left + "px",
+                zIndex: "" + _getSafeZIndex(_globalConfig.zIndex)
+            });
+        }
+    }, _setHandCursor = function(enabled) {
+        _flashState.ready === !0 && (_flashState.bridge && "function" == typeof _flashState.bridge.setHandCursor ? _flashState.bridge.setHandCursor(enabled) : _flashState.ready = !1);
+    }, _getSafeZIndex = function(val) {
+        if (/^(?:auto|inherit)$/.test(val)) return val;
+        var zIndex;
+        return "number" != typeof val || _isNaN(val) ? "string" == typeof val && (zIndex = _getSafeZIndex(_parseInt(val, 10))) : zIndex = val, 
+        "number" == typeof zIndex ? zIndex : "auto";
+    }, _detectSandbox = function(doNotReassessFlashSupport) {
+        var effectiveScriptOrigin, frame, frameError, previousState = _flashState.sandboxed, isSandboxed = null;
+        if (doNotReassessFlashSupport = doNotReassessFlashSupport === !0, _pageIsFramed === !1) isSandboxed = !1; else {
+            try {
+                frame = window.frameElement || null;
+            } catch (e) {
+                frameError = {
+                    name: e.name,
+                    message: e.message
+                };
+            }
+            if (frame && 1 === frame.nodeType && "IFRAME" === frame.nodeName) try {
+                isSandboxed = frame.hasAttribute("sandbox");
+            } catch (e) {
+                isSandboxed = null;
+            } else {
+                try {
+                    effectiveScriptOrigin = document.domain || null;
+                } catch (e) {
+                    effectiveScriptOrigin = null;
+                }
+                (null === effectiveScriptOrigin || frameError && "SecurityError" === frameError.name && /(^|[\s\(\[@])sandbox(es|ed|ing|[\s\.,!\)\]@]|$)/.test(frameError.message.toLowerCase())) && (isSandboxed = !0);
+            }
+        }
+        return _flashState.sandboxed = isSandboxed, previousState === isSandboxed || doNotReassessFlashSupport || _detectFlashSupport(_ActiveXObject), 
+        isSandboxed;
+    }, _detectFlashSupport = function(ActiveXObject) {
+        function parseFlashVersion(desc) {
+            var matches = desc.match(/[\d]+/g);
+            return matches.length = 3, matches.join(".");
+        }
+        function isPepperFlash(flashPlayerFileName) {
+            return !!flashPlayerFileName && (flashPlayerFileName = flashPlayerFileName.toLowerCase()) && (/^(pepflashplayer\.dll|libpepflashplayer\.so|pepperflashplayer\.plugin)$/.test(flashPlayerFileName) || "chrome.plugin" === flashPlayerFileName.slice(-13));
+        }
+        function inspectPlugin(plugin) {
+            plugin && (hasFlash = !0, plugin.version && (flashVersion = parseFlashVersion(plugin.version)), 
+            !flashVersion && plugin.description && (flashVersion = parseFlashVersion(plugin.description)), 
+            plugin.filename && (isPPAPI = isPepperFlash(plugin.filename)));
+        }
+        var plugin, ax, mimeType, hasFlash = !1, isActiveX = !1, isPPAPI = !1, flashVersion = "";
+        if (_navigator.plugins && _navigator.plugins.length) plugin = _navigator.plugins["Shockwave Flash"], 
+        inspectPlugin(plugin), _navigator.plugins["Shockwave Flash 2.0"] && (hasFlash = !0, 
+        flashVersion = "2.0.0.11"); else if (_navigator.mimeTypes && _navigator.mimeTypes.length) mimeType = _navigator.mimeTypes["application/x-shockwave-flash"], 
+        plugin = mimeType && mimeType.enabledPlugin, inspectPlugin(plugin); else if ("undefined" != typeof ActiveXObject) {
+            isActiveX = !0;
+            try {
+                ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.7"), hasFlash = !0, flashVersion = parseFlashVersion(ax.GetVariable("$version"));
+            } catch (e1) {
+                try {
+                    ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.6"), hasFlash = !0, flashVersion = "6.0.21";
+                } catch (e2) {
+                    try {
+                        ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash"), hasFlash = !0, flashVersion = parseFlashVersion(ax.GetVariable("$version"));
+                    } catch (e3) {
+                        isActiveX = !1;
+                    }
+                }
+            }
+        }
+        _flashState.disabled = hasFlash !== !0, _flashState.outdated = flashVersion && _parseFloat(flashVersion) < _parseFloat(_minimumFlashVersion), 
+        _flashState.version = flashVersion || "0.0.0", _flashState.pluginType = isPPAPI ? "pepper" : isActiveX ? "activex" : hasFlash ? "netscape" : "unknown";
+    };
+    _detectFlashSupport(_ActiveXObject), _detectSandbox(!0);
+    var ZeroClipboard = function() {
+        return this instanceof ZeroClipboard ? void ("function" == typeof ZeroClipboard._createClient && ZeroClipboard._createClient.apply(this, _args(arguments))) : new ZeroClipboard();
+    };
+    _defineProperty(ZeroClipboard, "version", {
+        value: "2.2.0",
+        writable: !1,
+        configurable: !0,
+        enumerable: !0
+    }), ZeroClipboard.config = function() {
+        return _config.apply(this, _args(arguments));
+    }, ZeroClipboard.state = function() {
+        return _state.apply(this, _args(arguments));
+    }, ZeroClipboard.isFlashUnusable = function() {
+        return _isFlashUnusable.apply(this, _args(arguments));
+    }, ZeroClipboard.on = function() {
+        return _on.apply(this, _args(arguments));
+    }, ZeroClipboard.off = function() {
+        return _off.apply(this, _args(arguments));
+    }, ZeroClipboard.handlers = function() {
+        return _listeners.apply(this, _args(arguments));
+    }, ZeroClipboard.emit = function() {
+        return _emit.apply(this, _args(arguments));
+    }, ZeroClipboard.create = function() {
+        return _create.apply(this, _args(arguments));
+    }, ZeroClipboard.destroy = function() {
+        return _destroy.apply(this, _args(arguments));
+    }, ZeroClipboard.setData = function() {
+        return _setData.apply(this, _args(arguments));
+    }, ZeroClipboard.clearData = function() {
+        return _clearData.apply(this, _args(arguments));
+    }, ZeroClipboard.getData = function() {
+        return _getData.apply(this, _args(arguments));
+    }, ZeroClipboard.focus = ZeroClipboard.activate = function() {
+        return _focus.apply(this, _args(arguments));
+    }, ZeroClipboard.blur = ZeroClipboard.deactivate = function() {
+        return _blur.apply(this, _args(arguments));
+    }, ZeroClipboard.activeElement = function() {
+        return _activeElement.apply(this, _args(arguments));
+    };
+    var _clientIdCounter = 0, _clientMeta = {}, _elementIdCounter = 0, _elementMeta = {}, _mouseHandlers = {};
+    _extend(_globalConfig, {
+        autoActivate: !0
+    });
+    var _clientConstructor = function(elements) {
+        var client = this;
+        client.id = "" + _clientIdCounter++, _clientMeta[client.id] = {
+            instance: client,
+            elements: [],
+            handlers: {}
+        }, elements && client.clip(elements), ZeroClipboard.on("*", function(event) {
+            return client.emit(event);
+        }), ZeroClipboard.on("destroy", function() {
+            client.destroy();
+        }), ZeroClipboard.create();
+    }, _clientOn = function(eventType, listener) {
+        var i, len, events, added = {}, meta = _clientMeta[this.id], handlers = meta && meta.handlers;
+        if (!meta) throw new Error("Attempted to add new listener(s) to a destroyed ZeroClipboard client instance");
+        if ("string" == typeof eventType && eventType) events = eventType.toLowerCase().split(/\s+/); else if ("object" == typeof eventType && eventType && "undefined" == typeof listener) for (i in eventType) _hasOwn.call(eventType, i) && "string" == typeof i && i && "function" == typeof eventType[i] && this.on(i, eventType[i]);
+        if (events && events.length) {
+            for (i = 0, len = events.length; len > i; i++) eventType = events[i].replace(/^on/, ""), 
+            added[eventType] = !0, handlers[eventType] || (handlers[eventType] = []), handlers[eventType].push(listener);
+            if (added.ready && _flashState.ready && this.emit({
+                type: "ready",
+                client: this
+            }), added.error) {
+                for (i = 0, len = _flashStateErrorNames.length; len > i; i++) if (_flashState[_flashStateErrorNames[i].replace(/^flash-/, "")]) {
+                    this.emit({
+                        type: "error",
+                        name: _flashStateErrorNames[i],
+                        client: this
+                    });
+                    break;
+                }
+                _zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion && this.emit({
+                    type: "error",
+                    name: "version-mismatch",
+                    jsVersion: ZeroClipboard.version,
+                    swfVersion: _zcSwfVersion
+                });
+            }
+        }
+        return this;
+    }, _clientOff = function(eventType, listener) {
+        var i, len, foundIndex, events, perEventHandlers, meta = _clientMeta[this.id], handlers = meta && meta.handlers;
+        if (!handlers) return this;
+        if (0 === arguments.length) events = _keys(handlers); else if ("string" == typeof eventType && eventType) events = eventType.split(/\s+/); else if ("object" == typeof eventType && eventType && "undefined" == typeof listener) for (i in eventType) _hasOwn.call(eventType, i) && "string" == typeof i && i && "function" == typeof eventType[i] && this.off(i, eventType[i]);
+        if (events && events.length) for (i = 0, len = events.length; len > i; i++) if (eventType = events[i].toLowerCase().replace(/^on/, ""), 
+        perEventHandlers = handlers[eventType], perEventHandlers && perEventHandlers.length) if (listener) for (foundIndex = perEventHandlers.indexOf(listener); -1 !== foundIndex; ) perEventHandlers.splice(foundIndex, 1), 
+        foundIndex = perEventHandlers.indexOf(listener, foundIndex); else perEventHandlers.length = 0;
+        return this;
+    }, _clientListeners = function(eventType) {
+        var copy = null, handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers;
+        return handlers && (copy = "string" == typeof eventType && eventType ? handlers[eventType] ? handlers[eventType].slice(0) : [] : _deepCopy(handlers)), 
+        copy;
+    }, _clientEmit = function(event) {
+        if (_clientShouldEmit.call(this, event)) {
+            "object" == typeof event && event && "string" == typeof event.type && event.type && (event = _extend({}, event));
+            var eventCopy = _extend({}, _createEvent(event), {
+                client: this
+            });
+            _clientDispatchCallbacks.call(this, eventCopy);
+        }
+        return this;
+    }, _clientClip = function(elements) {
+        if (!_clientMeta[this.id]) throw new Error("Attempted to clip element(s) to a destroyed ZeroClipboard client instance");
+        elements = _prepClip(elements);
+        for (var i = 0; i < elements.length; i++) if (_hasOwn.call(elements, i) && elements[i] && 1 === elements[i].nodeType) {
+            elements[i].zcClippingId ? -1 === _elementMeta[elements[i].zcClippingId].indexOf(this.id) && _elementMeta[elements[i].zcClippingId].push(this.id) : (elements[i].zcClippingId = "zcClippingId_" + _elementIdCounter++, 
+            _elementMeta[elements[i].zcClippingId] = [ this.id ], _globalConfig.autoActivate === !0 && _addMouseHandlers(elements[i]));
+            var clippedElements = _clientMeta[this.id] && _clientMeta[this.id].elements;
+            -1 === clippedElements.indexOf(elements[i]) && clippedElements.push(elements[i]);
+        }
+        return this;
+    }, _clientUnclip = function(elements) {
+        var meta = _clientMeta[this.id];
+        if (!meta) return this;
+        var arrayIndex, clippedElements = meta.elements;
+        elements = "undefined" == typeof elements ? clippedElements.slice(0) : _prepClip(elements);
+        for (var i = elements.length; i--; ) if (_hasOwn.call(elements, i) && elements[i] && 1 === elements[i].nodeType) {
+            for (arrayIndex = 0; -1 !== (arrayIndex = clippedElements.indexOf(elements[i], arrayIndex)); ) clippedElements.splice(arrayIndex, 1);
+            var clientIds = _elementMeta[elements[i].zcClippingId];
+            if (clientIds) {
+                for (arrayIndex = 0; -1 !== (arrayIndex = clientIds.indexOf(this.id, arrayIndex)); ) clientIds.splice(arrayIndex, 1);
+                0 === clientIds.length && (_globalConfig.autoActivate === !0 && _removeMouseHandlers(elements[i]), 
+                delete elements[i].zcClippingId);
+            }
+        }
+        return this;
+    }, _clientElements = function() {
+        var meta = _clientMeta[this.id];
+        return meta && meta.elements ? meta.elements.slice(0) : [];
+    }, _clientDestroy = function() {
+        _clientMeta[this.id] && (this.unclip(), this.off(), delete _clientMeta[this.id]);
+    }, _clientShouldEmit = function(event) {
+        if (!event || !event.type) return !1;
+        if (event.client && event.client !== this) return !1;
+        var meta = _clientMeta[this.id], clippedEls = meta && meta.elements, hasClippedEls = !!clippedEls && clippedEls.length > 0, goodTarget = !event.target || hasClippedEls && -1 !== clippedEls.indexOf(event.target), goodRelTarget = event.relatedTarget && hasClippedEls && -1 !== clippedEls.indexOf(event.relatedTarget), goodClient = event.client && event.client === this;
+        return meta && (goodTarget || goodRelTarget || goodClient) ? !0 : !1;
+    }, _clientDispatchCallbacks = function(event) {
+        var meta = _clientMeta[this.id];
+        if ("object" == typeof event && event && event.type && meta) {
+            var async = _shouldPerformAsync(event), wildcardTypeHandlers = meta && meta.handlers["*"] || [], specificTypeHandlers = meta && meta.handlers[event.type] || [], handlers = wildcardTypeHandlers.concat(specificTypeHandlers);
+            if (handlers && handlers.length) {
+                var i, len, func, context, eventCopy, originalContext = this;
+                for (i = 0, len = handlers.length; len > i; i++) func = handlers[i], context = originalContext, 
+                "string" == typeof func && "function" == typeof _window[func] && (func = _window[func]), 
+                "object" == typeof func && func && "function" == typeof func.handleEvent && (context = func, 
+                func = func.handleEvent), "function" == typeof func && (eventCopy = _extend({}, event), 
+                _dispatchCallback(func, context, [ eventCopy ], async));
+            }
+        }
+    }, _prepClip = function(elements) {
+        return "string" == typeof elements && (elements = []), "number" != typeof elements.length ? [ elements ] : elements;
+    }, _addMouseHandlers = function(element) {
+        if (element && 1 === element.nodeType) {
+            var _suppressMouseEvents = function(event) {
+                (event || (event = _window.event)) && ("js" !== event._source && (event.stopImmediatePropagation(), 
+                event.preventDefault()), delete event._source);
+            }, _elementMouseOver = function(event) {
+                (event || (event = _window.event)) && (_suppressMouseEvents(event), ZeroClipboard.focus(element));
+            };
+            element.addEventListener("mouseover", _elementMouseOver, !1), element.addEventListener("mouseout", _suppressMouseEvents, !1), 
+            element.addEventListener("mouseenter", _suppressMouseEvents, !1), element.addEventListener("mouseleave", _suppressMouseEvents, !1), 
+            element.addEventListener("mousemove", _suppressMouseEvents, !1), _mouseHandlers[element.zcClippingId] = {
+                mouseover: _elementMouseOver,
+                mouseout: _suppressMouseEvents,
+                mouseenter: _suppressMouseEvents,
+                mouseleave: _suppressMouseEvents,
+                mousemove: _suppressMouseEvents
+            };
+        }
+    }, _removeMouseHandlers = function(element) {
+        if (element && 1 === element.nodeType) {
+            var mouseHandlers = _mouseHandlers[element.zcClippingId];
+            if ("object" == typeof mouseHandlers && mouseHandlers) {
+                for (var key, val, mouseEvents = [ "move", "leave", "enter", "out", "over" ], i = 0, len = mouseEvents.length; len > i; i++) key = "mouse" + mouseEvents[i], 
+                val = mouseHandlers[key], "function" == typeof val && element.removeEventListener(key, val, !1);
+                delete _mouseHandlers[element.zcClippingId];
+            }
+        }
+    };
+    ZeroClipboard._createClient = function() {
+        _clientConstructor.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.on = function() {
+        return _clientOn.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.off = function() {
+        return _clientOff.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.handlers = function() {
+        return _clientListeners.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.emit = function() {
+        return _clientEmit.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.clip = function() {
+        return _clientClip.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.unclip = function() {
+        return _clientUnclip.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.elements = function() {
+        return _clientElements.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.destroy = function() {
+        return _clientDestroy.apply(this, _args(arguments));
+    }, ZeroClipboard.prototype.setText = function(text) {
+        if (!_clientMeta[this.id]) throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+        return ZeroClipboard.setData("text/plain", text), this;
+    }, ZeroClipboard.prototype.setHtml = function(html) {
+        if (!_clientMeta[this.id]) throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+        return ZeroClipboard.setData("text/html", html), this;
+    }, ZeroClipboard.prototype.setRichText = function(richText) {
+        if (!_clientMeta[this.id]) throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+        return ZeroClipboard.setData("application/rtf", richText), this;
+    }, ZeroClipboard.prototype.setData = function() {
+        if (!_clientMeta[this.id]) throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+        return ZeroClipboard.setData.apply(this, _args(arguments)), this;
+    }, ZeroClipboard.prototype.clearData = function() {
+        if (!_clientMeta[this.id]) throw new Error("Attempted to clear pending clipboard data from a destroyed ZeroClipboard client instance");
+        return ZeroClipboard.clearData.apply(this, _args(arguments)), this;
+    }, ZeroClipboard.prototype.getData = function() {
+        if (!_clientMeta[this.id]) throw new Error("Attempted to get pending clipboard data from a destroyed ZeroClipboard client instance");
+        return ZeroClipboard.getData.apply(this, _args(arguments));
+    }, "function" == typeof define && define.amd ? define(function() {
+        return ZeroClipboard;
+    }) : "object" == typeof module && module && "object" == typeof module.exports && module.exports ? module.exports = ZeroClipboard : window.ZeroClipboard = ZeroClipboard;
+}(function() {
+    return this || window;
+}()), function(window, angular) {
+    "use strict";
+    angular.module("ngClipboard", []).provider("ngClip", function() {
+        var self = this;
+        return this.path = "//cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.1.6/ZeroClipboard.swf", 
+        {
+            setPath: function(newPath) {
+                self.path = newPath;
+            },
+            setConfig: function(config) {
+                self.config = config;
+            },
+            $get: function() {
+                return {
+                    path: self.path,
+                    config: self.config
+                };
+            }
+        };
+    }).run([ "ngClip", function(ngClip) {
+        var config = {
+            swfPath: ngClip.path,
+            trustedDomains: [ "*" ],
+            allowScriptAccess: "always",
+            forceHandCursor: !0
+        };
+        ZeroClipboard.config(angular.extend(config, ngClip.config || {}));
+    } ]).directive("clipCopy", [ "ngClip", function() {
+        return {
+            scope: {
+                clipCopy: "&",
+                clipClick: "&",
+                clipClickFallback: "&"
+            },
+            restrict: "A",
+            link: function(scope, element, attrs) {
+                if (ZeroClipboard.isFlashUnusable()) return void element.bind("click", function($event) {
+                    scope.$apply(scope.clipClickFallback({
+                        $event: $event,
+                        copy: scope.$eval(scope.clipCopy)
+                    }));
+                });
+                var client = new ZeroClipboard(element);
+                "" === attrs.clipCopy && (scope.clipCopy = function() {
+                    return element[0].previousElementSibling.innerText;
+                }), client.on("ready", function() {
+                    client.on("copy", function(event) {
+                        var clipboard = event.clipboardData;
+                        clipboard.setData(attrs.clipCopyMimeType || "text/plain", scope.$eval(scope.clipCopy));
+                    }), client.on("aftercopy", function() {
+                        angular.isDefined(attrs.clipClick) && scope.$apply(scope.clipClick);
+                    }), scope.$on("$destroy", function() {
+                        client.destroy();
+                    });
+                });
+            }
+        };
+    } ]);
+}(window, window.angular), angular.module("ui.bootstrap", [ "ui.bootstrap.tpls", "ui.bootstrap.pagination" ]), 
 angular.module("ui.bootstrap.tpls", [ "template/pagination/pager.html", "template/pagination/pagination.html" ]), 
 angular.module("ui.bootstrap.pagination", []).controller("PaginationController", [ "$scope", "$attrs", "$parse", function($scope, $attrs, $parse) {
     var self = this, ngModelCtrl = {
@@ -15689,7 +17937,7 @@ angular.module("ui.bootstrap.pagination", []).controller("PaginationController",
         }
     };
 } ]), angular.module("template/pagination/pager.html", []).run([ "$templateCache", function($templateCache) {
-    $templateCache.put("template/pagination/pager.html", '<div class="pager"><md-button ng-disabled="noPrevious()" ng-click="selectPage(1)" class="md-primary">{{\'PREVIOUS_LABEL\' | translate}}</md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary">{{\'NEXT_LABEL\' | translate}}</md-button></div>');
+    $templateCache.put("template/pagination/pager.html", '<div class="pager"><md-button ng-disabled="noPrevious()" ng-click="selectPage(1)" class="md-primary" translate="PREVIOUS_LABEL"></md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary" translate="NEXT_LABEL"></md-button></div>');
 } ]), angular.module("template/pagination/pagination.html", []).run([ "$templateCache", function($templateCache) {
-    $templateCache.put("template/pagination/pagination.html", '<div class="pagination"><md-button ng-disabled="noPrevious()" ng-click="selectPage(page - 1)" class="md-primary">{{\'PREVIOUS_LABEL\' | translate}}</md-button><md-button ng-repeat="page in pages track by $index" ng-disabled="page.active" ng-click="selectPage(page.number)" class="md-primary">{{page.text}}</md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary">{{\'NEXT_LABEL\' | translate}}</md-button></div>');
+    $templateCache.put("template/pagination/pagination.html", '<div class="pagination"><md-button ng-disabled="noPrevious()" ng-click="selectPage(page - 1)" class="md-primary" translate="PREVIOUS_LABEL"></md-button><md-button ng-repeat="page in pages track by $index" ng-disabled="page.active" ng-click="selectPage(page.number)" class="md-primary">{{page.text}}</md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary" translate="NEXT_LABEL"></md-button></div>');
 } ]);

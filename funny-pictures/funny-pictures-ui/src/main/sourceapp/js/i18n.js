@@ -42,13 +42,16 @@
             COMMENTS_FALLBACK_1: "Please enable JavaScript to view the",
             COMMENTS_FALLBACK_2: "comments powered by Disqus.",
             PREVIOUS_LABEL: "Previous",
-            NEXT_LABEL: "Next"
+            NEXT_LABEL: "Next",
+            LINK_TO_IMAGE: "Direct link to image",
+            LINK_TO_PREVIEW: "Link to preview",
+            COPY_LABEL: "Copy"
         });
 
         $translateProvider.translations('uk', {
             CONTACT_HEADER: "Зв\'яжіться з нами",
             NAME_LABEL: "Ім\'я",
-            EMAIL_LABEL: "Email",
+            EMAIL_LABEL: "Електронна пошта",
             SUBJECT_LABEL: "Тема",
             MESSAGE_LABEL: "Повідомлення",
             SEND_MESSAGE_BUTTON: "Відслати",
@@ -76,7 +79,10 @@
             COMMENTS_FALLBACK_1: "Будь ласка, включіть JavaScript для перегляду",
             COMMENTS_FALLBACK_2: "Disqus коментарів.",
             PREVIOUS_LABEL: "Попередня",
-            NEXT_LABEL: "Наступна"
+            NEXT_LABEL: "Наступна",
+            LINK_TO_IMAGE: "Пряме посилання на картинку",
+            LINK_TO_PREVIEW: "Посилання на попередній перегляд",
+            COPY_LABEL: "Копіювати"
         });
 
         $translateProvider.determinePreferredLanguage();

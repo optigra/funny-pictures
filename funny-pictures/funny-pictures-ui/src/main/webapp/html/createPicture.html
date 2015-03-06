@@ -1,39 +1,35 @@
 <md-content class="md-padding create-piture" layout="column" layout-gt-md="row">
     <div flex="100" flex-gt-md="50">
         <md-card class="create-piture-form">
-            <h2>{{'UPLOAD_PICTURE_HEADER' | translate}}</h2>
+            <h2 translate="UPLOAD_PICTURE_HEADER"></h2>
             <md-card-content>
                 <form name="vm.templateInputForm" class="input-form" novalidate>
                     <md-input-container flex>
-                        <label>{{'TEMPLATE_TITLE_LABEL' | translate}}</label>
+                        <label translate="TEMPLATE_TITLE_LABEL"></label>
                         <input ng-model="vm.pictureTitle" name="pictureTitle" required>
                     </md-input-container>
                     <md-input-container flex>
-                        <label>{{'IMAGE_URL_LABEL' | translate}}</label>
+                        <label translate="IMAGE_URL_LABEL"></label>
                         <input type="url" ng-pattern="/\.jpg|\.jpeg|\.png|\.gif$/" ng-disabled="vm.myFile"
                                ng-model="vm.pictureUrl" name="pictureUrl" ng-required="!vm.myFile">
                     </md-input-container>
-                    <span class="text-center or-divider">{{'OR_LABEL' | translate}}</span>
+                    <span class="text-center or-divider" translate="OR_LABEL"></span>
 
                     <div layout layout="column">
                         <md-input-container layout="row" layout-align="center end">
-                            <md-button class="md-raised md-button" ng-disabled="vm.pictureUrl" click-selector="#upload">
-                                {{'OPEN_IMAGE_BUTTON' | translate}}
-                            </md-button>
+                            <md-button class="md-raised md-button" ng-disabled="vm.pictureUrl" click-selector="#upload" translate="OPEN_IMAGE_BUTTON"></md-button>
                             <input id="upload" type="file" file-model="vm.myFile" accept="image/*"
                                    style="display: none;" ng-required="!vm.pictureUrl">
                         </md-input-container>
                         <md-input-container flex>
-                            <label>{{'FILE_NAME_LABEL' | translate}}</label>
+                            <label translate="FILE_NAME_LABEL"></label>
                             <input name="fileName" class="form-control" ng-model="vm.myFile.name" readonly disabled
                                    ng-required="!vm.pictureUrl">
                         </md-input-container>
                     </div>
                     <div layout="row" layout-align="end center">
                         <md-button type="submit" class="md-raised md-primary md-button md-default-theme"
-                                   ng-click="vm.uploadFile()" ng-disabled="vm.isButtonDisabled()">
-                            {{'UPLOAD_IMAGE_BUTTON' | translate}}
-                        </md-button>
+                                   ng-click="vm.uploadFile()" ng-disabled="vm.isButtonDisabled()" translate="UPLOAD_IMAGE_BUTTON"></md-button>
                     </div>
                 </form>
             </md-card-content>

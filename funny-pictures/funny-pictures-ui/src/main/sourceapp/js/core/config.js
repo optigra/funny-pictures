@@ -8,14 +8,14 @@
     configure
         .$inject = [
             '$logProvider',
-            'exceptionHandlerProvider'
+            'ngClipProvider'
         ];
 
-    function configure($logProvider, exceptionHandlerProvider) {
+    function configure($logProvider, ngClipProvider) {
         if ($logProvider.debugEnabled) {
             $logProvider.debugEnabled(true);
         }
-        exceptionHandlerProvider.configure('test-');
+        ngClipProvider.setPath('js/ZeroClipboard.swf');
     }
 
 })();
