@@ -51,6 +51,8 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultFunnyPictureFacade.class);
 	
+	private static final String THUMBNAIL_PATH_PREFIX = "thumbnail";
+	
 	@Value("${facade.picture.label.text}")
 	private String labelText;
 
@@ -179,7 +181,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		for (ThumbnailContent thumbnailContent : thumbnails) {
 			ContentResource thumbnailResource = new ContentResource();
 			thumbnailResource.setMimeType(thumbnailContent.getMimeType());
-			String thumbnailUrl = namingStrategy.createIdentifier(thumbnailResource);
+			String thumbnailUrl = namingStrategy.createIdentifier(THUMBNAIL_PATH_PREFIX, thumbnailResource);
 			thumbnailContent.setPath(thumbnailUrl);
 			contentService.saveContent(thumbnailContent);
 		}

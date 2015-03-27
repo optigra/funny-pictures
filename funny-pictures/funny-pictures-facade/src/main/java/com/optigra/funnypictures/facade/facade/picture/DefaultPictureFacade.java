@@ -38,6 +38,8 @@ import com.optigra.funnypictures.service.thumbnail.ThumbnailGeneratorService;
 @Transactional
 public class DefaultPictureFacade implements PictureFacade {
 
+	private static final String THUMBNAIL_PATH_PREFIX = "thumbnail";
+
 	@Resource(name = "pagedRequestConverter")
 	private Converter<PagedRequest<PictureResource>, PagedSearch<Picture>> pagedRequestConverter;
 
@@ -171,7 +173,7 @@ public class DefaultPictureFacade implements PictureFacade {
 	private String generateThumbnail(final ThumbnailContent thumbnailContent) {
 		ContentResource thumbnailResource = new ContentResource();
 		thumbnailResource.setMimeType(thumbnailContent.getMimeType());
-		String thumbnailUrl = namingStrategy.createIdentifier(thumbnailResource);
+		String thumbnailUrl = namingStrategy.createIdentifier(THUMBNAIL_PATH_PREFIX, thumbnailResource);
 		thumbnailContent.setPath(thumbnailUrl);
 		contentService.saveContent(thumbnailContent);
 		return thumbnailUrl;

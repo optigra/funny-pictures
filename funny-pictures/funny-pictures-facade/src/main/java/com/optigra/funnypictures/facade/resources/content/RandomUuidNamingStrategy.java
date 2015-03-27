@@ -19,4 +19,10 @@ public class RandomUuidNamingStrategy implements ContentResourceNamingStrategy {
 		return "/" + uuid.toString() + resource.getMimeType().getExtension();
 	}
 
+	@Override
+	public String createIdentifier(final String prefix, final ContentResource resource) {
+		UUID uuid = UUID.randomUUID();
+		return "/" + prefix + "/" + uuid.toString() + resource.getMimeType().getExtension();
+	}
+
 }
