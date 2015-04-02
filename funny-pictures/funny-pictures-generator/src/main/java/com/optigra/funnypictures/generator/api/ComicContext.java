@@ -42,6 +42,10 @@ public class ComicContext {
 		return inputMimeType;
 	}
 
+	/**
+	 * Returns the text contents of text blocks mapped to their locations.
+	 * @return a map containing text blocks.
+	 */
 	public Map<Rectangle, String> getTextBlocks() {
 		//TODO consider using Guava's ImmutableMap
 		return Collections.unmodifiableMap(textBlocks);
