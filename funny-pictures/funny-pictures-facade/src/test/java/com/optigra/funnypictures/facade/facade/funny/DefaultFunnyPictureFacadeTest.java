@@ -88,6 +88,9 @@ public class DefaultFunnyPictureFacadeTest {
 	@Mock
 	private ContentResourceNamingStrategy namingStrategy;
 	
+	@Mock
+	private ContentResourceNamingStrategy thumbnailNamingStrategy;
+	
 	@InjectMocks
 	private DefaultFunnyPictureFacade unit = new DefaultFunnyPictureFacade();
 	

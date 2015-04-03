@@ -2,15 +2,12 @@ package com.optigra.funnypictures.facade.resources.content;
 
 import java.util.UUID;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Class for randomly resource naming.
  * 
  * @author rostyslav
  *
  */
-@Component("namingStrategy")
 public class RandomUuidNamingStrategy implements ContentResourceNamingStrategy {
 
 	@Override
