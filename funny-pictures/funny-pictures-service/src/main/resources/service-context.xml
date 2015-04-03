@@ -24,4 +24,12 @@
         </property>
     </bean>
 
+    <bean id="repositoryMonitorService" class="com.optigra.funnypictures.service.repository.FileSystemRepositoryMonitorService">
+    	<constructor-arg value="${content.repository.path}"/>
+    </bean>
+    
+    <bean id="thumbnailRepositoryMonitorService" class="com.optigra.funnypictures.service.repository.FileSystemRepositoryMonitorService">
+    	<constructor-arg value="${content.repository.path}/thumbnail"/>
+    </bean>
+
 </beans>

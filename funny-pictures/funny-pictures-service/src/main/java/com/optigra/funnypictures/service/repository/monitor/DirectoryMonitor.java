@@ -30,6 +30,9 @@ public class DirectoryMonitor implements RepositoryMonitor {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DirectoryMonitor.class);
 	
+	/* For generating loop thread number */
+    private static long loopThreadNumber = 0;
+	
 	private final WatchService directoryWatchService;
 	
 	private final Map<WatchKey, Path> keys = new HashMap<WatchKey, Path>();
@@ -86,7 +89,7 @@ public class DirectoryMonitor implements RepositoryMonitor {
 			}
 
 		};
-		new Thread(r).start();
+		new Thread(r, "directory-monitor-loop-" + nextThreadNumber()).start();
     }
 
     /**
@@ -176,7 +179,7 @@ public class DirectoryMonitor implements RepositoryMonitor {
 	 */
 	private void onEntryCreated(final Path fileName) {
 		for (RepositoryListener listener : listeners) {
-			listener.entryDeleted(fileName.toString());
+			listener.entryCreated(fileName.toString());
 		}		
 	}
 	
@@ -186,8 +189,16 @@ public class DirectoryMonitor implements RepositoryMonitor {
 	 */
 	private void onEntryDeleted(final Path fileName) {
 		for (RepositoryListener listener : listeners) {
-			listener.entryCreated(fileName.toString());
+			listener.entryDeleted(fileName.toString());
 		}
 	}
+	
+	/**
+	 * Returns a number for the next monitor loop thread.
+	 * @return a next thread number
+	 */
+	private static synchronized long nextThreadNumber() {
+        return ++loopThreadNumber;
+    }
 
 }

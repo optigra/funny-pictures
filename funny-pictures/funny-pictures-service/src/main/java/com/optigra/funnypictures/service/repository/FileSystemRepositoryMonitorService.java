@@ -3,6 +3,7 @@ package com.optigra.funnypictures.service.repository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +14,6 @@ import java.util.TreeSet;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import com.optigra.funnypictures.service.repository.monitor.DirectoryMonitor;
 import com.optigra.funnypictures.service.repository.monitor.RepositoryListener;
@@ -25,13 +25,18 @@ import com.optigra.funnypictures.service.repository.monitor.RepositoryMonitorExc
  * @author odisseus
  *
  */
-@Service("repositoryMonitorService")
 public class FileSystemRepositoryMonitorService implements
 		RepositoryMonitorService, RepositoryListener {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(FileSystemRepositoryMonitorService.class);
 	
 	private final Base62Converter converter = new Base62Converter();
+	
+	/**
+	 * The initial name to start increment from, in case no larger name is found in the repository.
+	 */
+	private static final String INITIAL_NAME_KEY = "1000";
+	
 	private final SortedSet<String> registeredFileNames = Collections.synchronizedSortedSet(new TreeSet<String>(converter.getBase62Comparator()));
 	
 	private final RepositoryMonitor repositoryMonitor;
@@ -42,9 +47,10 @@ public class FileSystemRepositoryMonitorService implements
 	 * Creates a new FileSystemRepositoryMonitorService.
 	 * @param repositoryLocation the directory to monitor
 	 */
-	public FileSystemRepositoryMonitorService(final Path repositoryLocation) {
-		this.repositoryLocation = repositoryLocation;
-		this.repositoryMonitor = new DirectoryMonitor(repositoryLocation);
+	public FileSystemRepositoryMonitorService(final String repositoryLocation) {
+		this.registeredFileNames.add(INITIAL_NAME_KEY);
+		this.repositoryLocation = Paths.get(repositoryLocation);
+		this.repositoryMonitor = new DirectoryMonitor(this.repositoryLocation);
 		repositoryMonitor.addListener(this);
 		repositoryMonitor.start();
 		try {
@@ -57,11 +63,18 @@ public class FileSystemRepositoryMonitorService implements
 	@Override
 	// TODO MG -- think of a more efficient synchronizing mode
 	public synchronized String getNextFreeIdentifier() {
-		return converter.getNextBase62Number(registeredFileNames.last());
+		String nextFreeName = converter.getNextBase62Number(registeredFileNames.last());
+		
+		// Mark the identifier as used so that if this method is called again 
+		// before the file is actually created, a different identifier will be returned
+		registeredFileNames.add(nextFreeName);
+		
+		return nextFreeName;
 	}
 
 	@Override
 	public void entryCreated(final String name) {
+		LOG.debug("Entry created: {}", name);
 		registeredFileNames.add(stripFileExtension(name));
 	}
 

@@ -9,10 +9,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class FileSystemRepositoryMonitorServiceTest {
 	
 	@Rule
@@ -24,39 +21,58 @@ public class FileSystemRepositoryMonitorServiceTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		
-
+		repositoryLocation = folder.newFolder().toPath();
 	}
-	
-	 public static void main(final String [] args[]) {
-		 for(int i = 0; i < 100; ++i)//{
-			 new Object();
-		// }
-	 }
 	
 	@Test
 	public void testGetNextFreeIdentifier() throws Exception {
-		// Given
-		repositoryLocation = folder.newFolder().toPath();
-		
-		//File created before monitor start
-		Path newFile = repositoryLocation.resolve("zzzzy.txt");
-		Files.createFile(newFile);	
-		
-		
-		unit = new FileSystemRepositoryMonitorService(repositoryLocation);
-		
 		// When
+		// Start the monitor
+		unit = new FileSystemRepositoryMonitorService(repositoryLocation.toString());
+		
+		// Fire some creation events
 		unit.entryCreated("1test.txt");
 		unit.entryCreated("2test.txt");
 		unit.entryCreated("Atest.txt");
-		unit.entryDeleted("Atest.txt");
 		
-		unit.entryDeleted("fake");
+		// Then
+		assertEquals("Atesu", unit.getNextFreeIdentifier());
+	}
+	
+	@Test
+	public void testGetNextFreeIdentifierWithPreexistingFiles() throws Exception {
+		// File created before monitor start
+		Path newFile = repositoryLocation.resolve("zzzzx.txt");
+		Files.createFile(newFile);
 		
-		String actual = unit.getNextFreeIdentifier();
-		assertEquals("zzzzz", actual);
+		// Start the monitor
+		unit = new FileSystemRepositoryMonitorService(repositoryLocation.toString());
 		
+		assertEquals("zzzzy", unit.getNextFreeIdentifier());
+		
+	}
+	
+	@Test
+	public void testGetNextFreeIdentifierWithDeletions() throws Exception {
+		unit = new FileSystemRepositoryMonitorService(repositoryLocation.toString());
+		unit.entryCreated("xxxxx.txt");
+		unit.entryDeleted("xxxxx.txt");	
+		assertEquals("xxxxy", unit.getNextFreeIdentifier());
+	}
+	
+	@Test
+	public void testGetNextFreeIdentifierWithNoCreationEvent() throws Exception {
+		unit = new FileSystemRepositoryMonitorService(repositoryLocation.toString());
+		unit.entryCreated("zzzzy.txt");
+		
+		// Get next identifier but don't create the new file
+		String expected1 = unit.getNextFreeIdentifier();
+
+		// Get another identifier
+		String expected2 = unit.getNextFreeIdentifier();
+
+		assertEquals("zzzzz", expected1);
+		assertEquals("100000", expected2);
 	}
 
 }
