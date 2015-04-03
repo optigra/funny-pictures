@@ -62,6 +62,9 @@ public class DefaultPictureFacadeTest {
 
 	@Mock
 	private ContentResourceNamingStrategy namingStrategy;
+	
+	@Mock
+	private ContentResourceNamingStrategy thumbnailNamingStrategy;
 
 	@Mock
 	private ThumbnailGeneratorService thumbnailGeneratorService;

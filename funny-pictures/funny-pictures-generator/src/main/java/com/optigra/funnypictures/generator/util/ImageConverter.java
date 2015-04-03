@@ -67,7 +67,7 @@ public class ImageConverter {
 			op.addImage();
 
 			Object[] args = new String[] {source.toString(), formatPrefix + destination.toString()};
-			LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
+			LOG.debug("Running command [{}] with arguments {} ", op.toString(), args);
 
 			convertCommand.run(op, args);
 			

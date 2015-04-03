@@ -86,6 +86,9 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	@Resource(name = "namingStrategy")
 	private ContentResourceNamingStrategy namingStrategy;
+	
+	@Resource(name = "thumbnailNamingStrategy")
+	private ContentResourceNamingStrategy thumbnailNamingStrategy;
 
 	@Resource(name = "thumbnailGeneratorService")
 	private ThumbnailGeneratorService thumbnailGeneratorService;
@@ -147,6 +150,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		AdviceMemeContext context = new AdviceMemeContext(templateContent.getContentStream(), 
 				templateContent.getMimeType(), funny.getHeader(), funny.getFooter());
 		ImageHandle generatedMeme = memeGenerator.generate(context);
+		// FIXME This should be another temporary file rather than content stored in the repository
 		Content unlabelledPictureContent = toContent(generatedMeme);
 		contentService.saveContent(unlabelledPictureContent);
 		String unlabelledPicturePath = unlabelledPictureContent.getPath();
@@ -182,7 +186,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		for (ThumbnailContent thumbnailContent : thumbnails) {
 			ContentResource thumbnailResource = new ContentResource();
 			thumbnailResource.setMimeType(thumbnailContent.getMimeType());
-			String thumbnailUrl = namingStrategy.createIdentifier(THUMBNAIL_PATH_PREFIX, thumbnailResource);
+			String thumbnailUrl = thumbnailNamingStrategy.createIdentifier(THUMBNAIL_PATH_PREFIX, thumbnailResource);
 			thumbnailContent.setPath(thumbnailUrl);
 			contentService.saveContent(thumbnailContent);
 		}

@@ -64,7 +64,7 @@ public class DefaultImageConversionService implements ImageConversionService {
 		if (bytesCopied == 0) {
 			LOG.warn("The input stream was empty");
 		}
-		LOG.debug("Created a temporary file: %1$s Size: %2$d bytes ", result.toAbsolutePath().toString(), bytesCopied);
+		LOG.debug("Created a temporary file: {} Size: {} bytes ", result.toAbsolutePath().toString(), bytesCopied);
 		
 		return result;
 	}

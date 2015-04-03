@@ -61,6 +61,9 @@ public class DefaultPictureFacade implements PictureFacade {
 	@Resource(name = "namingStrategy")
 	private ContentResourceNamingStrategy namingStrategy;
 	
+	@Resource(name = "thumbnailNamingStrategy")
+	private ContentResourceNamingStrategy thumbnailNamingStrategy;
+	
 	@Resource(name = "thumbnailGeneratorService")
 	private ThumbnailGeneratorService thumbnailGeneratorService;
 	
@@ -173,7 +176,7 @@ public class DefaultPictureFacade implements PictureFacade {
 	private String generateThumbnail(final ThumbnailContent thumbnailContent) {
 		ContentResource thumbnailResource = new ContentResource();
 		thumbnailResource.setMimeType(thumbnailContent.getMimeType());
-		String thumbnailUrl = namingStrategy.createIdentifier(THUMBNAIL_PATH_PREFIX, thumbnailResource);
+		String thumbnailUrl = thumbnailNamingStrategy.createIdentifier(THUMBNAIL_PATH_PREFIX, thumbnailResource);
 		thumbnailContent.setPath(thumbnailUrl);
 		contentService.saveContent(thumbnailContent);
 		return thumbnailUrl;

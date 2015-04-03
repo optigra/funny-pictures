@@ -7,5 +7,13 @@
         ">
 
     <context:component-scan base-package="com.optigra.funnypictures.facade" />
+    
+    <bean name="namingStrategy" class="com.optigra.funnypictures.facade.resources.content.SequentialNamingStrategy">
+    	<property name="repositoryMonitorService" ref="repositoryMonitorService"/>
+    </bean>
+    
+    <bean name="thumbnailNamingStrategy" class="com.optigra.funnypictures.facade.resources.content.SequentialNamingStrategy">
+    	<property name="repositoryMonitorService" ref="thumbnailRepositoryMonitorService"/>
+    </bean>
 
 </beans>
