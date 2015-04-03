@@ -1,0 +1,68 @@
+.authorize-form {
+  padding: 20px;
+  md-input-container {
+    padding: 0 10px 20px;
+  }
+}
+.social-authorize {
+  padding: 20px;
+}
+
+.entry-social {
+  padding-top: 10px;
+  color: rgb(126, 126, 126);
+  font-size: 14px;
+  font-weight: normal;
+  height: auto;
+  line-height: 23.799999237060547px;
+  width: 100%;
+  float: left;
+  border: solid 0 #aaa;
+  text-align: center;
+  div {
+    //display: block;
+    min-width: 130px;
+    margin: 3px;
+    vertical-align: middle;
+  }
+  a {
+    padding: 7px 10px 7px 32px;
+    text-decoration: none;
+    display: block;
+    color: #FFFFFF !important;
+    font-weight: bold;
+    transition: background-color .3s;
+  }
+  .fb {
+    a {
+      background: #3B5999 url('../img/social_icons/fb14.png') no-repeat 10px center;
+      &:hover {
+        background-color: rgb(50, 75, 129);
+      }
+    }
+  }
+  .twitter {
+    a {
+      background: #01BBF6 url('../img/social_icons/twitter14.png') no-repeat 8px center;
+      &:hover {
+        background-color: rgb(1, 159, 211);
+      }
+    }
+  }
+  .gplus {
+    a {
+      background: #D54135 url('../img/social_icons/gplus14.png') no-repeat 10px center;
+      &:hover {
+        background-color: rgb(191, 52, 40);
+      }
+    }
+  }
+  //.linkedin {
+  //  a {
+  //    background: #136F9B url('../img/social_icons/linkedin14.png') no-repeat 10px center;
+  //    &:hover {
+  //      background-color: rgb(15, 89, 125);
+  //    }
+  //  }
+  //}
+}

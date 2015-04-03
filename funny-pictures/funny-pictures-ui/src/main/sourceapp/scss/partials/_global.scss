@@ -1,80 +1,94 @@
 a {
-    @include linkColor($main-color);
-    transition: $color-animation;
+  @include linkColor($main-color);
+  transition: $color-animation;
 }
+
 img {
-    height: auto;
-    max-width: 100%;
-    vertical-align: middle;
-    border: 0;
+  height: auto;
+  max-width: 100%;
+  vertical-align: middle;
+  border: 0;
 }
+
 .center-content {
-	margin: 0 auto;
+  margin: 0 auto;
 }
+
 .pagination {
-    margin-top: 3em;
+  margin-top: 3em;
 }
+
 .md-toolbar-tools {
-    a {
-        &:hover, &:active, &:focus {
-            color: inherit;
-        }
+  a {
+    &:hover, &:active, &:focus {
+      color: inherit;
     }
+  }
 }
+
 md-input-container {
-    label {
-        color: rgba(0, 0, 0, .5) !important;
-    }
+  label {
+    color: rgba(0, 0, 0, .5) !important;
+  }
 }
+
 .footer {
-    margin: 60px auto 20px;
-    text-align: center;
+  margin: 60px auto 20px;
+  text-align: center;
+  color: $sub-text-color;
+  a {
     color: $sub-text-color;
-    .copyright {
-        a {
-            color: $sub-text-color;
-        }
-    }
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
+
 .loading {
-    background: rgba(255, 255, 255, .6);
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-    md-progress-circular {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+  background: rgba(255, 255, 255, .6);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  md-progress-circular {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
+
 .header {
-    .logo {
-        margin: 0 auto;
-        text-align: center;
+  .logo {
+    margin: 0 auto;
+    text-align: center;
+  }
+  .lang {
+    color: rgb(197, 202, 233);
+    font-size: .7em;
+    cursor: pointer;
+    &.current {
+      color: #ffffff;
+      cursor: initial;
     }
-    .lang {
-        color: rgb(197,202,233);
-        font-size: .7em;
-        cursor: pointer;
-        &.current {
-            color: #ffffff;
-            cursor: initial;
-        }
-    }
-    .divider {
-        margin: 0 5px;
-    }
+  }
+  .divider {
+    margin: 0 5px;
+  }
+  .authorize-header {
+    font-size: 14px;
+    text-transform: uppercase
+  }
 }
+
 md-sidenav, md-toast {
-    position: fixed;
+  position: fixed;
 }
+
 .comments {
-    margin: 2.5em auto 0;
-    padding: 0 25px;
+  margin: 2.5em auto 0;
+  padding: 0 25px;
 }

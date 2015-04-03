@@ -8,7 +8,9 @@
             'app.contact',
             'app.funnies',
             'app.pictures',
-            'app.header'
+            'app.header',
+            'app.footer',
+            'app.authorize'
         ])
 
 })();

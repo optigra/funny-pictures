@@ -3,6 +3,11 @@
         <md-card class="create-piture-form">
             <img ng-src="{{vm.picture.url}}" ng-show="vm.picture.url && !vm.loaded" reload-disqus="{{vm.picture.id}}">
             <img ng-src="{{vm.funnyPicture.url}}" ng-show="vm.funnyPicture.url && vm.loaded">
+            <meta itemprop="image" content="{{vm.funnyPicture.url}}">
+            <meta property="og:url" content="{{vm.currentFunnyLocation}}" />
+            <meta property="og:image" content="{{vm.funnyPicture.url}}" />
+            <meta name="twitter:site" content="{{vm.currentFunnyLocation}}">
+            <meta name="twitter:image:src" content="{{vm.funnyPicture.url}}">
             <md-card-content>
                 <form name="vm.funnyPictureText" ng-hide="vm.loaded">
                     <md-input-container flex>
@@ -13,8 +18,12 @@
                         <label translate="FOOTER_TEXT_LABEL"></label>
                         <input ng-model="vm.footerText" name="vm.footerText" ng-required="!(vm.headerText || vm.footerText)">
                     </md-input-container>
+                    <md-input-container flex>
+                        <label translate="TAGS_LABEL"></label>
+                        <input ng-model="vm.tag" name="vm.tag">
+                    </md-input-container>
                     <div layout="row" layout-align="end center">
-                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.createFunnyPicture()" ng-disabled="vm.isButtonDisabled()" translate="CREATE_FUNNY_BUTTON"></md-button>
+                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.createFunnyPicture()" ng-disabled="vm.isButtonDisabled()">{{'CREATE_FUNNY_BUTTON' | translate}}</md-button>
                     </div>
                 </form>
                 <div class="action-toolbar" layout="row" layout-align="space-between center" ng-show="vm.loaded">
@@ -33,9 +42,9 @@
                         </ul>
                     </div>
                     <div>
-                        <md-button class="md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}" translate="DOWNLOAD_LABEL"></md-button>
-                        <md-button class="md-warn" ng-click="vm.cancel()" translate="CANCEL_BUTTON"></md-button>
-                        <md-button type="submit" class="md-raised md-primary" ng-click="vm.createNew()" translate="CREATE_NEW_BUTTON"></md-button>
+                        <md-button class="md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}">{{'DOWNLOAD_LABEL'| translate}}</md-button>
+                        <md-button class="md-warn" ng-click="vm.cancel()">{{'CANCEL_BUTTON'| translate}}</md-button>
+                        <md-button type="submit" class="md-raised md-primary" ng-click="vm.createNew()">{{'CREATE_NEW_BUTTON'| translate}}</md-button>
                     </div>
                 </div>
                 <div class="clip-copy" layout="column" layout-align="start left" ng-show="vm.loaded">
@@ -44,14 +53,14 @@
                             <label translate="LINK_TO_IMAGE"></label>
                             <input ng-model="vm.funnyPicture.url" disabled>
                         </md-input-container>
-                        <md-button clip-copy="vm.funnyPicture.url" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                        <md-button clip-copy="vm.funnyPicture.url" clip-click="vm.clipCopyMessage()">{{'COPY_LABEL'| translate}}</md-button>
                     </div>
                     <div layout="row" layout-align="space-between center">
                         <md-input-container flex>
                             <label translate="LINK_TO_PREVIEW"></label>
                             <input ng-model="vm.currentFunnyLocation" disabled>
                         </md-input-container>
-                        <md-button clip-copy="vm.currentFunnyLocation" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                        <md-button clip-copy="vm.currentFunnyLocation" clip-click="vm.clipCopyMessage()">{{'COPY_LABEL'| translate}}</md-button>
                     </div>
                 </div>
             </md-card-content>

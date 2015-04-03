@@ -23,7 +23,7 @@
                             </li>
                         </ul>
                     </div>
-                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}" translate="DOWNLOAD_LABEL"></md-button>
+                    <md-button class="md-raised md-primary md-button" target="_self" ng-href="{{vm.funnyPicture.url}}" download="{{vm.funnyPicture.name}}">{{'DOWNLOAD_LABEL'|translate}}</md-button>
                 </div>
                 <div class="clip-copy" layout="column" layout-align="start left">
                     <div layout="row" layout-align="space-between center">
@@ -31,14 +31,14 @@
                             <label translate="LINK_TO_IMAGE"></label>
                             <input ng-model="vm.funnyPicture.url" disabled>
                         </md-input-container>
-                        <md-button clip-copy="vm.funnyPicture.url" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                        <md-button clip-copy="vm.funnyPicture.url" clip-click="vm.clipCopyMessage()">{{'COPY_LABEL'|translate}}</md-button>
                     </div>
                     <div layout="row" layout-align="space-between center">
                         <md-input-container flex>
                             <label translate="LINK_TO_PREVIEW"></label>
                             <input ng-model="vm.currentLocation" disabled>
                         </md-input-container>
-                        <md-button clip-copy="vm.currentLocation" clip-click="vm.clipCopyMessage()"><span translate="COPY_LABEL"></span></md-button>
+                        <md-button clip-copy="vm.currentLocation" clip-click="vm.clipCopyMessage()">{{'COPY_LABEL'|translate}}</md-button>
                     </div>
                 </div>
             </md-card-content>

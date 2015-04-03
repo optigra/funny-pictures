@@ -1,3 +1,7 @@
-<div class="footer">
-	<span class="copyright">Powered by <a href="http://optigra-soft.com/" target="_blank" title="Optigra">Optigra</a> &#8226; 2015</span>
+<div class="footer"  ng-controller="FooterController as vm">
+	<span class="copyright">Powered by <a href="http://optigra-soft.com/" target="_blank" title="Optigra">Optigra</a> @2015 &#8226; </span>
+	<span class="lang" ng-class="{current: vm.getCurrentLanguage() == 'uk'}" >
+		<a ng-show="vm.getCurrentLanguage() == 'en_US'" ng-click="vm.getCurrentLanguage() != 'uk' && vm.changeLanguage('uk')" translate="UKRAINIAN_LABEL"></a>
+		<a ng-show="vm.getCurrentLanguage() == 'uk'" ng-click="vm.getCurrentLanguage() != 'en_US' && vm.changeLanguage('en_US')" translate="ENGLISH_LABEL"></a>
+	</span>
 </div>

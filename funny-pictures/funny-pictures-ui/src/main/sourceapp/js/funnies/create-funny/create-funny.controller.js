@@ -16,10 +16,11 @@
         'values',
         'PicturesFactory',
         'FunniesFactory',
-        'FunnyThumbnailsByPictureFactory'
+        'FunnyThumbnailsByPictureFactory',
+        'TagsFactory'
     ];
 
-    function CreateFunnyController($scope, $window, $routeParams, $location, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
+    function CreateFunnyController($scope, $window, $routeParams, $location, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory, TagsFactory) {
         var vm = this;
         var currentUrl = $location.absUrl().split('#')[0] + '#/preview/';
 
@@ -27,6 +28,8 @@
         vm.headerText = '';
         vm.footerText = '';
         vm.funnyPicture = {};
+        vm.tags = ['funny', 'meme', 'lol'];
+        vm.tag = '';
         vm.funniesByTemplate = {};
         vm.totalItems = 0;
         vm.currentPage = 1;
@@ -43,6 +46,7 @@
         vm.isButtonDisabled = isButtonDisabled;
         vm.shareSocial = shareSocial;
         vm.clipCopyMessage = clipCopyMessage;
+        vm.createTag = createTag;
 
         activate();
 
@@ -52,6 +56,12 @@
             }, function (picture) {
                 vm.picture = picture;
                 pageChanged();
+            }, function (e) {
+                $exceptionHandler(e);
+            });
+
+            TagsFactory.query({}, function (data) {
+                vm.tags = data;
             }, function (e) {
                 $exceptionHandler(e);
             });
@@ -80,6 +90,7 @@
             postObject.footer = vm.footerText;
             postObject.template = {};
             postObject.template.id = vm.picture.id;
+            postObject.tags = vm.tags;
             FunniesFactory.save(postObject,
                 function (data) {
                     vm.funnyPicture = data;
@@ -87,6 +98,18 @@
                     vm.loaded = true;
                     vm.currentFunnyLocation = currentUrl + vm.funnyPicture.id;
                     pageChanged();
+                }, function (e) {
+                    vm.progress = false;
+                    $exceptionHandler(e);
+                });
+        }
+
+        function createTag() {
+            var postObject = new Object();
+            postObject.name = vm.tag;
+            TagsFactory.save(postObject,
+                function (data) {
+                    vm.tags = data;
                 }, function (e) {
                     $exceptionHandler(e);
                 });

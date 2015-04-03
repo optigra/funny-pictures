@@ -117,7 +117,7 @@ module.exports = function(grunt) {
                         '<%= app.dist %>/js/app.js': [
                             '<%= app.source %>/js/app.module.js',
 
-                            '<%= app.source %>/js/core/core.modules.js',
+                            '<%= app.source %>/js/core/core.module.js',
                             '<%= app.source %>/js/core/core.route.js',
                             '<%= app.source %>/js/core/core.values.js',
                             '<%= app.source %>/js/core/properties/development.constants.js',
@@ -131,14 +131,17 @@ module.exports = function(grunt) {
                             '<%= app.source %>/js/directives/click-link.directive.js',
                             '<%= app.source %>/js/directives/click-selector.directive.js',
                             '<%= app.source %>/js/directives/file-model.directive.js',
-                            '<%= app.source %>/js/directives/footer.directive.js',
                             '<%= app.source %>/js/directives/reload-disqus.directive.js',
 
-                            '<%= app.source %>/js/header/header.modules.js',
+                            '<%= app.source %>/js/header/header.module.js',
                             '<%= app.source %>/js/header/header.directive.js',
                             '<%= app.source %>/js/header/header.controller.js',
 
-                            '<%= app.source %>/js/funnies/funnies.modules.js',
+                            '<%= app.source %>/js/footer/footer.module.js',
+                            '<%= app.source %>/js/footer/footer.directive.js',
+                            '<%= app.source %>/js/footer/footer.controller.js',
+
+                            '<%= app.source %>/js/funnies/funnies.module.js',
                             '<%= app.source %>/js/funnies/funnies.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnail-by-funny-picture.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnails.factory.js',
@@ -147,14 +150,20 @@ module.exports = function(grunt) {
                             '<%= app.source %>/js/funnies/create-funny/create-funny.controller.js',
                             '<%= app.source %>/js/funnies/preview-funny/preview-funny.controller.js',
 
-                            '<%= app.source %>/js/pictures/pictures.modules.js',
+                            '<%= app.source %>/js/pictures/pictures.module.js',
                             '<%= app.source %>/js/pictures/pictures.factory.js',
                             '<%= app.source %>/js/pictures/picture-thumbnails.factory.js',
                             '<%= app.source %>/js/pictures/create-picture/file-upload.service.js',
                             '<%= app.source %>/js/pictures/pictures.controller.js',
                             '<%= app.source %>/js/pictures/create-picture/create-picture.controller.js',
 
-                            '<%= app.source %>/js/contact/contact.modules.js',
+                            '<%= app.source %>/js/tags/tags.module.js',
+                            '<%= app.source %>/js/tags/tags.factory.js',
+
+                            '<%= app.source %>/js/authorize/authorize.module.js',
+                            '<%= app.source %>/js/authorize/authorize.controller.js',
+
+                            '<%= app.source %>/js/contact/contact.module.js',
                             '<%= app.source %>/js/contact/feedbacks.factory.js',
                             '<%= app.source %>/js/contact/contact.controller.js',
 
@@ -192,7 +201,7 @@ module.exports = function(grunt) {
                         '<%= app.dist %>/js/app.js': [
                             '<%= app.source %>/js/app.module.js',
 
-                            '<%= app.source %>/js/core/core.modules.js',
+                            '<%= app.source %>/js/core/core.module.js',
                             '<%= app.source %>/js/core/core.route.js',
                             '<%= app.source %>/js/core/core.values.js',
                             '<%= app.source %>/js/core/properties/production.constants.js',
@@ -206,14 +215,17 @@ module.exports = function(grunt) {
                             '<%= app.source %>/js/directives/click-link.directive.js',
                             '<%= app.source %>/js/directives/click-selector.directive.js',
                             '<%= app.source %>/js/directives/file-model.directive.js',
-                            '<%= app.source %>/js/directives/footer.directive.js',
                             '<%= app.source %>/js/directives/reload-disqus.directive.js',
 
-                            '<%= app.source %>/js/header/header.modules.js',
+                            '<%= app.source %>/js/header/header.module.js',
                             '<%= app.source %>/js/header/header.directive.js',
                             '<%= app.source %>/js/header/header.controller.js',
 
-                            '<%= app.source %>/js/funnies/funnies.modules.js',
+                            '<%= app.source %>/js/footer/footer.module.js',
+                            '<%= app.source %>/js/footer/footer.directive.js',
+                            '<%= app.source %>/js/footer/footer.controller.js',
+
+                            '<%= app.source %>/js/funnies/funnies.module.js',
                             '<%= app.source %>/js/funnies/funnies.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnail-by-funny-picture.factory.js',
                             '<%= app.source %>/js/funnies/funny-thumbnails.factory.js',
@@ -222,14 +234,20 @@ module.exports = function(grunt) {
                             '<%= app.source %>/js/funnies/create-funny/create-funny.controller.js',
                             '<%= app.source %>/js/funnies/preview-funny/preview-funny.controller.js',
 
-                            '<%= app.source %>/js/pictures/pictures.modules.js',
+                            '<%= app.source %>/js/pictures/pictures.module.js',
                             '<%= app.source %>/js/pictures/pictures.factory.js',
                             '<%= app.source %>/js/pictures/picture-thumbnails.factory.js',
                             '<%= app.source %>/js/pictures/create-picture/file-upload.service.js',
                             '<%= app.source %>/js/pictures/pictures.controller.js',
                             '<%= app.source %>/js/pictures/create-picture/create-picture.controller.js',
 
-                            '<%= app.source %>/js/contact/contact.modules.js',
+                            '<%= app.source %>/js/tags/tags.module.js',
+                            '<%= app.source %>/js/tags/tags.factory.js',
+
+                            '<%= app.source %>/js/authorize/authorize.module.js',
+                            '<%= app.source %>/js/authorize/authorize.controller.js',
+
+                            '<%= app.source %>/js/contact/contact.module.js',
                             '<%= app.source %>/js/contact/feedbacks.factory.js',
                             '<%= app.source %>/js/contact/contact.controller.js',
 

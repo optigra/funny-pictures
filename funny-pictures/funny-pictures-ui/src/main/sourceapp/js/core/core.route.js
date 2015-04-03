@@ -42,6 +42,11 @@
                 controller: 'ContactController',
                 controllerAs: 'vm'
             })
+            .when("/authorize", {
+                templateUrl: "html/authorize.html",
+                controller: 'AuthorizeController',
+                controllerAs: 'vm'
+            })
             .otherwise({
                 redirectTo: '/home'
             });

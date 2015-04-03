@@ -1,18 +1,5 @@
 package com.optigra.funnypictures.facade.facade.funny;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
 import com.optigra.funnypictures.content.model.Content;
 import com.optigra.funnypictures.content.model.ThumbnailContent;
 import com.optigra.funnypictures.content.service.ContentService;
@@ -38,6 +25,17 @@ import com.optigra.funnypictures.service.funnypicture.FunnyPictureService;
 import com.optigra.funnypictures.service.picture.PictureService;
 import com.optigra.funnypictures.service.thumbnail.ThumbnailGeneratorService;
 import com.optigra.funnypictures.service.thumbnail.funny.FunnyPictureThumbnailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Default facade for funny pictures. Uses for creating funny picture.
@@ -82,6 +80,9 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 
 	@Resource(name = "funnyPictureConverter")
 	private Converter<FunnyPicture, FunnyPictureResource> funnyPictureConverter;
+
+	@Resource(name = "funnyPictureResourceConverter")
+	private Converter<FunnyPictureResource, FunnyPicture> funnyPictureResourceConverter;
 
 	@Resource(name = "namingStrategy")
 	private ContentResourceNamingStrategy namingStrategy;
@@ -217,7 +218,7 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	/**
 	 * Method save funny picture into database.
 	 * 
-	 * @param funny
+	 * @param funnyPictureResource
 	 *            resource with name,header and footer text.
 	 * @param template
 	 *            base for creating funny picture
@@ -225,13 +226,10 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 	 *            with url to content storage
 	 * @return created funny picture
 	 */
-	private FunnyPicture saveFunnyPicture(final FunnyPictureResource funny, final Picture template, final Content content) {
+	private FunnyPicture saveFunnyPicture(final FunnyPictureResource funnyPictureResource, final Picture template, final Content content) {
 		// Save generated meme
-		FunnyPicture funnyPicture = new FunnyPicture();
+		FunnyPicture funnyPicture = funnyPictureResourceConverter.convert(funnyPictureResource);
 		funnyPicture.setPicture(template);
-		funnyPicture.setName(funny.getName());
-		funnyPicture.setHeader(funny.getHeader());
-		funnyPicture.setFooter(funny.getFooter());
 		funnyPicture.setUrl(content.getPath());
 
 		return funnyPictureService.createFunnyPicture(funnyPicture);

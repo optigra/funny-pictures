@@ -54,10 +54,12 @@ public class DefaultFunnyPictureThumbnailDao extends AbstractDao<FunnyPictureThu
 	@Override
 	public FunnyPictureThumbnail getThumbnailForFunnyPicture(final Long funnyPictureId, final ThumbnailType thumbnailType) {
 		Queries query = Queries.FIND_FUNNY_PICTURE_THUMBNAILS_BY_FUNNY_PICTURE;
+
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("funnyPictureId", funnyPictureId);
 		parameters.put("type", thumbnailType);
 		Query<FunnyPictureThumbnail> finalQuery = new Query<>(getEntityClass(), query.getQuery(), parameters);
+
 		return getPersistenceManager().executeSingleResultQuery(finalQuery);
 	}
 

@@ -8,20 +8,19 @@
             </div>
 
             <md-tabs class="md-primary" flex hide-sm hide-md>
-                <md-tab id="tab1" aria-controls="tab3-content" click-link="/home" md-active="vm.isActive('/home')" label="{{'HOME_HEADER' | translate}}">
+                <md-tab id="tab1" aria-controls="tab1-content" click-link="/home" md-active="vm.isActive('/home')" label="{{'HOME_HEADER' | translate}}">
                 </md-tab>
-                <md-tab id="tab2" aria-controls="tab1-content" click-link="/templates" md-active="vm.isActive('/templates')" label="{{'TEMPLATES_HEADER' | translate}}">
+                <md-tab id="tab2" aria-controls="tab2-content" click-link="/templates" md-active="vm.isActive('/templates')" label="{{'TEMPLATES_HEADER' | translate}}">
                 </md-tab>
-                <md-tab id="tab3" aria-controls="tab2-content" click-link="/createTemplate" md-active="vm.isActive('/createTemplate')" label="{{'CREATE_TEMPLATE_HEADER' | translate}}">
+                <md-tab id="tab3" aria-controls="tab3-content" click-link="/createTemplate" md-active="vm.isActive('/createTemplate')" label="{{'CREATE_TEMPLATE_HEADER' | translate}}">
                 </md-tab>
-                <md-tab id="tab4" aria-controls="tab3-content" click-link="/contact" md-active="vm.isActive('/contact')" label="{{'CONTACT_US_HEADER' | translate}}">
+                <md-tab id="tab4" aria-controls="tab4-content" click-link="/contact" md-active="vm.isActive('/contact')" label="{{'CONTACT_US_HEADER' | translate}}">
                 </md-tab>
             </md-tabs>
 
-            <div layout="row" layout-align="center center" flex="10" hide-sm hide-md>
-                <span class="lang" ng-class="{current: vm.getCurrentLanguage() == 'uk'}" ng-click="vm.getCurrentLanguage() != 'uk' && vm.changeLanguage('uk')">UA</span>
-                <span class="divider">|</span>
-                <span class="lang" ng-class="{current: vm.getCurrentLanguage() == 'en_US'}" ng-click="vm.getCurrentLanguage() != 'en_US' && vm.changeLanguage('en_US')">EN</span>
+            <div class="authorize-header" layout="row" layout-align="center center" flex="10" hide-sm hide-md>
+                <a ng-href="#/authorize" translate="{{'AUTHORIZE_HEADER' | translate}}">
+                </a>
             </div>
         </div>
     </md-toolbar>
@@ -54,6 +53,11 @@
                 </li>
             </ul>
             <ul class="bottom-side-menu">
+                <li>
+                    <menu-link>
+                        <span  class="menu-item md-button md-default-theme" click-link="/authorize" ng-class="{'active' : vm.isActive('/authorize')}" translate="AUTHORIZE_HEADER"></span>
+                    </menu-link>
+                </li>
                 <li ng-hide="vm.getCurrentLanguage() == 'uk'">
                     <menu-link class="menu-item md-button md-default-theme" ng-click="vm.getCurrentLanguage() != 'uk' && vm.changeLanguage('uk')">
                         Українська версія

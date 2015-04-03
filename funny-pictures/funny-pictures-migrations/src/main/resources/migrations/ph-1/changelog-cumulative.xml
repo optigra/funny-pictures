@@ -258,4 +258,41 @@
 				   schemaName="public"
 				   tableName="c_user"/>
 	</changeSet>
+
+	<changeSet id="createTagTable" author="Oleh Zasadnyy">
+		<createTable tableName="tag">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="createFunnyPictureTagTable" author="Oleh Zasadnyy">
+		<createTable tableName="funny_picture_tag">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="funny_picture_id" type="bigint">
+				<constraints nullable="false" foreignKeyName="fk_funny_picture_tag" references="funny_picture(id)" />
+			</column>
+			<column name="tag_id" type="bigint">
+				<constraints nullable="false" foreignKeyName="fk_tag" references="tag(id)" />
+			</column>
+			<column name="update_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="create_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+	</changeSet>
 </databaseChangeLog>

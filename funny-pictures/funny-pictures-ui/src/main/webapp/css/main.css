@@ -6903,8 +6903,10 @@ md-input-container label {
   margin: 60px auto 20px;
   text-align: center;
   color: #999999; }
-  .footer .copyright a {
-    color: #999999; }
+  .footer a {
+    color: #999999;
+    cursor: pointer;
+    text-decoration: underline; }
 
 .loading {
   background: rgba(255, 255, 255, 0.6);
@@ -6936,6 +6938,9 @@ md-input-container label {
     cursor: initial; }
 .header .divider {
   margin: 0 5px; }
+.header .authorize-header {
+  font-size: 14px;
+  text-transform: uppercase; }
 
 md-sidenav, md-toast {
   position: fixed; }
@@ -7015,9 +7020,9 @@ md-sidenav, md-toast {
         -ms-transform: scale(1.02);
             transform: scale(1.02); }
 
-.create-piture-form {
+.create-picture-form {
   padding: 20px; }
-  .create-piture-form md-input-container {
+  .create-picture-form md-input-container {
     padding: 0 10px 20px; }
 
 .image-preview-wrapper {
@@ -7061,3 +7066,46 @@ md-sidenav, md-toast {
   .contact-details span {
     display: block;
     line-height: 1.2; }
+
+.authorize-form {
+  padding: 20px; }
+  .authorize-form md-input-container {
+    padding: 0 10px 20px; }
+
+.social-authorize {
+  padding: 20px; }
+
+.entry-social {
+  padding-top: 10px;
+  color: #7e7e7e;
+  font-size: 14px;
+  font-weight: normal;
+  height: auto;
+  line-height: 23.7999992371px;
+  width: 100%;
+  float: left;
+  border: solid 0 #aaa;
+  text-align: center; }
+  .entry-social div {
+    min-width: 130px;
+    margin: 3px;
+    vertical-align: middle; }
+  .entry-social a {
+    padding: 7px 10px 7px 32px;
+    text-decoration: none;
+    display: block;
+    color: #FFFFFF !important;
+    font-weight: bold;
+    transition: background-color .3s; }
+  .entry-social .fb a {
+    background: #3B5999 url('../img/social_icons/fb14.png') no-repeat 10px center; }
+    .entry-social .fb a:hover {
+      background-color: #324b81; }
+  .entry-social .twitter a {
+    background: #01BBF6 url('../img/social_icons/twitter14.png') no-repeat 8px center; }
+    .entry-social .twitter a:hover {
+      background-color: #019fd3; }
+  .entry-social .gplus a {
+    background: #D54135 url('../img/social_icons/gplus14.png') no-repeat 10px center; }
+    .entry-social .gplus a:hover {
+      background-color: #bf3428; }

@@ -12,7 +12,7 @@
             'FeedbacksFactory'
         ];
 
-    function ContactController($exceptionHandler,logger, FeedbacksFactory) {
+    function ContactController($exceptionHandler, logger, FeedbacksFactory) {
         var vm = this;
 
         vm.feedback = {};

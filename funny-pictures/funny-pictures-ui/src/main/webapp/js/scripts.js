@@ -4761,7 +4761,7 @@
             for (message = prefix + template.replace(/\{\d+\}/g, function(match) {
                 var index = +match.slice(1, -1);
                 return index + 2 < templateArgs.length ? toDebugString(templateArgs[index + 2]) : match;
-            }), message = message + "\nhttp://errors.angularjs.org/1.3.14/" + (module ? module + "/" : "") + code, 
+            }), message = message + "\nhttp://errors.angularjs.org/1.3.15/" + (module ? module + "/" : "") + code, 
             i = 2; i < arguments.length; i++) message = message + (2 == i ? "?" : "&") + "p" + (i - 2) + "=" + encodeURIComponent(toDebugString(arguments[i]));
             return new ErrorConstructor(message);
         };
@@ -4931,8 +4931,8 @@
         if (t1 == t2 && "object" == t1) {
             if (!isArray(o1)) {
                 if (isDate(o1)) return isDate(o2) ? equals(o1.getTime(), o2.getTime()) : !1;
-                if (isRegExp(o1) && isRegExp(o2)) return o1.toString() == o2.toString();
-                if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return !1;
+                if (isRegExp(o1)) return isRegExp(o2) ? o1.toString() == o2.toString() : !1;
+                if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2) || isDate(o2) || isRegExp(o2)) return !1;
                 keySet = {};
                 for (key in o1) if ("$" !== key.charAt(0) && !isFunction(o1[key])) {
                     if (!equals(o1[key], o2[key])) return !1;
@@ -5717,8 +5717,13 @@
         function cacheStateAndFireUrlChange() {
             cacheState(), fireUrlChange();
         }
+        function getCurrentState() {
+            try {
+                return history.state;
+            } catch (e) {}
+        }
         function cacheState() {
-            cachedState = window.history.state, cachedState = isUndefined(cachedState) ? null : cachedState, 
+            cachedState = getCurrentState(), cachedState = isUndefined(cachedState) ? null : cachedState, 
             equals(cachedState, lastCachedState) && (cachedState = lastCachedState), lastCachedState = cachedState;
         }
         function fireUrlChange() {
@@ -6881,7 +6886,9 @@
                     mediumDate: "MMM d, y",
                     shortDate: "M/d/yy",
                     mediumTime: "h:mm:ss a",
-                    shortTime: "h:mm a"
+                    shortTime: "h:mm a",
+                    ERANAMES: [ "Before Christ", "Anno Domini" ],
+                    ERAS: [ "BC", "AD" ]
                 },
                 pluralCat: function(num) {
                     return 1 === num ? "one" : "other";
@@ -7454,10 +7461,21 @@
         } ];
     }
     function $RootScopeProvider() {
+        function createChildScopeClass(parent) {
+            function ChildScope() {
+                this.$$watchers = this.$$nextSibling = this.$$childHead = this.$$childTail = null, 
+                this.$$listeners = {}, this.$$listenerCount = {}, this.$$watchersCount = 0, this.$id = nextUid(), 
+                this.$$ChildScope = null;
+            }
+            return ChildScope.prototype = parent, ChildScope;
+        }
         var TTL = 10, $rootScopeMinErr = minErr("$rootScope"), lastDirtyWatch = null, applyAsyncId = null;
         this.digestTtl = function(value) {
             return arguments.length && (TTL = value), TTL;
         }, this.$get = [ "$injector", "$exceptionHandler", "$parse", "$browser", function($injector, $exceptionHandler, $parse, $browser) {
+            function destroyChildScope($event) {
+                $event.currentScope.$$destroyed = !0;
+            }
             function Scope() {
                 this.$id = nextUid(), this.$$phase = this.$parent = this.$$watchers = this.$$nextSibling = this.$$prevSibling = this.$$childHead = this.$$childTail = null, 
                 this.$root = this, this.$$destroyed = !1, this.$$listeners = {}, this.$$listenerCount = {}, 
@@ -7490,17 +7508,11 @@
             Scope.prototype = {
                 constructor: Scope,
                 $new: function(isolate, parent) {
-                    function destroyChild() {
-                        child.$$destroyed = !0;
-                    }
                     var child;
-                    return parent = parent || this, isolate ? (child = new Scope(), child.$root = this.$root) : (this.$$ChildScope || (this.$$ChildScope = function() {
-                        this.$$watchers = this.$$nextSibling = this.$$childHead = this.$$childTail = null, 
-                        this.$$listeners = {}, this.$$listenerCount = {}, this.$id = nextUid(), this.$$ChildScope = null;
-                    }, this.$$ChildScope.prototype = this), child = new this.$$ChildScope()), child.$parent = parent, 
-                    child.$$prevSibling = parent.$$childTail, parent.$$childHead ? (parent.$$childTail.$$nextSibling = child, 
-                    parent.$$childTail = child) : parent.$$childHead = parent.$$childTail = child, (isolate || parent != this) && child.$on("$destroy", destroyChild), 
-                    child;
+                    return parent = parent || this, isolate ? (child = new Scope(), child.$root = this.$root) : (this.$$ChildScope || (this.$$ChildScope = createChildScopeClass(this)), 
+                    child = new this.$$ChildScope()), child.$parent = parent, child.$$prevSibling = parent.$$childTail, 
+                    parent.$$childHead ? (parent.$$childTail.$$nextSibling = child, parent.$$childTail = child) : parent.$$childHead = parent.$$childTail = child, 
+                    (isolate || parent != this) && child.$on("$destroy", destroyChildScope), child;
                 },
                 $watch: function(watchExp, listener, objectEquality) {
                     var get = $parse(watchExp);
@@ -8045,7 +8057,7 @@
         };
     }
     function deepCompare(actual, expected, comparator, matchAgainstAnyProp, dontMatchWholeObject) {
-        var actualType = typeof actual, expectedType = typeof expected;
+        var actualType = null !== actual ? typeof actual : "null", expectedType = null !== expected ? typeof expected : "null";
         if ("string" === expectedType && "!" === expected.charAt(0)) return !deepCompare(actual, expected.substring(1), comparator, matchAgainstAnyProp);
         if (isArray(actual)) return actual.some(function(item) {
             return deepCompare(item, expected, comparator, matchAgainstAnyProp);
@@ -8060,7 +8072,7 @@
             if ("object" === expectedType) {
                 for (key in expected) {
                     var expectedVal = expected[key];
-                    if (!isFunction(expectedVal)) {
+                    if (!isFunction(expectedVal) && !isUndefined(expectedVal)) {
                         var matchAnyProperty = "$" === key, actualVal = matchAnyProperty ? actual : actual[key];
                         if (!deepCompare(actualVal, expectedVal, comparator, matchAnyProperty, matchAnyProperty)) return !1;
                     }
@@ -8155,6 +8167,12 @@
     function ampmGetter(date, formats) {
         return date.getHours() < 12 ? formats.AMPMS[0] : formats.AMPMS[1];
     }
+    function eraGetter(date, formats) {
+        return date.getFullYear() <= 0 ? formats.ERAS[0] : formats.ERAS[1];
+    }
+    function longEraGetter(date, formats) {
+        return date.getFullYear() <= 0 ? formats.ERANAMES[0] : formats.ERANAMES[1];
+    }
     function dateFilter($locale) {
         function jsonStringToDate(string) {
             var match;
@@ -8188,7 +8206,7 @@
     }
     function limitToFilter() {
         return function(input, limit) {
-            return isNumber(input) && (input = input.toString()), isArray(input) || isString(input) ? (limit = 1/0 === Math.abs(Number(limit)) ? Number(limit) : int(limit), 
+            return isNumber(input) && (input = input.toString()), isArray(input) || isString(input) ? (limit = Math.abs(Number(limit)) === 1 / 0 ? Number(limit) : int(limit), 
             limit ? limit > 0 ? input.slice(0, limit) : input.slice(limit) : isString(input) ? "" : []) : input;
         };
     }
@@ -8365,7 +8383,7 @@
                 new Date(year, 0, firstThurs.getDate() + addDays, hours, minutes, seconds, milliseconds);
             }
         }
-        return 0/0;
+        return 0 / 0;
     }
     function createDateParser(regexp, mapping) {
         return function(iso, date) {
@@ -8394,7 +8412,7 @@
                     index < mapping.length && (map[mapping[index]] = +part);
                 }), new Date(map.yyyy, map.MM - 1, map.dd, map.HH, map.mm, map.ss || 0, 1e3 * map.sss || 0);
             }
-            return 0/0;
+            return 0 / 0;
         };
     }
     function createDateInputType(type, regexp, parseDate, format) {
@@ -8661,11 +8679,11 @@
         }
         return csp.isActive_ = active;
     }, ngAttrPrefixes = [ "ng-", "data-ng-", "ng:", "x-ng-" ], SNAKE_CASE_REGEXP = /[A-Z]/g, bindJQueryFired = !1, NODE_TYPE_ELEMENT = 1, NODE_TYPE_TEXT = 3, NODE_TYPE_COMMENT = 8, NODE_TYPE_DOCUMENT = 9, NODE_TYPE_DOCUMENT_FRAGMENT = 11, version = {
-        full: "1.3.14",
+        full: "1.3.15",
         major: 1,
         minor: 3,
-        dot: 14,
-        codeName: "instantaneous-browserification"
+        dot: 15,
+        codeName: "locality-filtration"
     };
     JQLite.expando = "ng339";
     var jqCache = JQLite.cache = {}, jqId = 1, addEventListenerFn = function(element, type, fn) {
@@ -9004,8 +9022,8 @@
                     return applyStyles(element, options), after ? after.after(element) : parent.prepend(element), 
                     asyncPromise();
                 },
-                leave: function(element) {
-                    return element.remove(), asyncPromise();
+                leave: function(element, options) {
+                    return applyStyles(element, options), element.remove(), asyncPromise();
                 },
                 move: function(element, parent, after, options) {
                     return this.enter(element, parent, after, options);
@@ -9567,8 +9585,12 @@
         a: ampmGetter,
         Z: timeZoneGetter,
         ww: weekGetter(2),
-        w: weekGetter(1)
-    }, DATE_FORMATS_SPLIT = /((?:[^yMdHhmsaZEw']+)|(?:'(?:[^']|'')*')|(?:E+|y+|M+|d+|H+|h+|m+|s+|a|Z|w+))(.*)/, NUMBER_STRING = /^\-?\d+$/;
+        w: weekGetter(1),
+        G: eraGetter,
+        GG: eraGetter,
+        GGG: eraGetter,
+        GGGG: longEraGetter
+    }, DATE_FORMATS_SPLIT = /((?:[^yMdHhmsaZEwG']+)|(?:'(?:[^']|'')*')|(?:E+|y+|M+|d+|H+|h+|m+|s+|a|Z|G+|w+))(.*)/, NUMBER_STRING = /^\-?\d+$/;
     dateFilter.$inject = [ "$locale" ];
     var lowercaseFilter = valueFn(lowercase), uppercaseFilter = valueFn(uppercase);
     orderByFilter.$inject = [ "$parse" ];
@@ -9646,8 +9668,10 @@
                 name: "form",
                 restrict: isNgForm ? "EAC" : "E",
                 controller: FormController,
-                compile: function(formElement) {
-                    return formElement.addClass(PRISTINE_CLASS).addClass(VALID_CLASS), {
+                compile: function(formElement, attr) {
+                    formElement.addClass(PRISTINE_CLASS).addClass(VALID_CLASS);
+                    var nameAttr = attr.name ? "name" : isNgForm && attr.ngForm ? "ngForm" : !1;
+                    return {
                         pre: function(scope, formElement, attr, controller) {
                             if (!("action" in attr)) {
                                 var handleFormSubmission = function(event) {
@@ -9661,12 +9685,13 @@
                                     }, 0, !1);
                                 });
                             }
-                            var parentFormCtrl = controller.$$parentForm, alias = controller.$name;
-                            alias && (setter(scope, null, alias, controller, alias), attr.$observe(attr.name ? "name" : "ngForm", function(newValue) {
-                                alias !== newValue && (setter(scope, null, alias, undefined, alias), alias = newValue, 
-                                setter(scope, null, alias, controller, alias), parentFormCtrl.$$renameControl(controller, alias));
+                            var parentFormCtrl = controller.$$parentForm;
+                            nameAttr && (setter(scope, null, controller.$name, controller, controller.$name), 
+                            attr.$observe(nameAttr, function(newValue) {
+                                controller.$name !== newValue && (setter(scope, null, controller.$name, undefined, controller.$name), 
+                                parentFormCtrl.$$renameControl(controller, newValue), setter(scope, null, controller.$name, controller, controller.$name));
                             })), formElement.on("$destroy", function() {
-                                parentFormCtrl.$removeControl(controller), alias && setter(scope, null, alias, undefined, alias), 
+                                parentFormCtrl.$removeControl(controller), nameAttr && setter(scope, null, attr[nameAttr], undefined, controller.$name), 
                                 extend(controller, nullFormCtrl);
                             });
                         }
@@ -17937,7 +17962,7 @@ angular.module("ui.bootstrap.pagination", []).controller("PaginationController",
         }
     };
 } ]), angular.module("template/pagination/pager.html", []).run([ "$templateCache", function($templateCache) {
-    $templateCache.put("template/pagination/pager.html", '<div class="pager"><md-button ng-disabled="noPrevious()" ng-click="selectPage(1)" class="md-primary" translate="PREVIOUS_LABEL"></md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary" translate="NEXT_LABEL"></md-button></div>');
+    $templateCache.put("template/pagination/pager.html", '<div class="pager"><md-button ng-disabled="noPrevious()" ng-click="selectPage(1)" class="md-primary">{{PREVIOUS_LABEL|translate}}</md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary">{{NEXT_LABEL|translate}}</md-button></div>');
 } ]), angular.module("template/pagination/pagination.html", []).run([ "$templateCache", function($templateCache) {
-    $templateCache.put("template/pagination/pagination.html", '<div class="pagination"><md-button ng-disabled="noPrevious()" ng-click="selectPage(page - 1)" class="md-primary" translate="PREVIOUS_LABEL"></md-button><md-button ng-repeat="page in pages track by $index" ng-disabled="page.active" ng-click="selectPage(page.number)" class="md-primary">{{page.text}}</md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary" translate="NEXT_LABEL"></md-button></div>');
+    $templateCache.put("template/pagination/pagination.html", '<div class="pagination"><md-button ng-disabled="noPrevious()" ng-click="selectPage(page - 1)" class="md-primary">{{PREVIOUS_LABEL|translate}}</md-button><md-button ng-repeat="page in pages track by $index" ng-disabled="page.active" ng-click="selectPage(page.number)" class="md-primary">{{page.text}}</md-button><md-button ng-disabled="noNext()" ng-click="selectPage(page + 1)" class="md-primary">{{NEXT_LABEL|translate}}</md-button></div>');
 } ]);

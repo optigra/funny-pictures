@@ -1,0 +1,42 @@
+<md-content class="md-padding authorize" layout="column" layout-gt-md="row">
+    <div flex="100" flex-gt-md="50">
+        <md-card class="authorize-form">
+            <h2 translate="AUTHORIZE_HEADER"></h2>
+            <md-card-content>
+                <form name="vm.authorizeForm" class="input-form" novalidate>
+                    <md-input-container flex>
+                        <label translate="USERNAME_LABEL"></label>
+                        <input ng-model="vm.username" name="username" required>
+                    </md-input-container>
+                    <md-input-container flex>
+                        <label translate="PASSWORD_LABEL"></label>
+                        <input ng-model="vm.password" type="password" name="password" required>
+                    </md-input-container>
+                    <div layout="row" layout-align="end center">
+                        <md-button type="submit" class="md-raised md-primary md-button md-default-theme"
+                                   ng-click="vm.authorize()" ng-disabled="vm.isButtonDisabled()">
+                            {{'AUTHORIZE_BUTTON_HEADER'|translate}}
+                        </md-button>
+                    </div>
+                </form>
+                <span class="text-center or-divider" translate="OR_LABEL"></span>
+                <div class="entry-social" layout="row" layout-align="center center">
+                    <div class="fb" flex>
+                        <a href="#" target="_blank" ng-click="vm.authorize()">Facebook</a>
+                    </div>
+                    <div class="twitter" flex>
+                        <a href="#" target="_blank" ng-click="vm.authorize()">Twitter</a>
+                    </div>
+                    <div class="gplus" flex>
+                        <a href="#" target="_blank" ng-click="vm.authorize()">Google+</a>
+                    </div>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+</md-content>
+
+<div class="loading" ng-show="vm.progress">
+    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+</div>
+

@@ -23,7 +23,7 @@
                                 this.page.url = $location.absUrl();
                             }
                         });
-                    }, 0, false);
+                    }, 1000, false);
                 });
             }
         }

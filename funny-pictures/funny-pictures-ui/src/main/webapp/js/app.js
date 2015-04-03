@@ -1,6 +1,6 @@
 !function() {
     "use strict";
-    angular.module("app", [ "app.core", "app.contact", "app.funnies", "app.pictures", "app.header" ]);
+    angular.module("app", [ "app.core", "app.contact", "app.funnies", "app.pictures", "app.header", "app.footer", "app.authorize" ]);
 }(), function() {
     "use strict";
     angular.module("app.core", [ "ngResource", "ngRoute", "ngMaterial", "ngClipboard", "pascalprecht.translate", "wu.masonry", "ui.bootstrap", "blocks.exception", "blocks.logger" ]);
@@ -30,6 +30,10 @@
         }).when("/contact", {
             templateUrl: "html/contact.html",
             controller: "ContactController",
+            controllerAs: "vm"
+        }).when("/authorize", {
+            templateUrl: "html/authorize.html",
+            controller: "AuthorizeController",
             controllerAs: "vm"
         }).otherwise({
             redirectTo: "/home"
@@ -150,15 +154,6 @@
     angular.module("app").directive("fileModel", fileModel), fileModel.$inject = [ "$parse" ];
 }(), function() {
     "use strict";
-    function footer() {
-        return {
-            restrict: "E",
-            templateUrl: "html/directives/footer.html"
-        };
-    }
-    angular.module("app").directive("footer", footer);
-}(), function() {
-    "use strict";
     function reloadDisqus($timeout, $location) {
         return {
             link: function($scope, element, attrs) {
@@ -170,7 +165,7 @@
                                 this.page.identifier = attrs.reloadDisqus, this.page.url = $location.absUrl();
                             }
                         });
-                    }, 0, !1);
+                    }, 1e3, !1);
                 });
             }
         };
@@ -190,27 +185,45 @@
     angular.module("app.header").directive("header", header);
 }(), function() {
     "use strict";
-    function HeaderController($location, $mdSidenav, $translate) {
+    function HeaderController($location, $mdSidenav) {
         function isActive(viewLocation) {
             return viewLocation === $location.path();
         }
+        function toggleMenu() {
+            $mdSidenav("left").toggle();
+        }
+        var vm = this;
+        vm.isActive = isActive, vm.toggleMenu = toggleMenu;
+    }
+    angular.module("app.header").controller("HeaderController", HeaderController), HeaderController.$inject = [ "$location", "$mdSidenav" ];
+}(), function() {
+    "use strict";
+    angular.module("app.footer", [ "app.core" ]);
+}(), function() {
+    "use strict";
+    function footer() {
+        return {
+            restrict: "E",
+            templateUrl: "html/directives/footer.html"
+        };
+    }
+    angular.module("app.footer").directive("footer", footer);
+}(), function() {
+    "use strict";
+    function FooterController($translate) {
         function changeLanguage(langKey) {
             $translate.use(langKey);
         }
         function getCurrentLanguage() {
             return $translate.use();
         }
-        function toggleMenu() {
-            $mdSidenav("left").toggle();
-        }
         var vm = this;
-        vm.isActive = isActive, vm.changeLanguage = changeLanguage, vm.getCurrentLanguage = getCurrentLanguage, 
-        vm.toggleMenu = toggleMenu;
+        vm.changeLanguage = changeLanguage, vm.getCurrentLanguage = getCurrentLanguage;
     }
-    angular.module("app.header").controller("HeaderController", HeaderController), HeaderController.$inject = [ "$location", "$mdSidenav", "$translate" ];
+    angular.module("app.footer").controller("FooterController", FooterController), FooterController.$inject = [ "$translate" ];
 }(), function() {
     "use strict";
-    angular.module("app.funnies", [ "app.core" ]);
+    angular.module("app.funnies", [ "app.core", "app.tags" ]);
 }(), function() {
     "use strict";
     function FunniesFactory($resource, constants) {
@@ -283,12 +296,16 @@
     FunniesController.$inject = [ "$exceptionHandler", "values", "FunnyThumbnailsFactory" ];
 }(), function() {
     "use strict";
-    function CreateFunnyController($scope, $window, $routeParams, $location, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory) {
+    function CreateFunnyController($scope, $window, $routeParams, $location, $exceptionHandler, logger, values, PicturesFactory, FunniesFactory, FunnyThumbnailsByPictureFactory, TagsFactory) {
         function activate() {
             PicturesFactory.get({
                 id: $routeParams.pictureId
             }, function(picture) {
                 vm.picture = picture, pageChanged();
+            }, function(e) {
+                $exceptionHandler(e);
+            }), TagsFactory.query({}, function(data) {
+                vm.tags = data;
             }, function(e) {
                 $exceptionHandler(e);
             });
@@ -309,9 +326,18 @@
             vm.progress = !0;
             var postObject = new Object();
             postObject.name = vm.picture.name, postObject.header = vm.headerText, postObject.footer = vm.footerText, 
-            postObject.template = {}, postObject.template.id = vm.picture.id, FunniesFactory.save(postObject, function(data) {
+            postObject.template = {}, postObject.template.id = vm.picture.id, postObject.tags = vm.tags, 
+            FunniesFactory.save(postObject, function(data) {
                 vm.funnyPicture = data, vm.progress = !1, vm.loaded = !0, vm.currentFunnyLocation = currentUrl + vm.funnyPicture.id, 
                 pageChanged();
+            }, function(e) {
+                vm.progress = !1, $exceptionHandler(e);
+            });
+        }
+        function createTag() {
+            var postObject = new Object();
+            postObject.name = vm.tag, TagsFactory.save(postObject, function(data) {
+                vm.tags = data;
             }, function(e) {
                 $exceptionHandler(e);
             });
@@ -342,15 +368,16 @@
             logger.info("Link is copied to clipboard");
         }
         var vm = this, currentUrl = $location.absUrl().split("#")[0] + "#/preview/";
-        vm.picture = {}, vm.headerText = "", vm.footerText = "", vm.funnyPicture = {}, vm.funniesByTemplate = {}, 
-        vm.totalItems = 0, vm.currentPage = 1, vm.itemsPerPage = 6, vm.progress = !1, vm.loaded = !1, 
-        vm.currentFunnyLocation = currentUrl, vm.pageChanged = pageChanged, vm.showPagination = showPagination, 
-        vm.createFunnyPicture = createFunnyPicture, vm.createNew = createNew, vm.cancel = cancel, 
-        vm.isButtonDisabled = isButtonDisabled, vm.shareSocial = shareSocial, vm.clipCopyMessage = clipCopyMessage, 
+        vm.picture = {}, vm.headerText = "", vm.footerText = "", vm.funnyPicture = {}, vm.tags = [ "funny", "meme", "lol" ], 
+        vm.tag = "", vm.funniesByTemplate = {}, vm.totalItems = 0, vm.currentPage = 1, vm.itemsPerPage = 6, 
+        vm.progress = !1, vm.loaded = !1, vm.currentFunnyLocation = currentUrl, vm.pageChanged = pageChanged, 
+        vm.showPagination = showPagination, vm.createFunnyPicture = createFunnyPicture, 
+        vm.createNew = createNew, vm.cancel = cancel, vm.isButtonDisabled = isButtonDisabled, 
+        vm.shareSocial = shareSocial, vm.clipCopyMessage = clipCopyMessage, vm.createTag = createTag, 
         activate();
     }
     angular.module("app.funnies").controller("CreateFunnyController", CreateFunnyController), 
-    CreateFunnyController.$inject = [ "$scope", "$window", "$routeParams", "$location", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPictureFactory" ];
+    CreateFunnyController.$inject = [ "$scope", "$window", "$routeParams", "$location", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPictureFactory", "TagsFactory" ];
 }(), function() {
     "use strict";
     function PreviewFunnyController($scope, $window, $location, $routeParams, logger, $exceptionHandler, values, FunniesFactory, FunnyThumbnailByFunnyPictureFactory, FunnyThumbnailsByPictureFactory) {
@@ -521,6 +548,37 @@
     CreatePictureController.$inject = [ "$location", "$exceptionHandler", "logger", "FileUploadService", "PicturesFactory" ];
 }(), function() {
     "use strict";
+    angular.module("app.tags", [ "app.core" ]);
+}(), function() {
+    "use strict";
+    function TagsFactory($resource, constants) {
+        return $resource(constants.apiUrl + "/tags/:id", {}, {
+            query: {
+                method: "GET",
+                isArray: !0
+            }
+        });
+    }
+    angular.module("app.tags").factory("TagsFactory", TagsFactory), TagsFactory.$inject = [ "$resource", "constants" ];
+}(), function() {
+    "use strict";
+    angular.module("app.authorize", [ "app.core" ]);
+}(), function() {
+    "use strict";
+    function AuthorizeController() {
+        function authorize() {
+            vm.progress = !0;
+        }
+        function isButtonDisabled() {
+            return !vm.authorizeForm.$valid;
+        }
+        var vm = this;
+        vm.username = "", vm.password = "", vm.authorize = authorize, vm.isButtonDisabled = isButtonDisabled;
+    }
+    angular.module("app.authorize").controller("AuthorizeController", AuthorizeController), 
+    AuthorizeController.$inject = [ "$resource", "$exceptionHandler", "logger" ];
+}(), function() {
+    "use strict";
     angular.module("app.contact", [ "app.core" ]);
 }(), function() {
     "use strict";
@@ -589,7 +647,14 @@
             NEXT_LABEL: "Next",
             LINK_TO_IMAGE: "Direct link to image",
             LINK_TO_PREVIEW: "Link to preview",
-            COPY_LABEL: "Copy"
+            COPY_LABEL: "Copy",
+            TAGS_LABEL: "Tags",
+            AUTHORIZE_HEADER: "Login",
+            USERNAME_LABEL: "Username",
+            PASSWORD_LABEL: "Password",
+            AUTHORIZE_BUTTON_HEADER: "Sign in",
+            ENGLISH_LABEL: "English",
+            UKRAINIAN_LABEL: "Українська"
         }), $translateProvider.translations("uk", {
             CONTACT_HEADER: "Зв'яжіться з нами",
             NAME_LABEL: "Ім'я",
@@ -624,7 +689,14 @@
             NEXT_LABEL: "Наступна",
             LINK_TO_IMAGE: "Пряме посилання на картинку",
             LINK_TO_PREVIEW: "Посилання на попередній перегляд",
-            COPY_LABEL: "Копіювати"
+            COPY_LABEL: "Копіювати",
+            TAGS_LABEL: "Теги",
+            AUTHORIZE_HEADER: "Авторизація",
+            USERNAME_LABEL: "Ім’я користувача",
+            PASSWORD_LABEL: "Пароль",
+            AUTHORIZE_BUTTON_HEADER: "Авторизуватися",
+            ENGLISH_LABEL: "English",
+            UKRAINIAN_LABEL: "Українська"
         }), $translateProvider.determinePreferredLanguage(), $translateProvider.fallbackLanguage("en_US");
     }
     angular.module("app").config(translation), translation.$inject = [ "$translateProvider" ];

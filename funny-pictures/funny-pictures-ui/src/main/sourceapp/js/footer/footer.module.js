@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    angular.module('app.funnies', [
+    angular.module('app.footer', [
         'app.core'
     ]);
 

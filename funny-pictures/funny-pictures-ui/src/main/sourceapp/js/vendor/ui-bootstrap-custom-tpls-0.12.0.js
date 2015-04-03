@@ -227,16 +227,16 @@ angular.module('ui.bootstrap.pagination', [])
 angular.module("template/pagination/pager.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/pagination/pager.html",
     "<div class=\"pager\">" +
-    "<md-button ng-disabled=\"noPrevious()\" ng-click=\"selectPage(1)\" class=\"md-primary\" translate=\"PREVIOUS_LABEL\"></md-button>" +
-    "<md-button ng-disabled=\"noNext()\" ng-click=\"selectPage(page + 1)\" class=\"md-primary\" translate=\"NEXT_LABEL\"></md-button>" +
+    "<md-button ng-disabled=\"noPrevious()\" ng-click=\"selectPage(1)\" class=\"md-primary\">{{PREVIOUS_LABEL|translate}}</md-button>" +
+    "<md-button ng-disabled=\"noNext()\" ng-click=\"selectPage(page + 1)\" class=\"md-primary\">{{NEXT_LABEL|translate}}</md-button>" +
     "</div>");
 }]);
 
 angular.module("template/pagination/pagination.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/pagination/pagination.html",
     "<div class=\"pagination\">" +
-    "<md-button ng-disabled=\"noPrevious()\" ng-click=\"selectPage(page - 1)\" class=\"md-primary\" translate=\"PREVIOUS_LABEL\"></md-button>" +
+    "<md-button ng-disabled=\"noPrevious()\" ng-click=\"selectPage(page - 1)\" class=\"md-primary\">{{PREVIOUS_LABEL|translate}}</md-button>" +
     "<md-button ng-repeat=\"page in pages track by $index\" ng-disabled=\"page.active\" ng-click=\"selectPage(page.number)\" class=\"md-primary\">{{page.text}}</md-button>" +
-    "<md-button ng-disabled=\"noNext()\" ng-click=\"selectPage(page + 1)\" class=\"md-primary\" translate=\"NEXT_LABEL\"></md-button>" +
+    "<md-button ng-disabled=\"noNext()\" ng-click=\"selectPage(page + 1)\" class=\"md-primary\">{{NEXT_LABEL|translate}}</md-button>" +
     "</div>");
 }]);

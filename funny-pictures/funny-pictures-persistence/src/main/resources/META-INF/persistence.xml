@@ -2,13 +2,14 @@
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 <persistence-unit name="persistenceUnit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        
+
         <class>com.optigra.funnypictures.model.Picture</class>
         <class>com.optigra.funnypictures.model.FunnyPicture</class>
         <class>com.optigra.funnypictures.model.feedback.Feedback</class>
         <class>com.optigra.funnypictures.model.thumbnail.PictureThumbnail</class>
         <class>com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail</class>
         <class>com.optigra.funnypictures.model.comment.FunnyPictureComment</class>
+        <class>com.optigra.funnypictures.model.tag.Tag</class>
         <class>com.optigra.funnypictures.view.thumbnail.RandomPictureThumbnailView</class>
         
         <properties>
@@ -18,6 +19,7 @@
             <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>
             <property name="hibernate.connection.charSet" value="UTF-8"/>
             <property name="hibernate.show_sql" value="true"/>
+
         </properties>
     </persistence-unit>
 </persistence>

@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app')
+        .module('app.footer')
         .directive('footer', footer);
 
     function footer() {

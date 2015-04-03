@@ -45,7 +45,14 @@
             NEXT_LABEL: "Next",
             LINK_TO_IMAGE: "Direct link to image",
             LINK_TO_PREVIEW: "Link to preview",
-            COPY_LABEL: "Copy"
+            COPY_LABEL: "Copy",
+            TAGS_LABEL: "Tags",
+            AUTHORIZE_HEADER: "Login",
+            USERNAME_LABEL: "Username",
+            PASSWORD_LABEL: "Password",
+            AUTHORIZE_BUTTON_HEADER: "Sign in",
+            ENGLISH_LABEL: "English",
+            UKRAINIAN_LABEL: "Українська"
         });
 
         $translateProvider.translations('uk', {
@@ -82,7 +89,14 @@
             NEXT_LABEL: "Наступна",
             LINK_TO_IMAGE: "Пряме посилання на картинку",
             LINK_TO_PREVIEW: "Посилання на попередній перегляд",
-            COPY_LABEL: "Копіювати"
+            COPY_LABEL: "Копіювати",
+            TAGS_LABEL: "Теги",
+            AUTHORIZE_HEADER: "Авторизація",
+            USERNAME_LABEL: "Ім’я користувача",
+            PASSWORD_LABEL: "Пароль",
+            AUTHORIZE_BUTTON_HEADER: "Авторизуватися",
+            ENGLISH_LABEL: "English",
+            UKRAINIAN_LABEL: "Українська"
         });
 
         $translateProvider.determinePreferredLanguage();

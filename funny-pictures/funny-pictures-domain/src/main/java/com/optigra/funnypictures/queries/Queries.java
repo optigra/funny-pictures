@@ -42,6 +42,9 @@ public class Queries {
 	private static final String FIND_FUNNY_PICTURE_THUMBNAIL_BY_FUNNY_PICTURE_QUERY_NAME = "FunnyPictureThumbnails.findThumbnailsByPicture";
 	private static final String FIND_FUNNY_PICTURE_THUMBNAIL_BY_FUNNY_PICTURE_QUERY = "SELECT t FROM FunnyPictureThumbnail t "
 			+ "WHERE t.funnyPicture.id = :funnyPictureId AND t.thumbnailType = :type";
+
+	private static final String GET_TAGS_QUERY_NAME = "Tag.getTags";
+	private static final String GET_TAGS_QUERY = "SELECT t FROM Tag t ORDER BY t.name DESC";
 	
 	
 	public static final Queries FIND_PICTURES = new Queries(FIND_PICTURES_QUERY_NAME, FIND_PICTURES_QUERY);
@@ -56,6 +59,7 @@ public class Queries {
 			FIND_FUNNY_PICTURE_THUMBNAIL_BY_FUNNY_PICTURE_QUERY);
 	public static final Queries GET_RANDOM_PICTURE_THUMBNAILS = new Queries(GET_RANDOM_PICTURE_THUMBNAILS_QUERY_NAME, GET_RANDOM_PICTURE_THUMBNAILS_QUERY);
 	public static final Queries GET_USER_BY_EMAIL = new Queries(GET_USER_BY_EMAIL_QUERY_NAME, GET_USER_BY_EMAIL_QUERY);
+	public static final Queries GET_TAGS = new Queries(GET_TAGS_QUERY_NAME, GET_TAGS_QUERY);
 	
 	
 

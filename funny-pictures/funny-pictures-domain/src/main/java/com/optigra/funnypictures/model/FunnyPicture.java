@@ -1,7 +1,7 @@
 package com.optigra.funnypictures.model;
 
-import java.io.Serializable;
-import java.util.List;
+import com.optigra.funnypictures.model.tag.Tag;
+import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,11 +10,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Entity, that describes generated picture with text.
@@ -49,6 +51,13 @@ public class FunnyPicture implements Serializable {
 	
 	@OneToMany(mappedBy = "funnyPicture", cascade = CascadeType.ALL)
 	private List<FunnyPictureThumbnail> thumbnails;
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "funny_picture_tag",
+			joinColumns = @JoinColumn(name = "funny_picture_id"),
+			inverseJoinColumns = @JoinColumn(name = "tag_id")
+	)
+	private List<Tag> tags;
 	
 	public Long getId() {
 		return id;
@@ -106,66 +115,61 @@ public class FunnyPicture implements Serializable {
 		this.thumbnails = thumbnails;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((footer == null) ? 0 : footer.hashCode());
-		result = prime * result + ((header == null) ? 0 : header.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((url == null) ? 0 : url.hashCode());
-		return result;
+	public List<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(final List<Tag> tags) {
+		this.tags = tags;
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
+	public boolean equals(final Object o) {
+		if (this == o) {
 			return true;
 		}
-		if (obj == null) {
+		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+
+		FunnyPicture that = (FunnyPicture) o;
+
+		if (id != null ? !id.equals(that.id) : that.id != null) {
 			return false;
 		}
-		FunnyPicture other = (FunnyPicture) obj;
-		if (footer == null) {
-			if (other.footer != null) {
-				return false;
-			}
-		} else if (!footer.equals(other.footer)) {
+		if (name != null ? !name.equals(that.name) : that.name != null) {
 			return false;
 		}
-		if (header == null) {
-			if (other.header != null) {
-				return false;
-			}
-		} else if (!header.equals(other.header)) {
+		if (url != null ? !url.equals(that.url) : that.url != null) {
 			return false;
 		}
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
+		if (header != null ? !header.equals(that.header) : that.header != null) {
 			return false;
 		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
+		if (footer != null ? !footer.equals(that.footer) : that.footer != null) {
 			return false;
 		}
-		if (url == null) {
-			if (other.url != null) {
-				return false;
-			}
-		} else if (!url.equals(other.url)) {
+		if (picture != null ? !picture.equals(that.picture) : that.picture != null) {
 			return false;
 		}
-		return true;
+		if (thumbnails != null ? !thumbnails.equals(that.thumbnails) : that.thumbnails != null) {
+			return false;
+		}
+		return !(tags != null ? !tags.equals(that.tags) : that.tags != null);
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = id != null ? id.hashCode() : 0;
+		result = 31 * result + (name != null ? name.hashCode() : 0);
+		result = 31 * result + (url != null ? url.hashCode() : 0);
+		result = 31 * result + (header != null ? header.hashCode() : 0);
+		result = 31 * result + (footer != null ? footer.hashCode() : 0);
+		result = 31 * result + (picture != null ? picture.hashCode() : 0);
+		result = 31 * result + (thumbnails != null ? thumbnails.hashCode() : 0);
+		result = 31 * result + (tags != null ? tags.hashCode() : 0);
+		return result;
 	}
 
 	@Override

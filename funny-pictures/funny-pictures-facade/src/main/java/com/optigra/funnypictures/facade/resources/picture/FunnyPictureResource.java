@@ -1,10 +1,11 @@
 package com.optigra.funnypictures.facade.resources.picture;
 
+import com.optigra.funnypictures.facade.resources.ApiResource;
+import com.optigra.funnypictures.facade.resources.tag.TagResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
+
 import java.text.MessageFormat;
 import java.util.List;
-
-import com.optigra.funnypictures.facade.resources.ApiResource;
-import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
 
 /**
  * Model for funny picture with PictureResource, header and footer texts.
@@ -24,9 +25,11 @@ public class FunnyPictureResource extends ApiResource {
 
 	private PictureResource template;
 
-	private List<FunnyPictureThumbnailResource> thumbnails;	
-	
-	@Override
+	private List<FunnyPictureThumbnailResource> thumbnails;
+
+    private List<TagResource> tags;
+
+    @Override
 	public String getUri() {
 		return MessageFormat.format("/funnies/{0}", getId());
 	}
@@ -79,83 +82,72 @@ public class FunnyPictureResource extends ApiResource {
 		this.thumbnails = thumbnails;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((footer == null) ? 0 : footer.hashCode());
-		result = prime * result + ((header == null) ? 0 : header.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((template == null) ? 0 : template.hashCode());
-		result = prime * result
-				+ ((thumbnails == null) ? 0 : thumbnails.hashCode());
-		result = prime * result + ((url == null) ? 0 : url.hashCode());
-		return result;
-	}
+    public List<TagResource> getTags() {
+        return tags;
+    }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		FunnyPictureResource other = (FunnyPictureResource) obj;
-		if (footer == null) {
-			if (other.footer != null) {
-				return false;
-			}
-		} else if (!footer.equals(other.footer)) {
-			return false;
-		}
-		if (header == null) {
-			if (other.header != null) {
-				return false;
-			}
-		} else if (!header.equals(other.header)) {
-			return false;
-		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		if (template == null) {
-			if (other.template != null) {
-				return false;
-			}
-		} else if (!template.equals(other.template)) {
-			return false;
-		}
-		if (thumbnails == null) {
-			if (other.thumbnails != null) {
-				return false;
-			}
-		} else if (!thumbnails.equals(other.thumbnails)) {
-			return false;
-		}
-		if (url == null) {
-			if (other.url != null) {
-				return false;
-			}
-		} else if (!url.equals(other.url)) {
-			return false;
-		}
-		return true;
-	}
+    public void setTags(final List<TagResource> tags) {
+        this.tags = tags;
+    }
 
-	@Override
-	public String toString() {
-		return "FunnyPictureResource [url=" + url + ", name="
-				+ name + ", header=" + header + ", footer=" + footer
-				+ ", template=" + template + ", thumbnails=" + thumbnails + "]";
-	}
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
+        FunnyPictureResource that = (FunnyPictureResource) o;
+
+        if (footer != null ? !footer.equals(that.footer) : that.footer != null) {
+            return false;
+        }
+        if (header != null ? !header.equals(that.header) : that.header != null) {
+            return false;
+        }
+        if (name != null ? !name.equals(that.name) : that.name != null) {
+            return false;
+        }
+        if (tags != null ? !tags.equals(that.tags) : that.tags != null) {
+            return false;
+        }
+        if (template != null ? !template.equals(that.template) : that.template != null) {
+            return false;
+        }
+        if (thumbnails != null ? !thumbnails.equals(that.thumbnails) : that.thumbnails != null) {
+            return false;
+        }
+        if (url != null ? !url.equals(that.url) : that.url != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = url != null ? url.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (header != null ? header.hashCode() : 0);
+        result = 31 * result + (footer != null ? footer.hashCode() : 0);
+        result = 31 * result + (template != null ? template.hashCode() : 0);
+        result = 31 * result + (thumbnails != null ? thumbnails.hashCode() : 0);
+        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FunnyPictureResource{"
+                + "url='" + url + '\''
+                + ", name='" + name + '\''
+                + ", header='" + header + '\''
+                + ", footer='" + footer + '\''
+                + ", template=" + template
+                + ", thumbnails=" + thumbnails
+                + ", tags=" + tags
+                + "} " + super.toString();
+    }
 }

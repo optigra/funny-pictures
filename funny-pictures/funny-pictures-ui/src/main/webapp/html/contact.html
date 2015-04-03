@@ -22,7 +22,7 @@
                     <textarea ng-model="vm.feedback.text" columns="1" rows="4" name="message" required></textarea>
                 </md-input-container>
                 <div layout="row" layout-align="end center">
-                    <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.sendFeedback()" ng-disabled="vm.isButtonDisabled()" translate="SEND_MESSAGE_BUTTON"></md-button>
+                    <md-button type="submit" class="md-raised md-primary md-button md-default-theme" ng-click="vm.sendFeedback()" ng-disabled="vm.isButtonDisabled()">{{'SEND_MESSAGE_BUTTON'|translate}}</md-button>
                 </div>
             </form>
         </md-card-content>
