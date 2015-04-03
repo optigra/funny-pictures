@@ -57,7 +57,7 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 			op.addImage();
 
 			Object[] args = new String[] {templateInput.toString(), result.toString()};
-			LOG.debug("Running command [%1%s] with arguments %2$s ", op.toString(), args);
+			LOG.debug("Running command [{}] with arguments {} ", op.toString(), args);
 
 			convertCommand.run(op, args);
 			
@@ -99,7 +99,7 @@ public class BaseThumbnailGenerator implements ThumbnailGenerator {
 		if (bytesCopied == 0) {
 			LOG.warn("The input stream was empty");
 		}
-		LOG.debug("Created a temporary file: %1$s Size: %2$d bytes ", result.toAbsolutePath().toString(), bytesCopied);
+		LOG.debug("Created a temporary file: {} Size: {} bytes ", result.toAbsolutePath().toString(), bytesCopied);
 		
 		return result;
 	}
