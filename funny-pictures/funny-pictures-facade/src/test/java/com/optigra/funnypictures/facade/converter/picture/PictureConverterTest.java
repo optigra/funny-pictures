@@ -1,11 +1,10 @@
-package com.optigra.funnypictures.facade.picture;
+package com.optigra.funnypictures.facade.converter.picture;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import com.optigra.funnypictures.facade.converter.Converter;
+import com.optigra.funnypictures.facade.resources.picture.PictureResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.PictureThumbnailResource;
+import com.optigra.funnypictures.model.Picture;
+import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,12 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.optigra.funnypictures.facade.converter.Converter;
-import com.optigra.funnypictures.facade.converter.picture.PictureConverter;
-import com.optigra.funnypictures.facade.resources.picture.PictureResource;
-import com.optigra.funnypictures.facade.resources.thumbnail.PictureThumbnailResource;
-import com.optigra.funnypictures.model.Picture;
-import com.optigra.funnypictures.model.thumbnail.PictureThumbnail;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PictureConverterTest {

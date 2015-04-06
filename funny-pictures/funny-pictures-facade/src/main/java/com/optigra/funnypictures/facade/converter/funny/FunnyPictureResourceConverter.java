@@ -5,9 +5,11 @@ import com.optigra.funnypictures.facade.converter.Converter;
 import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.facade.resources.tag.TagResource;
+import com.optigra.funnypictures.facade.resources.thumbnail.funny.FunnyPictureThumbnailResource;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.tag.Tag;
+import com.optigra.funnypictures.model.thumbnail.FunnyPictureThumbnail;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -24,6 +26,9 @@ public class FunnyPictureResourceConverter extends AbstractConverter<FunnyPictur
     @Resource(name = "tagResourceConverter")
     private Converter<TagResource, Tag> tagResourceConverter;
 
+    @Resource(name = "funnyPictureThumbnailResourceConverter")
+    private Converter<FunnyPictureThumbnailResource, FunnyPictureThumbnail> funnyPictureThumbnailResourceConverter;
+
     @Override
     public FunnyPicture convert(final FunnyPictureResource source, final FunnyPicture target) {
         target.setId(source.getId());
@@ -32,6 +37,7 @@ public class FunnyPictureResourceConverter extends AbstractConverter<FunnyPictur
         target.setHeader(source.getHeader());
         target.setFooter(source.getFooter());
         target.setPicture(pictureResourceConverter.convert(source.getTemplate()));
+        target.setThumbnails(funnyPictureThumbnailResourceConverter.convertAll(source.getThumbnails()));
         target.setTags(tagResourceConverter.convertAll(source.getTags()));
 
         return target;

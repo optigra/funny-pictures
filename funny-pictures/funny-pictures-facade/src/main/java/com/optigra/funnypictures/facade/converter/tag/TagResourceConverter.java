@@ -5,9 +5,6 @@ import com.optigra.funnypictures.facade.resources.tag.TagResource;
 import com.optigra.funnypictures.model.tag.Tag;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by oleh on 10.03.15.
  */
@@ -27,18 +24,4 @@ public class TagResourceConverter extends AbstractConverter<TagResource, Tag> {
         return convert(source, new Tag());
     }
 
-    @Override
-    public List<Tag> convertAll(final List<TagResource> source, final List<Tag> target) {
-        if (source != null) {
-            for (TagResource tagResource : source) {
-                target.add(convert(tagResource));
-            }
-        }
-        return target;
-    }
-
-    @Override
-    public List<Tag> convertAll(final List<TagResource> source) {
-        return convertAll(source, new ArrayList<>());
-    }
 }
