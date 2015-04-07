@@ -32,6 +32,14 @@ public class Tag extends Model {
         this.name = name;
     }
 
+    public List<FunnyPicture> getFunnyPictures() {
+        return funnyPictures;
+    }
+
+    public void setFunnyPictures(List<FunnyPicture> funnyPictures) {
+        this.funnyPictures = funnyPictures;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {

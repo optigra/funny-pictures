@@ -37,7 +37,6 @@ public class FunnyPictureResourceConverter extends AbstractConverter<FunnyPictur
         target.setHeader(source.getHeader());
         target.setFooter(source.getFooter());
         target.setPicture(pictureResourceConverter.convert(source.getTemplate()));
-        target.setThumbnails(funnyPictureThumbnailResourceConverter.convertAll(source.getThumbnails()));
         target.setTags(tagResourceConverter.convertAll(source.getTags()));
 
         return target;

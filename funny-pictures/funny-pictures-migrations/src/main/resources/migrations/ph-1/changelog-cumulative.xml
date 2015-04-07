@@ -295,4 +295,15 @@
 			</column>
 		</createTable>
 	</changeSet>
+
+	<changeSet id="updateFunnyPictureTagTable" author="Oleh Zasadnyy">
+		<dropColumn catalogName="optigra-funnypictures"
+				   schemaName="public"
+				   tableName="funny_picture_tag"
+				   columnName="update_date"/>
+		<dropColumn catalogName="optigra-funnypictures"
+					schemaName="public"
+					tableName="funny_picture_tag"
+					columnName="create_date"/>
+	</changeSet>
 </databaseChangeLog>

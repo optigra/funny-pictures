@@ -28,8 +28,8 @@
         vm.headerText = '';
         vm.footerText = '';
         vm.funnyPicture = {};
-        vm.tags = ['funny', 'meme', 'lol'];
-        vm.tag = '';
+        //vm.tags = [];
+        //vm.availableTags = '';
         vm.funniesByTemplate = {};
         vm.totalItems = 0;
         vm.currentPage = 1;
@@ -60,11 +60,11 @@
                 $exceptionHandler(e);
             });
 
-            TagsFactory.query({}, function (data) {
-                vm.tags = data;
-            }, function (e) {
-                $exceptionHandler(e);
-            });
+            //TagsFactory.query({}, function (data) {
+            //    vm.availableTags = data;
+            //}, function (e) {
+            //    $exceptionHandler(e);
+            //});
         }
 
         function pageChanged() {
@@ -90,7 +90,7 @@
             postObject.footer = vm.footerText;
             postObject.template = {};
             postObject.template.id = vm.picture.id;
-            postObject.tags = vm.tags;
+            //postObject.tags = [{'name':'funny'}, {'name':'meme'}, {'name':'lol'}];
             FunniesFactory.save(postObject,
                 function (data) {
                     vm.funnyPicture = data;

@@ -11617,6 +11617,9 @@ function(window, angular, undefined) {
         function shouldAttachAttr(attr, normalizedAttr, elem) {
             return $aria.config(normalizedAttr) && !elem.attr(attr);
         }
+        function shouldAttachRole(role, elem) {
+            return !elem.attr("role") && elem.attr("type") === role && "INPUT" !== elem[0].nodeName;
+        }
         function getShape(attr, elem) {
             var type = attr.type, role = attr.role;
             return "checkbox" === (type || role) || "menuitemcheckbox" === role ? "checkbox" : "radio" === (type || role) || "menuitemradio" === role ? "radio" : "range" === type || "progressbar" === role || "slider" === role ? "range" : "textbox" === (type || role) || "TEXTAREA" === elem[0].nodeName ? "multiline" : "";
@@ -11644,11 +11647,11 @@ function(window, angular, undefined) {
                 switch (shape) {
                   case "radio":
                   case "checkbox":
-                    shouldAttachAttr("aria-checked", "ariaChecked", elem) && scope.$watch(ngAriaWatchModelValue, "radio" === shape ? getRadioReaction() : ngAriaCheckboxReaction);
+                    shouldAttachRole(shape, elem) && elem.attr("role", shape), shouldAttachAttr("aria-checked", "ariaChecked", elem) && scope.$watch(ngAriaWatchModelValue, "radio" === shape ? getRadioReaction() : ngAriaCheckboxReaction);
                     break;
 
                   case "range":
-                    $aria.config("ariaValue") && (attr.min && !elem.attr("aria-valuemin") && elem.attr("aria-valuemin", attr.min), 
+                    shouldAttachRole(shape, elem) && elem.attr("role", "slider"), $aria.config("ariaValue") && (attr.min && !elem.attr("aria-valuemin") && elem.attr("aria-valuemin", attr.min), 
                     attr.max && !elem.attr("aria-valuemax") && elem.attr("aria-valuemax", attr.max), 
                     elem.attr("aria-valuenow") || scope.$watch(ngAriaWatchModelValue, function(newVal) {
                         elem.attr("aria-valuenow", newVal);
@@ -11688,8 +11691,10 @@ function(window, angular, undefined) {
                     function isNodeOneOf(elem, nodeTypeArray) {
                         return -1 !== nodeTypeArray.indexOf(elem[0].nodeName) ? !0 : void 0;
                     }
+                    var nodeBlackList = [ "BUTTON", "A", "INPUT", "TEXTAREA" ];
+                    elem.attr("role") || isNodeOneOf(elem, nodeBlackList) || elem.attr("role", "button"), 
                     $aria.config("tabindex") && !elem.attr("tabindex") && elem.attr("tabindex", 0), 
-                    $aria.config("bindKeypress") && !attr.ngKeypress && isNodeOneOf(elem, [ "DIV", "LI" ]) && elem.on("keypress", function(event) {
+                    !$aria.config("bindKeypress") || attr.ngKeypress || isNodeOneOf(elem, nodeBlackList) || elem.on("keypress", function(event) {
                         function callback() {
                             fn(scope, {
                                 $event: event

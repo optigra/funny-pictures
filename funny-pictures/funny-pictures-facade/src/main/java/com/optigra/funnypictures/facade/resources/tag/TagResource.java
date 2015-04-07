@@ -13,7 +13,7 @@ public class TagResource extends ApiResource {
 
     @Override
     public String getUri() {
-        return MessageFormat.format("/pictures/thumbnails/{0}", getId());
+        return MessageFormat.format("/tags/{0}", getId());
     }
 
     public String getName() {
