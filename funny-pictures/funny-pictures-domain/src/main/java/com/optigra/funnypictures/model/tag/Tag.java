@@ -36,7 +36,7 @@ public class Tag extends Model {
         return funnyPictures;
     }
 
-    public void setFunnyPictures(List<FunnyPicture> funnyPictures) {
+    public void setFunnyPictures(final List<FunnyPicture> funnyPictures) {
         this.funnyPictures = funnyPictures;
     }
 

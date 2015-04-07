@@ -11,7 +11,11 @@ import com.optigra.funnypictures.facade.resources.picture.FunnyPictureResource;
 import com.optigra.funnypictures.facade.resources.picture.PictureResource;
 import com.optigra.funnypictures.facade.resources.search.PagedRequest;
 import com.optigra.funnypictures.facade.resources.search.PagedResultResource;
-import com.optigra.funnypictures.generator.api.*;
+import com.optigra.funnypictures.generator.api.AdviceMemeContext;
+import com.optigra.funnypictures.generator.api.AdviceMemeGenerator;
+import com.optigra.funnypictures.generator.api.ImageHandle;
+import com.optigra.funnypictures.generator.api.ImageLabellingContext;
+import com.optigra.funnypictures.generator.api.LabelledImageGenerator;
 import com.optigra.funnypictures.model.FunnyPicture;
 import com.optigra.funnypictures.model.Picture;
 import com.optigra.funnypictures.model.tag.Tag;
@@ -232,9 +236,11 @@ public class DefaultFunnyPictureFacade implements FunnyPictureFacade {
 		FunnyPicture funnyPicture = funnyPictureResourceConverter.convert(funnyPictureResource);
 		funnyPicture.setPicture(template);
 		funnyPicture.setUrl(content.getPath());
-		for(Tag tag : funnyPicture.getTags()) {
-			tag.setCreateDate(new Date());
-			tag.setUpdateDate(new Date());
+		if (funnyPicture.getTags() != null) {
+			for (Tag tag : funnyPicture.getTags()) {
+				tag.setCreateDate(new Date());
+				tag.setUpdateDate(new Date());
+			}
 		}
 
 		return funnyPictureService.createFunnyPicture(funnyPicture);

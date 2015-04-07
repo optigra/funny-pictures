@@ -304,10 +304,6 @@
                 vm.picture = picture, pageChanged();
             }, function(e) {
                 $exceptionHandler(e);
-            }), TagsFactory.query({}, function(data) {
-                vm.availableTags = data;
-            }, function(e) {
-                $exceptionHandler(e);
             });
         }
         function pageChanged() {
@@ -326,13 +322,7 @@
             vm.progress = !0;
             var postObject = new Object();
             postObject.name = vm.picture.name, postObject.header = vm.headerText, postObject.footer = vm.footerText, 
-            postObject.template = {}, postObject.template.id = vm.picture.id, postObject.tags = [ {
-                name: "funny"
-            }, {
-                name: "meme"
-            }, {
-                name: "lol"
-            } ], FunniesFactory.save(postObject, function(data) {
+            postObject.template = {}, postObject.template.id = vm.picture.id, FunniesFactory.save(postObject, function(data) {
                 vm.funnyPicture = data, vm.progress = !1, vm.loaded = !0, vm.currentFunnyLocation = currentUrl + vm.funnyPicture.id, 
                 pageChanged();
             }, function(e) {
@@ -373,13 +363,12 @@
             logger.info("Link is copied to clipboard");
         }
         var vm = this, currentUrl = $location.absUrl().split("#")[0] + "#/preview/";
-        vm.picture = {}, vm.headerText = "", vm.footerText = "", vm.funnyPicture = {}, vm.tags = [], 
-        vm.availableTags = "", vm.funniesByTemplate = {}, vm.totalItems = 0, vm.currentPage = 1, 
-        vm.itemsPerPage = 6, vm.progress = !1, vm.loaded = !1, vm.currentFunnyLocation = currentUrl, 
-        vm.pageChanged = pageChanged, vm.showPagination = showPagination, vm.createFunnyPicture = createFunnyPicture, 
-        vm.createNew = createNew, vm.cancel = cancel, vm.isButtonDisabled = isButtonDisabled, 
-        vm.shareSocial = shareSocial, vm.clipCopyMessage = clipCopyMessage, vm.createTag = createTag, 
-        activate();
+        vm.picture = {}, vm.headerText = "", vm.footerText = "", vm.funnyPicture = {}, vm.funniesByTemplate = {}, 
+        vm.totalItems = 0, vm.currentPage = 1, vm.itemsPerPage = 6, vm.progress = !1, vm.loaded = !1, 
+        vm.currentFunnyLocation = currentUrl, vm.pageChanged = pageChanged, vm.showPagination = showPagination, 
+        vm.createFunnyPicture = createFunnyPicture, vm.createNew = createNew, vm.cancel = cancel, 
+        vm.isButtonDisabled = isButtonDisabled, vm.shareSocial = shareSocial, vm.clipCopyMessage = clipCopyMessage, 
+        vm.createTag = createTag, activate();
     }
     angular.module("app.funnies").controller("CreateFunnyController", CreateFunnyController), 
     CreateFunnyController.$inject = [ "$scope", "$window", "$routeParams", "$location", "$exceptionHandler", "logger", "values", "PicturesFactory", "FunniesFactory", "FunnyThumbnailsByPictureFactory", "TagsFactory" ];
