@@ -1,35 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
-       default-autowire="byName">
+	default-autowire="byName">
 
-    <context:component-scan base-package="com.optigra.funnypictures.service" />
-    <context:component-scan base-package="com.optigra.funnypictures.extractor" />
+	<context:component-scan base-package="com.optigra.funnypictures.service" />
+	<context:component-scan base-package="com.optigra.funnypictures.extractor" />
 
-    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="smtp.gmail.com" />
-        <property name="port" value="587" />
-        <property name="username" value="drawmeme@optigra-soft.com" />
-        <property name="password" value="bqZ2XeXQ034i" />
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="587" />
+		<property name="username" value="drawmeme@optigra-soft.com" />
+		<property name="password" value="bqZ2XeXQ034i" />
 
-        <property name="javaMailProperties">
-            <props>
-                <prop key="mail.smtp.auth">true</prop>
-                <prop key="mail.smtp.starttls.enable">true</prop>
-            </props>
-        </property>
-    </bean>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
 
-    <bean id="repositoryMonitorService" class="com.optigra.funnypictures.service.repository.FileSystemRepositoryMonitorService">
-    	<constructor-arg value="${content.repository.path}"/>
-    </bean>
-    
-    <bean id="thumbnailRepositoryMonitorService" class="com.optigra.funnypictures.service.repository.FileSystemRepositoryMonitorService">
-    	<constructor-arg value="${content.repository.path}/thumbnail"/>
-    </bean>
+	<bean id="contentRepositoryPath" class="java.nio.file.Paths"
+		factory-method="get">
+		<constructor-arg value="file:///${content.repository.path}" />
+	</bean>
+
+	<bean id="thumbnailRepositoryPath" class="java.nio.file.Paths"
+		factory-method="get">
+		<constructor-arg value="file:///${content.repository.path}/thumbnail" />
+	</bean>
+
+	<bean id="contentFileSystem" class="java.nio.file.FileSystems"
+		factory-method="getDefault" />
+	
+	<bean id="fileSystemWatchService" factory-bean="contentFileSystem" factory-method="newWatchService" scope="prototype"/>
+
+	<bean id="contentRepositoryMonitorTask"
+		class="com.optigra.funnypictures.service.repository.monitor.DirectoryMonitorTask">
+		<constructor-arg ref="fileSystemWatchService"/>
+		<constructor-arg ref="contentRepositoryPath" />
+	</bean>
+
+	<bean id="thumbnailRepositoryMonitorTask"
+		class="com.optigra.funnypictures.service.repository.monitor.DirectoryMonitorTask">
+		<constructor-arg ref="fileSystemWatchService"/>
+		<constructor-arg ref="thumbnailRepositoryPath" />
+	</bean>
+
+	<bean id="repositoryMonitorService"
+		class="com.optigra.funnypictures.service.repository.FileSystemRepositoryMonitorService">
+		<constructor-arg ref="contentRepositoryMonitorTask" />
+		<constructor-arg ref="contentRepositoryPath" />
+	</bean>
+
+	<bean id="thumbnailRepositoryMonitorService"
+		class="com.optigra.funnypictures.service.repository.FileSystemRepositoryMonitorService">
+		<constructor-arg ref="thumbnailRepositoryMonitorTask" />
+		<constructor-arg ref="thumbnailRepositoryPath" />
+	</bean>
+	
+<bean id="directoryMonitor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+  <property name="corePoolSize" value="2" />
+  <property name="maxPoolSize" value="5" />
+  <property name="queueCapacity" value="2" />
+  <!-- <property name="awaitTerminationSeconds" value="10" /> -->
+  <!-- <property name="waitForTasksToCompleteOnShutdown" value="true" /> -->
+</bean> 
+
+<task:annotation-driven executor="directoryMonitor"/>
+
+<!-- <task:executor id="directoryMonitor" pool-size="5"/> -->
+
+
 
 </beans>

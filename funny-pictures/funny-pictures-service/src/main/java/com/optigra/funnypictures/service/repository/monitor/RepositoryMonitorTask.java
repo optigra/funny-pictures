@@ -1,13 +1,10 @@
 package com.optigra.funnypictures.service.repository.monitor;
 
 /**
- * A repository monitor. It monitors the target repository for entry creation and deletion events and fires the respective abstract methods. 
- * An implementation may not block the thread that called it. 
- * Creation and deletion of nested directories should be monitored, but their contents may be not monitored.
  * @author odisseus
  *
  */
-public interface RepositoryMonitor {
+public interface RepositoryMonitorTask extends Runnable {
 
 	/**
 	 * Adds a repository listener that will receive notifications 
@@ -24,13 +21,11 @@ public interface RepositoryMonitor {
 	void removeListener(RepositoryListener listener);
 
 	/**
-	 * Starts the monitor.
-	 */
-	void start();
-
-	/**
 	 * Stops the monitor.
 	 */
 	void stop();
+	
+	@Override
+	void run();
 
 }

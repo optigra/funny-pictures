@@ -3,7 +3,6 @@ package com.optigra.funnypictures.service.repository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,10 +14,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.optigra.funnypictures.service.repository.monitor.DirectoryMonitor;
 import com.optigra.funnypictures.service.repository.monitor.RepositoryListener;
-import com.optigra.funnypictures.service.repository.monitor.RepositoryMonitor;
 import com.optigra.funnypictures.service.repository.monitor.RepositoryMonitorException;
+import com.optigra.funnypictures.service.repository.monitor.RepositoryMonitorTask;
 
 /**
  * A service that monitors a directory the file system for file creation and deletion events.
@@ -39,7 +37,7 @@ public class FileSystemRepositoryMonitorService implements
 	
 	private final SortedSet<String> registeredFileNames = Collections.synchronizedSortedSet(new TreeSet<String>(converter.getBase62Comparator()));
 	
-	private final RepositoryMonitor repositoryMonitor;
+	private final RepositoryMonitorTask repositoryMonitor;
 	
 	private final Path repositoryLocation;
 
@@ -47,12 +45,12 @@ public class FileSystemRepositoryMonitorService implements
 	 * Creates a new FileSystemRepositoryMonitorService.
 	 * @param repositoryLocation the directory to monitor
 	 */
-	public FileSystemRepositoryMonitorService(final String repositoryLocation) {
+	public FileSystemRepositoryMonitorService(final RepositoryMonitorTask repositoryMonitor, final Path repositoryLocation) {
 		this.registeredFileNames.add(INITIAL_NAME_KEY);
-		this.repositoryLocation = Paths.get(repositoryLocation);
-		this.repositoryMonitor = new DirectoryMonitor(this.repositoryLocation);
+		this.repositoryLocation = repositoryLocation;
+		this.repositoryMonitor = repositoryMonitor;
 		repositoryMonitor.addListener(this);
-		repositoryMonitor.start();
+		repositoryMonitor.run();
 		try {
 			scanRepository();
 		} catch (IOException e) {
