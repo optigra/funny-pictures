@@ -2,7 +2,7 @@
 
 Was build on top of [Spring](https://spring.io/) and [Angular.js](https://angularjs.org/) frameworks. [ImageMagick](http://www.imagemagick.org/script/index.php)  as main image processing tool.
 
-![](http://drawmeme.com/api/content/f5ae1bc8-f3c3-4f60-a4d6-0e6de7961640.png)
+![](http://drawmeme.com/api/content/6a7863ac-5081-49f1-ba46-31ad65b87c11.png)
 
 # TODO LIST
 
