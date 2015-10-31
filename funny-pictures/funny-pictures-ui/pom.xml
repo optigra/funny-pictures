@@ -8,7 +8,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<frontend.maven.version>0.0.20</frontend.maven.version>
+		<frontend.maven.version>0.0.26</frontend.maven.version>
 		<checkstyleDir>${basedir}/../checks</checkstyleDir>
 	</properties>
 
